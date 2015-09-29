@@ -39,15 +39,13 @@ public class Main {
         while (i < student_preferences.size()){
             while (j < priority_list.size()){
                 if (student_preferences.containsKey(priority_list.get(j))){
-                    // try and match priority_list.get(j) to their first available choice
                     String name = priority_list.get(j).toString();
-                    Object preferences = student_preferences.get(name);
-                    ArrayList<String> array_preferences = (ArrayList<String>) preferences;
-
-                    for(String choice : array_preferences){
+                    @SuppressWarnings("unchecked")
+                    ArrayList<String> preferences = (ArrayList<String>) student_preferences.get(name);
+                    for(String choice : preferences){
                         if(projects_allocated.contains(choice)){
-                            if (array_preferences.get(array_preferences.size() - 1).equals(choice)){
-                                System.out.println(name + " not matched because none their choices are available");
+                            if (preferences.get(preferences.size() - 1).equals(choice)){
+                                System.out.println(name + " not matched because none of their choices are available!");
                             }
                         }else{
                             System.out.println(name + " " + choice);
@@ -55,14 +53,12 @@ public class Main {
                             break;
                         }
                     }
-
                 }else{
-                    System.out.println("Name not in student list");
+                    System.out.println("Name not in student list!");
                 }
                 j++;
             }
             i++;
         }
-
     }
 }
