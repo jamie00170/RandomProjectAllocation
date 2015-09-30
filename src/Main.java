@@ -65,6 +65,17 @@ public class Main {
         }
     }
 
+
+    public static boolean check_sizes(Map resource_Allocation){
+        Collection<Integer> sizes = resource_Allocation.values();
+        int num_of_zeros = 0;
+        for (int size : sizes){
+           if (size == 0)
+               num_of_zeros++;
+        }
+        return (num_of_zeros == sizes.size());
+    }
+
     public static void probabilisticSerialDictatorship(Map student_preferences, ArrayList project_list, ArrayList priority_list){
 
         Map<String, Integer> resource_allocation = new HashMap<>();
@@ -74,5 +85,10 @@ public class Main {
             i++;
         }
         System.out.println(resource_allocation.toString());
+        // while resources i.e projects are still to be allocated
+        while(check_sizes(resource_allocation)){
+            
+        }
+
     }
 }
