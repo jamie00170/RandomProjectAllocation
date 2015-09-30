@@ -2,6 +2,8 @@ import java.util.*;
 
 public class Main {
 
+    static int num_of_projects_used = 0;
+
     public static void main(String[] args) {
 
 
@@ -66,8 +68,8 @@ public class Main {
     }
 
 
-    public static boolean check_sizes(Map resource_Allocation){
-        Collection<Integer> sizes = resource_Allocation.values();
+    public static boolean check_sizes(Map resource_allocation){
+        Collection<Integer> sizes = resource_allocation.values();
         int num_of_zeros = 0;
         for (int size : sizes){
            if (size == 0)
@@ -76,18 +78,29 @@ public class Main {
         return (num_of_zeros == sizes.size());
     }
 
+    public static boolean check_individial_sizes(Map resource_allocation, ArrayList project_list){
+        num_of_projects_used++;
+        return (num_of_projects_used == project_list.size());
+    }
+
     public static void probabilisticSerialDictatorship(Map student_preferences, ArrayList project_list, ArrayList priority_list){
 
         Map<String, Integer> resource_allocation = new HashMap<>();
+        Map<String, Arrays> student_probabilities = new HashMap<>();
+
         int i = 0;
         while (i < project_list.size()){
-            resource_allocation.put((String) project_list.get(i), 1 );
+            resource_allocation.put((String) project_list.get(i), 1);
             i++;
         }
         System.out.println(resource_allocation.toString());
         // while resources i.e projects are still to be allocated
         while(check_sizes(resource_allocation)){
-            
+            while (!(check_individial_sizes(resource_allocation, project_list))){
+                
+                // Divide amount of each resource left by each agent consuming it
+                // decrement resource by above number
+            }
         }
 
     }
