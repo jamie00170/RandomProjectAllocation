@@ -1,4 +1,3 @@
-import java.lang.reflect.Array;
 import java.util.*;
 
 public class Main {
@@ -11,7 +10,7 @@ public class Main {
 
         student_preferences.put("Jamie", new ArrayList<>(Arrays.asList("project1", "project2")));
         student_preferences.put("Jack", new ArrayList<>(Arrays.asList("project2", "project1")));
-        student_preferences.put("Ben", new ArrayList<>(Arrays.asList("project3", "project2")));
+        student_preferences.put("Ben", new ArrayList<>(Arrays.asList("project1", "project3")));
 
         ArrayList<String> project_list = new ArrayList<>();
 
@@ -28,7 +27,11 @@ public class Main {
         priority_list.add("Jack");
         priority_list.add("Ben");
 
+        //Collections.shuffle(priority_list);
+
         randomSerialDictatorship(student_preferences, project_list, priority_list);
+        probabilisticSerialDictatorship(student_preferences, project_list, priority_list);
+
     }
 
     public static void randomSerialDictatorship(Map student_preferences, ArrayList project_list, ArrayList priority_list){
@@ -60,5 +63,16 @@ public class Main {
             }
             i++;
         }
+    }
+
+    public static void probabilisticSerialDictatorship(Map student_preferences, ArrayList project_list, ArrayList priority_list){
+
+        Map<String, Integer> resource_allocation = new HashMap<>();
+        int i = 0;
+        while (i < project_list.size()){
+            resource_allocation.put((String) project_list.get(i), 1 );
+            i++;
+        }
+        System.out.println(resource_allocation.toString());
     }
 }
