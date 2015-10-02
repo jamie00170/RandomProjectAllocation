@@ -41,43 +41,39 @@ public class Main {
 
         // Initialise projects_allocated array
         ArrayList<String> projects_allocated = new ArrayList<>();
-        int i = 0;
-        int j =0;
-        // Loop for size of student preferences
-        while (i < student_preferences.size()){
-            // Loop for size of priority list
-            while (j < priority_list.size()){
-                // If the current student in the priority list is in student_preferences
-                if (student_preferences.containsKey(priority_list.get(j))){
-                    String name = priority_list.get(j).toString();
-                    @SuppressWarnings("unchecked")
-                    // Get the students preferences
-                    ArrayList<String> preferences = (ArrayList<String>) student_preferences.get(name);
-                    // For each choice in the list of preferences
-                    for(String choice : preferences){
-                        // If the project has already been taken
-                        if(projects_allocated.contains(choice)){
-                            // If the choice is the students last
-                            if (preferences.get(preferences.size() - 1).equals(choice)){
-                                // Unable to match student
-                                System.out.println(name + " not matched because none of their choices are available!");
-                            }
-                        }else{
-                            // Match the student to their choice
-                            System.out.println(name + " " + choice);
-                            // Add the project to the projects_allocated list
-                            projects_allocated.add(choice);
-                            break;
+        int i =0;
+        // Loop for number of students
+        while (i < priority_list.size()) {
+            // If the current student in the priority list is in student_preferences
+            if (student_preferences.containsKey(priority_list.get(i))) {
+                String name = priority_list.get(i).toString();
+                @SuppressWarnings("unchecked")
+                // Get the students preferences
+                        ArrayList<String> preferences = (ArrayList<String>) student_preferences.get(name);
+                // For each choice in the list of preferences
+                for (String choice : preferences) {
+                    // If the project has already been taken
+                    if (projects_allocated.contains(choice)) {
+                        // If the choice is the students last
+                        if (preferences.get(preferences.size() - 1).equals(choice)) {
+                            // Unable to match student
+                            System.out.println(name + " not matched because none of their choices are available!");
                         }
+                    } else {
+                        // Match the student to their choice
+                        System.out.println(name + " " + choice);
+                        // Add the project to the projects_allocated list
+                        projects_allocated.add(choice);
+                        break;
                     }
-                }else{
-                    System.out.println("Name not in student list!");
                 }
-                j++;
+            } else {
+                System.out.println("Name not in student list!");
             }
             i++;
         }
     }
+
 
 
     public static boolean check_sizes(Map resource_allocation){
