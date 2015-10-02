@@ -6,54 +6,66 @@ public class Main {
 
     public static void main(String[] args) {
 
-
-
         Map<String, ArrayList> student_preferences = new HashMap<>();
 
-        student_preferences.put("Jamie", new ArrayList<>(Arrays.asList("project1", "project2")));
-        student_preferences.put("Jack", new ArrayList<>(Arrays.asList("project2", "project1")));
-        student_preferences.put("Ben", new ArrayList<>(Arrays.asList("project1", "project3")));
+        student_preferences.put("Student1", new ArrayList<>(Arrays.asList("project1", "project2", "project3", "project4")));
+        student_preferences.put("Student2", new ArrayList<>(Arrays.asList("project2", "project4", "project3", "project1")));
+        student_preferences.put("Student3", new ArrayList<>(Arrays.asList("project1", "project3", "project2", "project4")));
+        student_preferences.put("Student4", new ArrayList<>(Arrays.asList("project3", "project4", "project2", "project1")));
 
         ArrayList<String> project_list = new ArrayList<>();
 
         project_list.add("project1");
         project_list.add("project2");
         project_list.add("project3");
+        project_list.add("project4");
 
         //System.out.println(project_list.toString());
         //System.out.println(student_preferences.toString());
 
         ArrayList<String> priority_list = new ArrayList<>();
 
-        priority_list.add("Jamie");
-        priority_list.add("Jack");
-        priority_list.add("Ben");
+        priority_list.add("Student1");
+        priority_list.add("Student2");
+        priority_list.add("Student3");
+        priority_list.add("Student4");
 
-        //Collections.shuffle(priority_list);
+        Collections.shuffle(priority_list);
 
         randomSerialDictatorship(student_preferences, project_list, priority_list);
-        probabilisticSerialDictatorship(student_preferences, project_list, priority_list);
+        //probabilisticSerialDictatorship(student_preferences, project_list, priority_list);
 
     }
 
     public static void randomSerialDictatorship(Map student_preferences, ArrayList project_list, ArrayList priority_list){
 
+        // Initialise projects_allocated array
         ArrayList<String> projects_allocated = new ArrayList<>();
         int i = 0;
         int j =0;
+        // Loop for size of student preferences
         while (i < student_preferences.size()){
+            // Loop for size of priority list
             while (j < priority_list.size()){
+                // If the current student in the priority list is in student_preferences
                 if (student_preferences.containsKey(priority_list.get(j))){
                     String name = priority_list.get(j).toString();
                     @SuppressWarnings("unchecked")
+                    // Get the students preferences
                     ArrayList<String> preferences = (ArrayList<String>) student_preferences.get(name);
+                    // For each choice in the list of preferences
                     for(String choice : preferences){
+                        // If the project has already been taken
                         if(projects_allocated.contains(choice)){
+                            // If the choice is the students last
                             if (preferences.get(preferences.size() - 1).equals(choice)){
+                                // Unable to match student
                                 System.out.println(name + " not matched because none of their choices are available!");
                             }
                         }else{
+                            // Match the student to their choice
                             System.out.println(name + " " + choice);
+                            // Add the project to the projects_allocated list
                             projects_allocated.add(choice);
                             break;
                         }
@@ -78,10 +90,6 @@ public class Main {
         return (num_of_zeros == sizes.size());
     }
 
-    public static boolean check_individial_sizes(Map resource_allocation, ArrayList project_list){
-        num_of_projects_used++;
-        return (num_of_projects_used == project_list.size());
-    }
 
     public static void probabilisticSerialDictatorship(Map student_preferences, ArrayList project_list, ArrayList priority_list){
 
@@ -96,11 +104,12 @@ public class Main {
         System.out.println(resource_allocation.toString());
         // while resources i.e projects are still to be allocated
         while(check_sizes(resource_allocation)){
-            while (!(check_individial_sizes(resource_allocation, project_list))){
-                
+            // loop until one project has been used
+                // get each students first choice run clock, stop when one is exhausted
+                // move onto next choice unless students choice was the one which was exhausted
+
                 // Divide amount of each resource left by each agent consuming it
                 // decrement resource by above number
-            }
         }
 
     }
