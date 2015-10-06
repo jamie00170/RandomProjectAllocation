@@ -1,36 +1,54 @@
+import com.sun.xml.internal.bind.v2.TODO;
+
 import java.util.*;
 
+// Specification + problem description +
 public class Main {
 
-    static int num_of_projects_used = 0;
+    public static ArrayList<String> generateprojects(int num_of_projects) {
+
+        ArrayList<String> project_list = new ArrayList<>();
+        int i = 1;
+        while (i <= num_of_projects) {
+            project_list.add("Project" + i);
+            i++;
+        }
+        return project_list;
+
+    }
+
+    public static Map<String, ArrayList<String>> generateStudents(int num_of_students, ArrayList project_list) {
+
+
+        Map<String, ArrayList<String>> student_preferences = new HashMap<>();
+        int j = 1;
+        while (j <= num_of_students) {
+            Collections.shuffle(project_list);
+            student_preferences.put("Student" + j , new ArrayList<String>(project_list));
+            j++;
+        }
+        return student_preferences;
+    }
 
     public static void main(String[] args) {
 
-        Map<String, ArrayList> student_preferences = new HashMap<>();
+        ArrayList<String> project_list = generateprojects(5);
+        System.out.println("Project List:" + project_list.toString());
 
-        student_preferences.put("Student1", new ArrayList<>(Arrays.asList("project1", "project2", "project3", "project4")));
-        student_preferences.put("Student2", new ArrayList<>(Arrays.asList("project2", "project4", "project3", "project1")));
-        student_preferences.put("Student3", new ArrayList<>(Arrays.asList("project1", "project3", "project2", "project4")));
-        student_preferences.put("Student4", new ArrayList<>(Arrays.asList("project3", "project4", "project2", "project1")));
+        Map<String, ArrayList<String>> student_preferences = generateStudents(5 , project_list);
 
-        ArrayList<String> project_list = new ArrayList<>();
-
-        project_list.add("project1");
-        project_list.add("project2");
-        project_list.add("project3");
-        project_list.add("project4");
-
-        //System.out.println(project_list.toString());
-        //System.out.println(student_preferences.toString());
-
+        System.out.println("Student Preferences: " + student_preferences.toString());
         ArrayList<String> priority_list = new ArrayList<>();
 
         priority_list.add("Student1");
         priority_list.add("Student2");
         priority_list.add("Student3");
         priority_list.add("Student4");
+        priority_list.add("Student5");
 
+        // Create a random order of Students
         Collections.shuffle(priority_list);
+        System.out.println("Priority List: " + priority_list.toString());
 
         randomSerialDictatorship(student_preferences, project_list, priority_list);
         //probabilisticSerialDictatorship(student_preferences, project_list, priority_list);
@@ -47,25 +65,27 @@ public class Main {
             // If the current student in the priority list is in student_preferences
             if (student_preferences.containsKey(priority_list.get(i))) {
                 String name = priority_list.get(i).toString();
-                @SuppressWarnings("unchecked")
                 // Get the students preferences
-                        ArrayList<String> preferences = (ArrayList<String>) student_preferences.get(name);
+                ArrayList<String> preferences = (ArrayList<String>) (student_preferences.get(name));
                 // For each choice in the list of preferences
-                for (String choice : preferences) {
+                //System.out.println("Preferences: " + preferences);
+                int j = 0;
+                while (j < preferences.size()) {
                     // If the project has already been taken
-                    if (projects_allocated.contains(choice)) {
+                    if (projects_allocated.contains(preferences.get(j))) {
                         // If the choice is the students last
-                        if (preferences.get(preferences.size() - 1).equals(choice)) {
+                        if (preferences.get(preferences.size() - 1).equals(preferences.get(j))) {
                             // Unable to match student
                             System.out.println(name + " not matched because none of their choices are available!");
                         }
                     } else {
                         // Match the student to their choice
-                        System.out.println(name + " " + choice);
+                        System.out.println(name + " " + preferences.get(j));
                         // Add the project to the projects_allocated list
-                        projects_allocated.add(choice);
+                        projects_allocated.add(preferences.get(j));
                         break;
                     }
+                    j++;
                 }
             } else {
                 System.out.println("Name not in student list!");
@@ -75,15 +95,14 @@ public class Main {
     }
 
 
-
     public static boolean check_sizes(Map resource_allocation){
-        Collection<Integer> sizes = resource_allocation.values();
-        int num_of_zeros = 0;
-        for (int size : sizes){
-           if (size == 0)
-               num_of_zeros++;
+        Collection<Integer> scores = resource_allocation.values();
+        int num_of_projects_used = 0;
+        for (int score : scores){
+           if (score == 0)
+               num_of_projects_used++;
         }
-        return (num_of_zeros == sizes.size());
+        return (num_of_projects_used == scores.size());
     }
 
 
@@ -94,12 +113,12 @@ public class Main {
 
         int i = 0;
         while (i < project_list.size()){
-            resource_allocation.put((String) project_list.get(i), 1);
+            resource_allocation.put((String) project_list.get(i), 0);
             i++;
         }
         System.out.println(resource_allocation.toString());
         // while resources i.e projects are still to be allocated
-        while(check_sizes(resource_allocation)){
+        while(check_sizes(resource_allocation)){ // or students are fully matched i.e have a combinted total of 1
             // loop until one project has been used
                 // get each students first choice run clock, stop when one is exhausted
                 // move onto next choice unless students choice was the one which was exhausted
@@ -107,6 +126,5 @@ public class Main {
                 // Divide amount of each resource left by each agent consuming it
                 // decrement resource by above number
         }
-
     }
 }
