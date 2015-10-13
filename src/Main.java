@@ -24,7 +24,7 @@ public class Main {
         int j = 1;
         while (j <= num_of_students) {
             Collections.shuffle(project_list);
-            student_preferences.put("Student" + j , new ArrayList<String>(project_list));
+            student_preferences.put("Student" + j, new ArrayList<String>(project_list));
             j++;
         }
         return student_preferences;
@@ -50,8 +50,8 @@ public class Main {
         Collections.shuffle(priority_list);
         System.out.println("Priority List: " + priority_list.toString());
 
-        randomSerialDictatorship(student_preferences, project_list, priority_list);
-        //probabilisticSerialDictatorship(student_preferences, project_list, priority_list);
+        //randomSerialDictatorship(student_preferences, project_list, priority_list);
+        probabilisticSerialDictatorship(student_preferences, project_list);
 
     }
 
@@ -105,26 +105,79 @@ public class Main {
         return (num_of_projects_used == scores.size());
     }
 
+    public static Map<String, Integer> getCurrentProjects(int j, Map<String, ArrayList<String>> student_preferences, Map<String, Integer> current_projects, ArrayList<String> students
+            , int num_of_iterations){
+        while(j < num_of_iterations) {
+            String name = students.get(j);
+            // Get the students preferences
+            ArrayList<String> preferences = (ArrayList<String>) (student_preferences.get(name));
+            System.out.println(name + " " + preferences.get(0));
+            current_projects.put(preferences.get(0), current_projects.get(preferences.get(0)) + 1);
+            j++;
+        }
+        return current_projects;
+    }
 
-    public static void probabilisticSerialDictatorship(Map student_preferences, ArrayList project_list, ArrayList priority_list){
 
-        Map<String, Integer> resource_allocation = new HashMap<>();
+    public static void probabilisticSerialDictatorship(Map student_preferences, ArrayList project_list){
+
+        // Stores the amount left of each project to be consumed
+        Map<String, Integer> project_allocation = new HashMap<>();
+
+        // Stores the amount of each student left to be consumed
+        Map<String, Integer> student_allocation = new HashMap<>();
+
+        // store the final matrix of students probability of being matched to a project
         Map<String, Arrays> student_probabilities = new HashMap<>();
 
         int i = 0;
         while (i < project_list.size()){
-            resource_allocation.put((String) project_list.get(i), 0);
+            project_allocation.put((String) project_list.get(i), 0);
             i++;
         }
-        System.out.println(resource_allocation.toString());
-        // while resources i.e projects are still to be allocated
-        while(check_sizes(resource_allocation)){ // or students are fully matched i.e have a combinted total of 1
-            // loop until one project has been used
+        System.out.println(project_allocation.toString());
+
+        ArrayList<String> students = new ArrayList<>();
+        for(Object name : student_preferences.keySet()){
+            student_allocation.put((String) name, 0);
+            students.add((String) name);
+        }
+        System.out.println(student_allocation.toString());
+        //System.out.println(student_preferences.toString());
+        // while projects are still to be allocated or students are fully matched i.e have a combined total of 1
+        int j = 0;
+        int num_of_iterations = Math.max(project_list.size(), student_preferences.size());
+
+        Map<String, Integer> current_projects = new HashMap<>();
+        int k = 0;
+        while (k < project_list.size()){
+            current_projects.put((String) project_list.get(k), 0);
+            k++;
+        }
+
+        while(check_sizes(project_allocation) || check_sizes(student_allocation)){
+
+            while (j < num_of_iterations){
+
+                // Get current projects being consumed by students
+                Map<String, Integer> first_projects = getCurrentProjects(j, student_preferences, current_projects, students, num_of_iterations);
+                System.out.println(first_projects.toString());
+
+
+                // increment appropriate students and projects
+                // remove matched students + projects from student preferences
+                break;
+                }
+                break;
                 // get each students first choice run clock, stop when one is exhausted
                 // move onto next choice unless students choice was the one which was exhausted
 
                 // Divide amount of each resource left by each agent consuming it
                 // decrement resource by above number
         }
+        //System.out.println(student_allocation.toString());
+        //System.out.println(project_allocation.toString());
+        //System.out.println(current_projects.toString());
     }
+
 }
