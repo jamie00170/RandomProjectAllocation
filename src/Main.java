@@ -118,6 +118,11 @@ public class Main {
         return current_projects;
     }
 
+    public static Map<String, Double> getAmountRemaining(Map<String, Double> projects_remaining){
+
+        System.out.println("projects remaining: " + projects_remaining);
+        return projects_remaining;
+    }
 
     public static void probabilisticSerialDictatorship(Map student_preferences, ArrayList project_list){
 
@@ -155,19 +160,37 @@ public class Main {
             k++;
         }
 
+        Map<String, Double> projects_remaining = new HashMap<>();
+        int l = 0;
+        while (l < project_list.size()){
+            projects_remaining.put((String) project_list.get(l), 0.0);
+            l++;
+        }
+
         while(check_sizes(project_allocation) || check_sizes(student_allocation)){
 
             while (j < num_of_iterations){
 
                 // Get current projects being consumed by students
                 Map<String, Double> currentProjects = getCurrentProjects(j, student_preferences, current_projects, students, num_of_iterations);
-                System.out.println(currentProjects.toString());
+                System.out.println("Current Projects: " + currentProjects.toString());
+
                 for (String name : students){
                     ArrayList<String> preferences = (ArrayList<String>) (student_preferences.get(name));
                     // increment student allocation + project allocation
                     String current_project = preferences.get(0);
                     Double num_of_students_consuming = current_projects.get(current_project);
-                    student_allocation.put(name, student_allocation.get(name) + (1.0/num_of_students_consuming));
+                    // have a method that gets the amount of each project remaining before loop so it doesn't change during the iteration
+                    Double amount_of_project_remaining = (1.0 - (projects_remaining.get(current_project)));
+
+                    student_allocation.put(name, student_allocation.get(name) + (amount_of_project_remaining / num_of_students_consuming));
+                    project_allocation.put(current_project, project_allocation.get(current_project) + (amount_of_project_remaining/num_of_students_consuming));
+                    
+                    // Deal with fully matched students + projects
+                    if (student_allocation.get(name) == 1.0){
+                        student_preferences.remove(name);
+                    }
+                    // Deal with moving onto next round
                 }
 
 
@@ -182,8 +205,8 @@ public class Main {
                 // Divide amount of each resource left by each agent consuming it
                 // decrement resource by above number
         }
-        System.out.println(student_allocation.toString());
-        System.out.println(project_allocation.toString());
+        System.out.println("Student Allocation: " + student_allocation.toString());
+        System.out.println("Project Allocation: " + project_allocation.toString());
         //System.out.println(current_projects.toString());
     }
 
