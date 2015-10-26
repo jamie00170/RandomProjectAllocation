@@ -119,6 +119,15 @@ public class Main {
     }
 
     public static void removeMatched(Map<String, ArrayList<String>> student_preferences, Map<String, Double> project_allocation, Map<String, Double> student_allocation){
+        ArrayList<String> student_list = new ArrayList<>();
+        for (String name : student_preferences.keySet()) {
+            student_list.add(name);
+
+        }
+        for (String name : student_list)
+        if (student_allocation.get(name) == 1.0) {
+            student_preferences.remove(name);
+        }
 
 
     }
@@ -188,16 +197,17 @@ public class Main {
                     project_allocation.put(current_project, project_allocation.get(current_project) + (amount_of_project_remaining/num_of_students_consuming));
 
                     // Deal with fully matched students + projects
-                    if (student_allocation.get(name) == 1.0){
-                        student_preferences.remove(name);
-                    }
+                    //if (student_allocation.get(name) == 1.0){
+                       // student_preferences.remove(name);
+                    //}
                     // Deal with moving onto next round
                 }
+                removeMatched(student_preferences,project_allocation, student_allocation);
                 System.out.println("Student preferences: " + student_preferences.toString());
 
                 // increment appropriate students and projects
                 // remove matched students + projects from student preferences
-                //removematched(project_allocation, student_allocation);
+
                 //j++;
                 break;
                 }
