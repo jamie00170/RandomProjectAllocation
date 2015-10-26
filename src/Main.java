@@ -119,18 +119,40 @@ public class Main {
     }
 
     public static void removeMatched(Map<String, ArrayList<String>> student_preferences, Map<String, Double> project_allocation, Map<String, Double> student_allocation){
+
+        System.out.println("Attempting to remove matched students and projects .... ");
         ArrayList<String> student_list = new ArrayList<>();
         for (String name : student_preferences.keySet()) {
             student_list.add(name);
 
         }
-        for (String name : student_list)
-        if (student_allocation.get(name) == 1.0) {
-            student_preferences.remove(name);
+        for (String name : student_list) {
+            if (student_allocation.get(name) == 1.0) {
+                student_preferences.remove(name);
+            }
+
         }
 
+        ArrayList<String> project_list = new ArrayList<>();
+        for (String project : project_allocation.keySet()){
+            project_list.add(project);
+        }
+        for (String name : student_list) {
+            ArrayList<String> preferences = student_preferences.get(name);
+            int i = 0;
+            while (i < preferences.size()) {
+                if (project_allocation.get(preferences.get(i)) == 1.0) {
+                    // remove project from all preferences list
+                    System.out.println("Removing " + preferences.get(i));
+                    preferences.remove(preferences.get(i));
 
-    }
+                    i--;
+                }
+            i++;
+            }
+        }
+        System.out.println("Removed matched students and projects");
+        }
 
 
 
@@ -202,7 +224,8 @@ public class Main {
                     //}
                     // Deal with moving onto next round
                 }
-                removeMatched(student_preferences,project_allocation, student_allocation);
+                System.out.println("Student preferences before removal: " + student_preferences.toString());
+                removeMatched(student_preferences, project_allocation, student_allocation);
                 System.out.println("Student preferences: " + student_preferences.toString());
 
                 // increment appropriate students and projects
