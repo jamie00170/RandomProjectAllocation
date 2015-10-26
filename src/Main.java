@@ -117,12 +117,7 @@ public class Main {
         }
         return current_projects;
     }
-
-    public static Map<String, Double> getAmountRemaining(Map<String, Double> projects_remaining){
-
-        System.out.println("projects remaining: " + projects_remaining);
-        return projects_remaining;
-    }
+    
 
     public static void probabilisticSerialDictatorship(Map student_preferences, ArrayList project_list){
 
@@ -185,7 +180,7 @@ public class Main {
 
                     student_allocation.put(name, student_allocation.get(name) + (amount_of_project_remaining / num_of_students_consuming));
                     project_allocation.put(current_project, project_allocation.get(current_project) + (amount_of_project_remaining/num_of_students_consuming));
-                    
+
                     // Deal with fully matched students + projects
                     if (student_allocation.get(name) == 1.0){
                         student_preferences.remove(name);
