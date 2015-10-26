@@ -117,7 +117,13 @@ public class Main {
         }
         return current_projects;
     }
-    
+
+    public static void removeMatched(Map<String, ArrayList<String>> student_preferences, Map<String, Double> project_allocation, Map<String, Double> student_allocation){
+
+
+    }
+
+
 
     public static void probabilisticSerialDictatorship(Map student_preferences, ArrayList project_list){
 
@@ -173,7 +179,7 @@ public class Main {
                 for (String name : students){
                     ArrayList<String> preferences = (ArrayList<String>) (student_preferences.get(name));
                     // increment student allocation + project allocation
-                    String current_project = preferences.get(0);
+                    String current_project = preferences.get(j);
                     Double num_of_students_consuming = current_projects.get(current_project);
                     // have a method that gets the amount of each project remaining before loop so it doesn't change during the iteration
                     Double amount_of_project_remaining = (1.0 - (projects_remaining.get(current_project)));
@@ -187,10 +193,12 @@ public class Main {
                     }
                     // Deal with moving onto next round
                 }
-
+                System.out.println("Student preferences: " + student_preferences.toString());
 
                 // increment appropriate students and projects
                 // remove matched students + projects from student preferences
+                //removematched(project_allocation, student_allocation);
+                //j++;
                 break;
                 }
                 break;
