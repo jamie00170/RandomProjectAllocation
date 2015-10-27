@@ -99,21 +99,25 @@ public class Main {
         Collection<Double> scores = resource_allocation.values();
         int num_of_projects_used = 0;
         for (double score : scores){
-           if (score == 0.0)
+           if (score == 1.0)
                num_of_projects_used++;
         }
         return (num_of_projects_used == scores.size());
     }
 
-    public static Map<String, Double> getCurrentProjects(int j, Map<String, ArrayList<String>> student_preferences, Map<String, Double> current_projects, ArrayList<String> students
-            , int num_of_iterations){
-        while(j < num_of_iterations) {
-            String name = students.get(j);
+
+    public static Map<String, Double> getCurrentProjects(Map<String, ArrayList<String>> student_preferences, Map<String, Double> current_projects){
+
+        // reset current projects
+        for(String project : current_projects.keySet()){
+            current_projects.put(project, current_projects.get(project) - current_projects.get(project));
+        }
+
+        for (String student : student_preferences.keySet()){
             // Get the students preferences
-            ArrayList<String> preferences = (ArrayList<String>) (student_preferences.get(name));
-            System.out.println(name + " " + preferences.get(0));
+            ArrayList<String> preferences = (ArrayList<String>) (student_preferences.get(student));
+            System.out.println(student + " " + preferences.get(0));
             current_projects.put(preferences.get(0), current_projects.get(preferences.get(0)) + 1.0);
-            j++;
         }
         return current_projects;
     }
@@ -144,7 +148,7 @@ public class Main {
                 // If the choice has been fully matched remove it from the preferences list
                 if (project_allocation.get(project) == 1.0) {
                     // remove project from preferences list
-                    System.out.println("Removing " + project);
+                    //System.out.println("Removing " + project);
                     items_to_remove.add(project);
                 }
             }
@@ -172,16 +176,13 @@ public class Main {
         }
         System.out.println(project_allocation.toString());
 
-        ArrayList<String> students = new ArrayList<>();
         for(Object name : student_preferences.keySet()){
             student_allocation.put((String) name, 0.0);
-            students.add((String) name);
         }
         System.out.println(student_allocation.toString());
         //System.out.println(student_preferences.toString());
-        // while projects are still to be allocated or students are fully matched i.e have a combined total of 1
-        int j = 0;
-        int num_of_iterations = Math.max(project_list.size(), student_preferences.size());
+
+
 
         Map<String, Double> current_projects = new HashMap<>();
         int k = 0;
@@ -197,55 +198,43 @@ public class Main {
             l++;
         }
 
-        while(check_sizes(project_allocation) || check_sizes(student_allocation)){
+        // while projects are still to be allocated or students are fully matched i.e have a combined total of 1
+        while(!(check_sizes(project_allocation) || check_sizes(student_allocation))){
             // loop for number of students or projects - whatever there is more of
-            while (j < num_of_iterations){
-                // Get current projects being consumed by students
-                Map<String, Double> currentProjects = getCurrentProjects(j, student_preferences, current_projects, students, num_of_iterations);
-                System.out.println("Current Projects: " + currentProjects.toString());
+            // Get current projects being consumed by students
+            Map<String, Double> currentProjects = getCurrentProjects(student_preferences, current_projects);
+            System.out.println("Current Projects: " + currentProjects.toString());
 
-                // for each student that hasn't yet been matched
-                for (String name : student_preferences.keySet()){
-                    // get the students list of preferences
-                    ArrayList<String> preferences = (ArrayList<String>) (student_preferences.get(name));
-                    // get their first available choice - matched choices have been removed to always index 0
-                    String current_project = preferences.get(0);
-                    // Find out the number of student consuming this students current project
-                    Double num_of_students_consuming = current_projects.get(current_project);
-                    // Find the amount of the project yet to be assigned
-                    Double amount_of_project_remaining = (1.0 - (projects_remaining.get(current_project)));
+            // for each student that hasn't yet been matched
+            for (String name : student_preferences.keySet()){
+                // get the students list of preferences
+                ArrayList<String> preferences = (ArrayList<String>) (student_preferences.get(name));
+                // get their first available choice - matched choices have been removed to always index 0
+                String current_project = preferences.get(0);
+                // Find out the number of student consuming this students current project
+                Double num_of_students_consuming = current_projects.get(current_project);
+                // Find the amount of the project yet to be assigned
+                Double amount_of_project_remaining = (1.0 - (projects_remaining.get(current_project)));
 
-                    //System.out.println(name +" has: " + (amount_of_project_remaining/num_of_students_consuming) + "percenatge of being matched to" + current_project);
-                    // increment student allocation + project allocation
-                    student_allocation.put(name, student_allocation.get(name) + (amount_of_project_remaining / num_of_students_consuming));
-                    project_allocation.put(current_project, project_allocation.get(current_project) + (amount_of_project_remaining/num_of_students_consuming));
+                //System.out.println(name +" has: " + (amount_of_project_remaining/num_of_students_consuming) + "percenatge of being matched to" + current_project);
+                // increment student allocation + project allocation
+                student_allocation.put(name, student_allocation.get(name) + (amount_of_project_remaining / num_of_students_consuming));
+                project_allocation.put(current_project, project_allocation.get(current_project) + (amount_of_project_remaining/num_of_students_consuming));
 
-                    // Deal with fully matched students + projects
-                    //if (student_allocation.get(name) == 1.0){
-                       // student_preferences.remove(name);
-                    //}
-                    // Deal with moving onto next round
-                }
+            }
                 System.out.println("Student preferences before removal: " + student_preferences.toString());
+                // Removed matched Students and Projects
                 removeMatched(student_preferences, project_allocation, student_allocation);
                 System.out.println("Student preferences: " + student_preferences.toString());
 
-                // increment appropriate students and projects
-                // remove matched students + projects from student preferences
 
-                j++;
-                //break;
-                }
-                break;
-                // get each students first choice run clock, stop when one is exhausted
-                // move onto next choice unless students choice was the one which was exhausted
-
-                // Divide amount of each resource left by each agent consuming it
-                // decrement resource by above number
         }
+
         System.out.println("Student Allocation: " + student_allocation.toString());
         System.out.println("Project Allocation: " + project_allocation.toString());
+        }
+
         //System.out.println(current_projects.toString());
     }
 
-}
+
