@@ -5,35 +5,36 @@ import java.lang.reflect.Array;
 import java.util.*;
 public class Permutations {
 
-    /**
-     * Write a description of class GeneratePermutations here.
-     *
-     * @author Kushtrim
-     * @version 1.01
-     */
+    public static int factorial(int n) {
+        int fact = 1; // this  will be the result
+        for (int i = 1; i <= n; i++) {
+            fact *= i;
+        }
+        return fact;
+    }
+
         public static void main(String args[]) {
             Permutations g = new Permutations();
-            String[] elements = {"Studenta","Studentb","Studentc"};
+            String[] elements = {"Student1","Student2","Student3"};
             ArrayList<String> permutations = g.generatePermutations(elements);
 
             //ArrayList<ArrayList<String>> permutations_list = new ArrayList<ArrayList<String>>();
-            String[][] permutations_list = new String[6][3];
+            String[][] permutations_list = new String[factorial(elements.length)][elements.length];
             System.out.println(permutations.toString());
             int i = 0;
             while(i < permutations.size()){
-                String[] new_string = permutations.get(i).split("(?<=[a-z])(?=[A-Z])");
+                String[] new_string = permutations.get(i).split("(?<=[0-9])(?=[A-Z])");
                 //System.out.println(Arrays.toString(new_string));
                 permutations_list[i] = new_string;
                 i++;
             }
-            System.out.println(Arrays.toString(permutations_list[0]));
             //System.out.println(permutations.get(999999));
             for (String[] perm : permutations_list){
                 System.out.println(Arrays.toString(perm));
             }
         }
 
-        private ArrayList<String> generatePermutations( String[] elements ) {
+        public ArrayList<String> generatePermutations( String[] elements ) {
             ArrayList<String> permutations = new ArrayList<String>();
             if ( elements.length == 2 ) {
 
