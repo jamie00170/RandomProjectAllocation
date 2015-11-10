@@ -30,7 +30,7 @@ public class Main {
         return student_preferences;
     }
 
-    public static void incrementValue(String[][] matrix, String student, String project){
+    public static void incrementValue(String[][] matrix, String student, String project, Double calculated_value){
         int i = 0;
         int j;
 
@@ -48,17 +48,18 @@ public class Main {
             }
             i++;
         }
-        int value = Integer.parseInt(matrix[coordinates[0]][coordinates[1]]);
-        value++;
-        matrix[coordinates[0]][coordinates[1]] = Integer.toString(value);
+
+        Double value = Double.parseDouble(matrix[coordinates[0]][coordinates[1]]);
+        value += (double) calculated_value;
+        matrix[coordinates[0]][coordinates[1]] = Double.toString(value);
     }
 
     public static void main(String[] args) {
 
-        ArrayList<String> project_list = generateprojects(3);
+        ArrayList<String> project_list = generateprojects(2);
         System.out.println("Project List:" + project_list.toString());
 
-        Map<String, ArrayList<String>> student_preferences = generateStudents(3 , project_list);
+        Map<String, ArrayList<String>> student_preferences = generateStudents(2 , project_list);
 
         System.out.println("Student Preferences: " + student_preferences.toString());
         ArrayList<String> priority_list = new ArrayList<>();
@@ -71,8 +72,9 @@ public class Main {
         Collections.shuffle(priority_list);
         System.out.println("Priority List: " + priority_list.toString());
 
-        randomSerialDictatorship(student_preferences, project_list, priority_list);
+        //randomSerialDictatorship(student_preferences, project_list, priority_list);
         //probabilisticSerialDictatorship(student_preferences, project_list);
+        BostonSerial(student_preferences, project_list);
 
     }
 
@@ -171,7 +173,7 @@ public class Main {
                         } else {
                             // Match the student to their choice
                             System.out.println(name + " " + preferences.get(j));
-                            incrementValue(matrix, name, preferences.get(j));
+                            incrementValue(matrix, name, preferences.get(j), 1.0);
                             // Add the project to the projects_allocated list
                             projects_allocated.add(preferences.get(j));
                             break;
@@ -241,7 +243,7 @@ public class Main {
 
     public static void removeMatched(Map<String, ArrayList<String>> student_preferences, Map<String, Double> project_allocation, Map<String, Double> student_allocation){
 
-        System.out.println("Attempting to remove matched students and projects .... ");
+        //System.out.println("Attempting to remove matched students and projects .... ");
         ArrayList<String> student_list = new ArrayList<>();
         for (String name : student_preferences.keySet()) {
             student_list.add(name);
@@ -271,11 +273,41 @@ public class Main {
             }
             preferences.removeAll(items_to_remove);
         }
-        System.out.println("Removed matched students and projects");
+        //System.out.println("Removed matched students and projects");
         }
 
 
-    public static void probabilisticSerialDictatorship(Map<String, ArrayList<String>> student_preferences, ArrayList project_list){
+    public static void BostonSerial(Map<String, ArrayList<String>> student_preferences, ArrayList<String> project_list){
+
+        // Create matrix
+        String[][] matrix = new String[(student_preferences.size() + 1)][(project_list.size() + 1)];
+
+        matrix[0][0] = "-";
+        int i = 1;
+        for (String student : student_preferences.keySet()) {
+            matrix[i][0] = student;
+            i++;
+        }
+
+
+        int j = 1;
+        for (String project : project_list){
+
+            matrix[0][j] = project;
+            j++;
+        }
+
+        i = 1;
+        j = 1;
+        while( i < matrix.length){
+            j = 1;
+            while (j < matrix[i].length){
+                matrix[i][j] = "0.0";
+                j++;
+            }
+            i++;
+        }
+
 
         // Stores the amount left of each project to be consumed
         Map<String, Double> project_allocation = new HashMap<>();
@@ -286,7 +318,7 @@ public class Main {
         // store the final matrix of students probability of being matched to a project
         Map<String, Arrays> student_probabilities = new HashMap<>();
 
-        int i = 0;
+        i = 0;
         while (i < project_list.size()){
             project_allocation.put((String) project_list.get(i), 0.0);
             i++;
@@ -306,13 +338,6 @@ public class Main {
         while (k < project_list.size()){
             current_projects.put((String) project_list.get(k), 0.0);
             k++;
-        }
-
-        Map<String, Double> projects_remaining = new HashMap<>();
-        int l = 0;
-        while (l < project_list.size()){
-            projects_remaining.put((String) project_list.get(l), 0.0);
-            l++;
         }
 
         // while projects are still to be allocated or students are fully matched i.e have a combined total of 1
@@ -338,9 +363,8 @@ public class Main {
                     max_project = entry.getKey();
                 }
             }
+            Double amount_remaing_of_max_project = 1.0 - project_allocation.get(max_project);
 
-            Double amount_remaing_of_max_project = (max_increment/ current_projects.get(max_project));
-            System.out.println("Increment: " + amount_remaing_of_max_project);
 
             // for each student that hasn't yet been matched
             for (String name : student_preferences.keySet()){
@@ -351,12 +375,16 @@ public class Main {
                 // Find out the number of student consuming this students current project
                 Double num_of_students_consuming = current_projects.get(current_project);
                 // Find the amount of the project yet to be assigned
-                Double amount_of_project_remaining = (1.0 - (projects_remaining.get(current_project)));
+                Double amount_of_project_remaining = (1.0 - (project_allocation.get(current_project)));
 
                 //System.out.println(name +" has: " + (amount_of_project_remaining/num_of_students_consuming) + "percentage of being matched to" + current_project);
                 // increment student allocation + project allocation
-                student_allocation.put(name, student_allocation.get(name) + amount_remaing_of_max_project); // /Collection.Max(current_projects.values())
-                project_allocation.put(current_project, project_allocation.get(current_project) + amount_remaing_of_max_project);
+                // TAKE ACCOUNT OF AMOUNT OF PROJECT REMAINING
+                System.out.println("Increment: " + max_increment * amount_remaing_of_max_project);
+                student_allocation.put(name, student_allocation.get(name) + (max_increment * amount_remaing_of_max_project));
+                project_allocation.put(current_project, project_allocation.get(current_project) + (max_increment * amount_remaing_of_max_project));
+                // Increment values in the matrix
+                incrementValue(matrix, name, current_project, (max_increment * amount_remaing_of_max_project));
             }
                 System.out.println("Student Allocation: " + student_allocation.toString());
                 System.out.println("Project Allocation: " + project_allocation.toString());
@@ -368,7 +396,135 @@ public class Main {
 
         System.out.println("Student Allocation: " + student_allocation.toString());
         System.out.println("Project Allocation: " + project_allocation.toString());
+
+        for (String[] row : matrix){
+            System.out.println(Arrays.toString(row));
+        }
         }
 
+    public static void probabilisticSerialDictatorship(Map<String, ArrayList<String>> student_preferences, ArrayList<String> project_list){
+
+        // Create matrix
+        String[][] matrix = new String[(student_preferences.size() + 1)][(project_list.size() + 1)];
+
+        matrix[0][0] = "-";
+        int i = 1;
+        for (String student : student_preferences.keySet()) {
+            matrix[i][0] = student;
+            i++;
+        }
+
+
+        int j = 1;
+        for (String project : project_list){
+
+            matrix[0][j] = project;
+            j++;
+        }
+
+        i = 1;
+        j = 1;
+        while( i < matrix.length){
+            j = 1;
+            while (j < matrix[i].length){
+                matrix[i][j] = "0.0";
+                j++;
+            }
+            i++;
+        }
+
+
+        // Stores the amount left of each project to be consumed
+        Map<String, Double> project_allocation = new HashMap<>();
+
+        // Stores the amount of each student left to be consumed
+        Map<String, Double> student_allocation = new HashMap<>();
+
+        // store the final matrix of students probability of being matched to a project
+        Map<String, Arrays> student_probabilities = new HashMap<>();
+
+        i = 0;
+        while (i < project_list.size()){
+            project_allocation.put((String) project_list.get(i), 0.0);
+            i++;
+        }
+        System.out.println(project_allocation.toString());
+
+        for(Object name : student_preferences.keySet()){
+            student_allocation.put((String) name, 0.0);
+        }
+        System.out.println(student_allocation.toString());
+        //System.out.println(student_preferences.toString());
+
+
+
+        Map<String, Double> current_projects = new HashMap<>();
+        int k = 0;
+        while (k < project_list.size()){
+            current_projects.put((String) project_list.get(k), 0.0);
+            k++;
+        }
+
+        // while projects are still to be allocated or students are fully matched i.e have a combined total of 1
+        while(!(check_sizes(project_allocation) || check_sizes(student_allocation) || student_preferences.isEmpty())){
+            // Get current projects being consumed by students
+            Map<String, Double> currentProjects = getCurrentProjects(student_preferences, current_projects);
+            System.out.println("Current Projects: " + currentProjects.toString());
+
+            // Get the maximum amount each project can be incremented by
+            // 1/highest number of students consuming a project - max(current_projects.values())
+
+            Double max_increment = (1/(Collections.max(current_projects.values())));
+
+            // Get the most project with most students consuming then
+            // access the project_Allocation to get amount remaining
+            // divide that number by number of students consuming
+
+            // Iterate over entry set if value == max value
+            // key == max_project
+            String max_project = "";
+            for (Map.Entry<String, Double> entry : current_projects.entrySet()){
+                if (entry.getValue().equals(Collections.max(current_projects.values()))){
+                    max_project = entry.getKey();
+                }
+            }
+            Double amount_remaing_of_max_project = 1.0 - project_allocation.get(max_project);
+
+
+            // for each student that hasn't yet been matched
+            for (String name : student_preferences.keySet()){
+                // get the students list of preferences
+                ArrayList<String> preferences = (ArrayList<String>) (student_preferences.get(name));
+                // get their first available choice - matched choices have been removed to always index 0
+                String current_project = preferences.get(0);
+                // Find out the number of student consuming this students current project
+                Double num_of_students_consuming = current_projects.get(current_project);
+                // Find the amount of the project yet to be assigned
+                Double amount_of_project_remaining = (1.0 - (project_allocation.get(current_project)));
+
+                //System.out.println(name +" has: " + (amount_of_project_remaining/num_of_students_consuming) + "percentage of being matched to" + current_project);
+                // increment student allocation + project allocation
+                // TAKE ACCOUNT OF AMOUNT OF PROJECT REMAINING
+                System.out.println("Increment: " + max_increment * amount_remaing_of_max_project);
+                student_allocation.put(name, student_allocation.get(name) + (max_increment * amount_remaing_of_max_project));
+                project_allocation.put(current_project, project_allocation.get(current_project) + (max_increment * amount_remaing_of_max_project));
+                // Increment values in the matrix
+                incrementValue(matrix, name, current_project, (max_increment * amount_remaing_of_max_project));
+            }
+            System.out.println("Student Allocation: " + student_allocation.toString());
+            System.out.println("Project Allocation: " + project_allocation.toString());
+            System.out.println("Student preferences before removal: " + student_preferences.toString());
+            // Removed matched Students and Projects
+            removeMatched(student_preferences, project_allocation, student_allocation);
+            System.out.println("Student preferences: " + student_preferences.toString());
+        }
+
+        System.out.println("Student Allocation: " + student_allocation.toString());
+        System.out.println("Project Allocation: " + project_allocation.toString());
+
+        for (String[] row : matrix){
+            System.out.println(Arrays.toString(row));
+        }
+    }
         //System.out.println(current_projects.toString());
     }
