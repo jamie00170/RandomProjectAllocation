@@ -47,13 +47,12 @@ public class Permutations {
             else {
                 for (  int i = 0 ; i < elements.length  ; i++) {
                     String[] elements2 = new String[elements.length -1];
-                    int kalo = 0;
+                    int k = 0;
                     for( int j =0 ; j< elements2.length ; j++ ) {
-                        if( i == j)
-                        {
-                            kalo = 1;
+                        if( i == j) {
+                            k = 1;
                         }
-                        elements2[j] = elements[j+kalo];
+                        elements2[j] = elements[j+k];
                     }
                     ArrayList<String> k2 = generatePermutations(elements2);
                     for( String x : k2 ) {
