@@ -6,7 +6,7 @@ import java.util.*;
 
 public class BostonSerial {
 
-    public static Map<String, Double> getCurrentProjects(Map<String, ArrayList<String>> student_preferences, Map<String, Double> current_projects){
+    public static Map<String, Double> getCurrentProjects(Map<String, ArrayList<String>> student_preferences, Map<String, Double> current_projects, Integer p){
 
         // reset current projects
         for(String project : current_projects.keySet()){
@@ -16,8 +16,8 @@ public class BostonSerial {
         for (String student : student_preferences.keySet()){
             // Get the students preferences
             ArrayList<String> preferences =  student_preferences.get(student);
-            System.out.println(student + " " + preferences.get(0));
-            current_projects.put(preferences.get(0), current_projects.get(preferences.get(0)) + 1.0);
+            System.out.println(student + " " + preferences.get(p));
+            current_projects.put(preferences.get(p), current_projects.get(preferences.get(p)) + 1.0);
         }
         return current_projects;
     }
@@ -136,12 +136,17 @@ public class BostonSerial {
         int p = 0;
         while(p < project_allocation.size()){
             // Get current projects being consumed by students
-            Map<String, Double> currentProjects = getCurrentProjects(student_preferences, current_projects);
+            Map<String, Double> currentProjects = getCurrentProjects(student_preferences, current_projects, p);
             System.out.println("Current Projects: " + currentProjects.toString());
 
             // Get the maximum amount each project can be incremented by
             // 1/highest number of students consuming a project - max(current_projects.values())
 
+            // Have two data structures that remain consistent throughout the round
+            HashMap<String, Double> stu_all = new HashMap<>();
+            stu_all.putAll(student_allocation);
+            HashMap<String, Double> proj_all = new HashMap<>();
+            proj_all.putAll(project_allocation);
 
             // for each student that hasn't yet been matched
             for (String name : student_preferences.keySet()){
@@ -155,18 +160,24 @@ public class BostonSerial {
                     continue;
 
                 // Find out the number of student consuming this students current project
-                //Double num_of_students_consuming = current_projects.get(current_project);
+                Double num_of_students_consuming = current_projects.get(current_project);
                 // Find the amount of the project yet to be assigned
                 //Double amount_of_project_remaining = (1.0 - (project_allocation.get(current_project)));
+
 
                 //System.out.println(name +" has: " + (amount_of_project_remaining/num_of_students_consuming) + "percentage of being matched to" + current_project);
                 // increment student allocation + project allocation
                 // TAKE ACCOUNT OF AMOUNT OF PROJECT REMAINING
-                System.out.println("Increment: " + (1.0/current_projects.get(current_project)));
-                student_allocation.put(name, student_allocation.get(name) + (1.0/current_projects.get(current_project)));
-                project_allocation.put(current_project, project_allocation.get(current_project) + (1.0/current_projects.get(current_project)));
+                Double smallest_space = Math.min((proj_all.get(current_project)), (stu_all.get(name)));
+                Double incrementValue = ((1.0/num_of_students_consuming) - smallest_space);
+
+                System.out.println("Smallest Space: " + smallest_space);
+                System.out.println("Number of students: " + num_of_students_consuming);
+                System.out.println("Increment: " + incrementValue);
+                student_allocation.put(name, student_allocation.get(name) + incrementValue);
+                project_allocation.put(current_project, project_allocation.get(current_project) + incrementValue);
                 // Increment values in the matrix
-                incrementValue(matrix, name, current_project, (1.0/current_projects.get(current_project)));
+                incrementValue(matrix, name, current_project, incrementValue);
             }
             p++;
             System.out.println("Student Allocation: " + student_allocation.toString());
@@ -176,7 +187,6 @@ public class BostonSerial {
             removeMatched(student_preferences, project_allocation, student_allocation);
             System.out.println("Student preferences: " + student_preferences.toString());
         }
-
         System.out.println("Student Allocation: " + student_allocation.toString());
         System.out.println("Project Allocation: " + project_allocation.toString());
 

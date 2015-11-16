@@ -58,6 +58,8 @@ public class Permutations {
                     for( String x : k2 ) {
                         String s = elements[i]+x;
                         permutations.add(s);
+                        // format s into a list -
+                        // then run rsd for that list
                     }
                 }
             }
