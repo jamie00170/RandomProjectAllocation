@@ -54,10 +54,10 @@ public class Main {
 
     public static void main(String[] args) {
 
-        ArrayList<String> project_list = generateprojects(3);
+        ArrayList<String> project_list = generateprojects(2);
         System.out.println("Project List:" + project_list.toString());
 
-        Map<String, ArrayList<String>> student_preferences = generateStudents(3 , project_list);
+        Map<String, ArrayList<String>> student_preferences = generateStudents(2 , project_list);
 
         System.out.println("Student Preferences: " + student_preferences.toString());
         ArrayList<String> priority_list = new ArrayList<>();
@@ -70,10 +70,10 @@ public class Main {
         Collections.shuffle(priority_list);
         System.out.println("Priority List: " + priority_list.toString());
 
-        //randomSerialDictatorship(student_preferences, project_list, priority_list);
+        randomSerialDictatorship(student_preferences, project_list);
         //probabilisticSerialDictatorship(student_preferences, project_list);
-        BostonSerial bs = new BostonSerial();
-        bs.bostonSerial(student_preferences, project_list);
+        //BostonSerial bs = new BostonSerial();
+        //bs.bostonSerial(student_preferences, project_list);
 
     }
 
@@ -85,7 +85,7 @@ public class Main {
         return fact;
     }
 
-    public static void randomSerialDictatorship(Map<String, ArrayList<String>> student_preferences, ArrayList<String> project_list, ArrayList priority_list){
+    public static void randomSerialDictatorship(Map<String, ArrayList<String>> student_preferences, ArrayList<String> project_list){
 
         // Create matrix
         String[][] matrix = new String[(student_preferences.size() + 1)][(project_list.size() + 1)];
@@ -133,7 +133,7 @@ public class Main {
 
         //ArrayList<ArrayList<String>> permutations_list = new ArrayList<ArrayList<String>>();
         String[][] permutations_list = new String[factorial(student_preferences.size())][student_preferences.size()];
-        System.out.println(permutations.toString());
+        //System.out.println(permutations.toString());
         int k = 0;
         while(k < permutations.size()){
             String[] new_string = permutations.get(k).split("(?<=[0-9])(?=[A-Z])");
@@ -142,13 +142,10 @@ public class Main {
             k++;
         }
 
-        for (String[] perm : permutations_list){
-            System.out.println(Arrays.toString(perm));
-        }
-
         for (String[] permutation : permutations_list) {
             // Loop for number of students
             i = 0;
+            // Start here - need to format string into list first
             projects_allocated.clear();
             while (i < permutation.length) {
                 // If the current student in the priority list is in student_preferences
@@ -184,25 +181,22 @@ public class Main {
             }
         }
 
-
         i = 1;
         while( i < matrix.length){
             j = 1;
             while (j < matrix[i].length){
                 try {
-                    int int_value = Integer.parseInt(matrix[i][j]);
-
-                    Double double_value = (double) int_value;
+                   Double double_value = Double.parseDouble(matrix[i][j]);
 
                     matrix[i][j] = Double.toString(double_value / factorial(student_list.length));
                 } catch (NumberFormatException e){
-                    continue;
+                    e.printStackTrace();
                 }
-
                 j++;
             }
             i++;
         }
+
         for (String[] row : matrix){
             System.out.println(Arrays.toString(row));
         }
