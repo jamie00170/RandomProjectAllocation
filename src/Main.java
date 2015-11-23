@@ -54,10 +54,10 @@ public class Main {
 
     public static void main(String[] args) {
 
-        ArrayList<String> project_list = generateprojects(2);
+        ArrayList<String> project_list = generateprojects(4);
         System.out.println("Project List:" + project_list.toString());
 
-        Map<String, ArrayList<String>> student_preferences = generateStudents(2 , project_list);
+        Map<String, ArrayList<String>> student_preferences = generateStudents(4 , project_list);
 
         System.out.println("Student Preferences: " + student_preferences.toString());
         ArrayList<String> priority_list = new ArrayList<>();
@@ -389,6 +389,18 @@ public class Main {
         }
     }
 
+    public static void RandomSerialWithTies(Map<String, ArrayList<String>> student_preferences, ArrayList<String> project_list){
+
+        // Construct undirected bipartite graph where V = (N U A) and E = empty
+        // for each agent in order of current permutation
+        //    start at first indifference class
+        //    provisionally add (i, a) to E for all a in agent i's current indifference class
+        //    if augmenting path starting from agent i
+        //        augment along path and modify E accordingly
+        //    else
+        //        provisionally added edges are removed
+        //        move onto agent i's next indifference class 
+    }
 
         //System.out.println(current_projects.toString());
     }
