@@ -54,10 +54,10 @@ public class Main {
 
     public static void main(String[] args) {
 
-        ArrayList<String> project_list = generateprojects(4);
+        ArrayList<String> project_list = generateprojects(2);
         System.out.println("Project List:" + project_list.toString());
 
-        Map<String, ArrayList<String>> student_preferences = generateStudents(4 , project_list);
+        Map<String, ArrayList<String>> student_preferences = generateStudents(2 , project_list);
 
         System.out.println("Student Preferences: " + student_preferences.toString());
         ArrayList<String> priority_list = new ArrayList<>();
@@ -70,7 +70,6 @@ public class Main {
         Collections.shuffle(priority_list);
         System.out.println("Priority List: " + priority_list.toString());
 
-        randomSerialDictatorship(student_preferences, project_list);
         //probabilisticSerialDictatorship(student_preferences, project_list);
         //BostonSerial bs = new BostonSerial();
         //bs.bostonSerial(student_preferences, project_list);
@@ -84,126 +83,6 @@ public class Main {
         }
         return fact;
     }
-
-    public static void randomSerialDictatorship(Map<String, ArrayList<String>> student_preferences, ArrayList<String> project_list){
-
-        // Create matrix
-        String[][] matrix = new String[(student_preferences.size() + 1)][(project_list.size() + 1)];
-
-        matrix[0][0] = "-";
-        int i = 1;
-        for (String student : student_preferences.keySet()) {
-            matrix[i][0] = student;
-            i++;
-        }
-
-
-        int j = 1;
-        for (String project : project_list){
-
-            matrix[0][j] = project;
-            j++;
-        }
-
-        i = 1;
-        while( i < matrix.length){
-            j = 1;
-            while (j < matrix[i].length){
-                matrix[i][j] = "0";
-                j++;
-            }
-            i++;
-        }
-
-
-        // Initialise projects_allocated array
-        ArrayList<String> projects_allocated = new ArrayList<>();
-        // Generate a permutations list then loop for each permutation
-        Permutations g = new Permutations();
-
-        String[] student_list = new String[student_preferences.size()];
-        int l = 0;
-        for (String name : student_preferences.keySet()){
-            student_list[l] = name;
-            l++;
-        }
-        System.out.println("Student list:" + Arrays.toString(student_list));
-
-        ArrayList<String> permutations = g.generatePermutations(student_list);
-
-        //ArrayList<ArrayList<String>> permutations_list = new ArrayList<ArrayList<String>>();
-        String[][] permutations_list = new String[factorial(student_preferences.size())][student_preferences.size()];
-        //System.out.println(permutations.toString());
-        int k = 0;
-        while(k < permutations.size()){
-            String[] new_string = permutations.get(k).split("(?<=[0-9])(?=[A-Z])");
-            //System.out.println(Arrays.toString(new_string));
-            permutations_list[k] = new_string;
-            k++;
-        }
-
-        for (String[] permutation : permutations_list) {
-            // Loop for number of students
-            i = 0;
-            // Start here - need to format string into list first
-            projects_allocated.clear();
-            while (i < permutation.length) {
-                // If the current student in the priority list is in student_preferences
-                if (student_preferences.containsKey(permutation[i])) {
-                    String name = permutation[i];
-                    // Get the students preferences
-                    ArrayList<String> preferences = student_preferences.get(name);
-                    // For each choice in the list of preferences
-                    //System.out.println("Preferences: " + preferences);
-                    j = 0;
-                    while (j < preferences.size()) {
-                        // If the project has already been taken
-                        if (projects_allocated.contains(preferences.get(j))) {
-                            // If the choice is the students last
-                            if (preferences.get(preferences.size() - 1).equals(preferences.get(j))) {
-                                // Unable to match student
-                                System.out.println(name + " not matched because none of their choices are available!");
-                            }
-                        } else {
-                            // Match the student to their choice
-                            System.out.println(name + " " + preferences.get(j));
-                            incrementValue(matrix, name, preferences.get(j), 1.0);
-                            // Add the project to the projects_allocated list
-                            projects_allocated.add(preferences.get(j));
-                            break;
-                        }
-                        j++;
-                    }
-                } else {
-                    System.out.println("Name not in student list!");
-                }
-                i++;
-            }
-        }
-
-        i = 1;
-        while( i < matrix.length){
-            j = 1;
-            while (j < matrix[i].length){
-                try {
-                   Double double_value = Double.parseDouble(matrix[i][j]);
-
-                    matrix[i][j] = Double.toString(double_value / factorial(student_list.length));
-                } catch (NumberFormatException e){
-                    e.printStackTrace();
-                }
-                j++;
-            }
-            i++;
-        }
-
-        for (String[] row : matrix){
-            System.out.println(Arrays.toString(row));
-        }
-
-
-    }
-
 
     public static boolean check_sizes(Map<String, Double> resource_allocation){
         Collection<Double> scores = resource_allocation.values();
@@ -399,7 +278,7 @@ public class Main {
         //        augment along path and modify E accordingly
         //    else
         //        provisionally added edges are removed
-        //        move onto agent i's next indifference class 
+        //        move onto agent i's next indifference class
     }
 
         //System.out.println(current_projects.toString());
