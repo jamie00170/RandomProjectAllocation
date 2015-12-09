@@ -162,8 +162,6 @@ public class RandomSerialDictatorship {
         }
 
 
-
-
         String[] student_list = new String[student_preferences.size()];
         int l = 0;
         for (String name : student_preferences.keySet()){
