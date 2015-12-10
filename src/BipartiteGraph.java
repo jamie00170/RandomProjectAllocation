@@ -155,8 +155,6 @@ public class BipartiteGraph {
 
         bG.searchAP(vL);
 
-
-
     }
 
 }
