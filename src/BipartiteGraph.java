@@ -26,8 +26,8 @@ public class BipartiteGraph {
     }
 
 
-    public Vertex searchAP(List<Vertex> vL) {
-        for (Vertex u : vL) {
+    public Vertex searchAP() {
+        for (Vertex u : this.vertexList) {
             u.visited = false;
             u.startVertex = false;
             for (Vertex w : u.adjacentV)
@@ -35,7 +35,7 @@ public class BipartiteGraph {
         }
         List<Vertex> queue = new LinkedList<Vertex>();
         Vertex u;
-        while ((u = getExposedUnvisited(vL)) != null) { // find an exposed and unvisited vertex u
+        while ((u = getExposedUnvisited(this.vertexList)) != null) { // find an exposed and unvisited vertex u
             queue.add(u);
             u.startVertex = true; // first vertex in alternating path
             while (queue.size() > 0) {
@@ -81,6 +81,7 @@ public class BipartiteGraph {
 
     BipartiteGraph(ArrayList<String> student_list,  ArrayList<String[]> project_list){
 
+        this.vertexList = new ArrayList<>();
         // Create Vertices for students
         for (String student : student_list){
             Vertex v = new Vertex(student);
@@ -96,19 +97,53 @@ public class BipartiteGraph {
     }
 
 
-    public void newEdge(Vertex i, Vertex a) {
-
-        // Create a non-matching edge between i and a
-        i.adjacentV.add(a);
-        a.adjacentV.add(i);
-
-        // Do below in initialisation
-        // this.vertexList.add(i);
-        // this.vertexList.add(a);
+    public void new_matching_edge(String student, String project){
+        for(Vertex v : vertexList){
+            if(v.name.equals(student)){
+                for (Vertex u : vertexList){
+                    if (u.name.equals(project)){
+                        v.mate = u;
+                    }
+                }
+            }
+        }
+        for(Vertex v : vertexList){
+            if(v.name.equals(project)){
+                for (Vertex u : vertexList){
+                    if (u.name.equals(student)){
+                        v.mate = u;
+                    }
+                }
+            }
+        }
 
     }
 
-    public void removeEdge(Vertex i, Vertex a){
+
+    public void new_provisional_edge(String student, String project) {
+        for (Vertex v : vertexList) {
+            if (v.name.equals(student)) {
+                for (Vertex u : vertexList) {
+                    if (u.name.equals(project)) {
+                        v.adjacentV.add(u);
+                    }
+                }
+            }
+        }
+
+        for (Vertex v : vertexList) {
+            if (v.name.equals(project)) {
+                for (Vertex u : vertexList) {
+                    if (u.name.equals(student)) {
+                        v.adjacentV.add(u);
+                    }
+                }
+            }
+        }
+
+    }
+
+    public void remove_edge(Vertex i, Vertex a){
 
         i.mate = null;
         i.adjacentV = null;
@@ -123,35 +158,26 @@ public class BipartiteGraph {
 
     public static void main(String[] args) {
 
-        // Set up Vertices
+        /**
+        Set up Vertices
         Vertex student1 = new Vertex("Student1");
         Vertex student2 = new Vertex("Student2");
         Vertex student3 = new Vertex("Student3");
-        //Vertex student4 = new Vertex("Student4");
 
         Vertex project1 = new Vertex("Project1");
         Vertex project2 = new Vertex("Project2");
         Vertex project3 = new Vertex("Project3");
 
-
         student1.mate = project2;
-
-
         project2.mate = student1;
 
-
         student1.adjacentV.add(project1);
-        student1.adjacentV.add(project2);
-
-        student2.adjacentV.add(project2);
-
-
-        project1.adjacentV.add(student1);
-
+         student1.adjacentV.add(project2);
+         student2.adjacentV.add(project2);
+         project1.adjacentV.add(student1);
 
         project2.adjacentV.add(student1);
         project2.adjacentV.add(student2);
-
 
         // Create a vertex list and add it to an Instance of Bipartite graph
         List<Vertex> vL = new LinkedList<>();
@@ -182,7 +208,7 @@ public class BipartiteGraph {
         for (Vertex v : bG.vertexList){
             System.out.println(v.toString());
         }
-
+        **/
 
         //////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -206,10 +232,22 @@ public class BipartiteGraph {
 
         BipartiteGraph bG2 = new BipartiteGraph(student_list, project_list);
 
-        // new_matching_edge
-        // new_provisioanl_edge
-        // remove_matching edge
-        // remove_provisional_edge
+        bG2.new_provisional_edge("Student1", "Project1");
+        bG2.new_matching_edge("Student1", "Project2");
+        bG2.new_provisional_edge("Student2", "Project2");
+        bG2.new_provisional_edge("Student1", "Project2");
+
+        for (Vertex v : bG2.vertexList){
+            System.out.println(v.toString());
+        }
+
+        Vertex end_v = bG2.searchAP();
+
+        bG2.augment(end_v);
+
+        for (Vertex v : bG2.vertexList){
+            System.out.println(v.toString());
+        }
 
     }
 
