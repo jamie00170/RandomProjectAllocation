@@ -1,9 +1,6 @@
 import javafx.scene.effect.PerspectiveTransform;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by Jamie on 06/12/2015.
@@ -79,7 +76,7 @@ public class BipartiteGraph {
 
     }
 
-    BipartiteGraph(ArrayList<String> student_list,  ArrayList<String[]> project_list){
+    BipartiteGraph(ArrayList<String> student_list,  ArrayList<String> project_list){
 
         this.vertexList = new ArrayList<>();
         // Create Vertices for students
@@ -89,8 +86,8 @@ public class BipartiteGraph {
         }
 
         // Create Vertices for projects
-        for (String[] project : project_list){
-            Vertex v = new Vertex(Arrays.toString(project));
+        for (String project : project_list){
+            Vertex v = new Vertex(project);
             this.vertexList.add(v);
         }
 
@@ -143,16 +140,16 @@ public class BipartiteGraph {
 
     }
 
-    public void remove_edge(Vertex i, Vertex a){
+    public void remove_provisional_edge(String student, String project){
 
-        i.mate = null;
-        i.adjacentV = null;
+        List<Vertex> toRemove = new ArrayList<>();
 
-        a.mate = null;
-        a.adjacentV = null;
+        for (Vertex v : vertexList) {
+            if (v.name.equals(student) || v.name.equals(project)){
+                v.adjacentV = new ArrayList<Vertex>();
+            }
+        }
 
-        vertexList.remove(i);
-        vertexList.remove(a);
 
     }
 
@@ -220,11 +217,11 @@ public class BipartiteGraph {
         student_list.add("Student2");
         student_list.add("Student3");
 
-        ArrayList<String[]> project_list = new ArrayList<>();
+        ArrayList<String> project_list = new ArrayList<>();
 
-        String[] project_1 = {"Project1"};
-        String[] project_2 = {"Project2"};
-        String[] project_3 = {"Project3"};
+        String project_1 = "Project1";
+        String project_2 = "Project2";
+        String project_3 = "Project3";
 
         project_list.add(project_1);
         project_list.add(project_2);
