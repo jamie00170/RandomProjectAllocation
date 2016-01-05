@@ -153,6 +153,16 @@ public class BipartiteGraph {
 
     }
 
+    public boolean hasEdge(){
+
+        for (Vertex v : this.vertexList){
+            if (v.mate != null){
+                return true;
+            }
+        }
+        return false;
+    }
+
     public static void main(String[] args) {
 
         /**
