@@ -44,6 +44,22 @@ public class RandomSerialDictatorshipTies {
 
     }
 
+    public static BipartiteGraph undirectedToDirected(BipartiteGraph bG){
+
+        for (Vertex v: bG.vertexList) {
+            if (v.mate != null && v.isStudent) {
+                Vertex u = v.mate;
+                u.mate = null;
+            }
+            if (v.adjacentV != null){
+
+            }
+
+        }
+        // direct adjacent edges
+
+        return bG;
+    }
 
 
     public static void enum_perfect_matchings_iter(BipartiteGraph G, String[][] M){
@@ -52,16 +68,20 @@ public class RandomSerialDictatorshipTies {
             return;
         }
         //2. pick an edge
-        
-        //3. find a cycle containing e by a depth first search algorithm
 
+        //3. find a cycle containing e by a depth first search algorithm
 
 
     }
 
 
     public static void enum_perfect_matchings(BipartiteGraph G, String[][] M){
-
+        // Transform undirected graph into a directed graph
+        G = undirectedToDirected(G);
+        System.out.println("-------------------------------------------");
+        for (Vertex v : G.vertexList){
+            System.out.println(v.toString());
+        }
         // TODO - Trim unnecessary edges from G by a strongly connected component decomposition algorithm
         enum_perfect_matchings_iter(G, M);
     }

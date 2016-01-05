@@ -81,13 +81,13 @@ public class BipartiteGraph {
         this.vertexList = new ArrayList<>();
         // Create Vertices for students
         for (String student : student_list){
-            Vertex v = new Vertex(student);
+            Vertex v = new Vertex(student, true);
             this.vertexList.add(v);
         }
 
         // Create Vertices for projects
         for (String project : project_list){
-            Vertex v = new Vertex(project);
+            Vertex v = new Vertex(project, false);
             this.vertexList.add(v);
         }
 

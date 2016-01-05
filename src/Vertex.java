@@ -11,12 +11,13 @@ public class Vertex {
 
     public String name;
     public boolean visited, startVertex;
+    public boolean isStudent;
     public Vertex predecessor, mate;
     public List<Vertex> adjacentV; // graph represented
     // by adjacency lists
 
 
-    public Vertex(String name){
+    public Vertex(String name, boolean isStudent){
 
         if (name.startsWith("[")) {
             this.name = name.substring(1, (name.length()-1));
@@ -25,6 +26,7 @@ public class Vertex {
         }
 
         this.mate = null;
+        this.isStudent =isStudent;
         adjacentV = new ArrayList<Vertex>();
 
     }
