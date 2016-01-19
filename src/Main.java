@@ -1,6 +1,10 @@
 import org.apache.commons.math.fraction.Fraction;
 import org.apache.commons.math.fraction.FractionConversionException;
 
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.*;
 
 // Specification + problem description +
@@ -97,6 +101,7 @@ public class Main {
 
     public static void main(String[] args) {
 
+
         ArrayList<String> project_list = generateprojects(3);
         System.out.println("Project List:" + project_list.toString());
 
@@ -104,9 +109,11 @@ public class Main {
 
         System.out.println("Student Preferences: " + student_preferences.toString());
 
+
         //probabilisticSerialDictatorship(student_preferences, project_list);
         BostonSerial bs = new BostonSerial();
         bs.bostonSerial(student_preferences, project_list);
+
 
     }
 

@@ -40,6 +40,23 @@ public class BostonSerial {
                 student_preferences.remove(name);
             }
         }
+
+        ArrayList<String> items_to_remove = new ArrayList<>();
+
+        for (String name : student_preferences.keySet()) {
+            // Get students list of ranked choices
+            ArrayList<String> preferences = student_preferences.get(name);
+            // Loop through their choices
+            for (String project : preferences) {
+                // If the choice has been fully matched remove it from the preferences list
+                if (project_allocation.get(project).equals(new Fraction(1))) {
+                    // remove project from preferences list
+                    //System.out.println("Removing " + project);
+                    items_to_remove.add(project);
+                }
+            }
+            preferences.removeAll(items_to_remove);
+        }
     }
 
     public static boolean check_sizes(Map<String, Double> resource_allocation){

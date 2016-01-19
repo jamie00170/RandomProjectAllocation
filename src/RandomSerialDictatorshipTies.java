@@ -51,12 +51,13 @@ public class RandomSerialDictatorshipTies {
                 Vertex u = v.mate;
                 u.mate = null;
             }
-            if (v.adjacentV != null){
-
+            // if v is a student make its adjacent v null, i.e remove adjacent edges pointing from students to projets
+            if (v.adjacentV != null && v.isStudent){
+                v.adjacentV = new ArrayList<Vertex>();
             }
 
         }
-        // direct adjacent edges
+
 
         return bG;
     }
@@ -67,10 +68,56 @@ public class RandomSerialDictatorshipTies {
         if (!(G.hasEdge())){
             return;
         }
-        //2. pick an edge
+        // 2. Try to find a cycle in G by DFS therefore confirming if there is another perfect matching
+        boolean isCycle = false;
+        int i = 0;
+        while (!isCycle) { // - Cycle could start from any vertex?
+            isCycle = G.depth_first_search(G.vertexList.get(i));
+            i++;
+        }
 
-        //3. find a cycle containing e by a depth first search algorithm
+        // 3. If there is no cycle found stop alogrithm
+        if (!isCycle){
+            System.out.println("Algorithm Stopped no cycle found!");
+            return;
+        }
 
+        if (isCycle){
+            G.exchange_edges();
+        }
+        // use vertex G.vertexList.get(i-1) as edge, e when .mate is not null then the vertex is also in the matching
+        Vertex edgeFrom = G.vertexList.get(i-1);
+        int j = 1;
+        while (edgeFrom.mate == null){
+            edgeFrom = G.vertexList.get(i-j);
+            j++;
+        }
+
+
+        try {
+            BipartiteGraph g_plus = G.clone();
+
+            // Generate G+(e)
+            g_plus.remove_associated_edges(edgeFrom);
+
+            enum_perfect_matchings_iter(g_plus, M);
+        }catch (CloneNotSupportedException e){
+            e.printStackTrace();
+        }
+        // Call enum_perfect_matchings_iter(G+(e), M)
+
+
+        try {
+            BipartiteGraph g_minus = G.clone();
+
+            // Generate G-(e)
+            g_minus.remove_matching_edge(edgeFrom);
+            // Call enum_perfect_matchings_iter(G-(e), M')
+            enum_perfect_matchings_iter(g_minus, M);
+
+        } catch (CloneNotSupportedException e){
+            e.printStackTrace();
+        }
 
     }
 

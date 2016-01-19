@@ -163,6 +163,94 @@ public class BipartiteGraph {
         return false;
     }
 
+    public boolean depth_first_search(Vertex startVertex) {
+
+        System.out.println("\n\nBeginning Depth First Search.......\n");
+
+        Stack<Vertex> stack = new Stack<>();
+
+        for (Vertex v : this.vertexList) {
+            v.visited = false;
+            v.startVertex = false;
+            if (v.name.equals(startVertex.name)) {
+                v.startVertex = true;
+                stack.push(v);
+            }
+        }
+
+
+        boolean after_first = false;
+        while (!(stack.empty())) {
+            Vertex u = stack.pop();
+            System.out.println("Visited: " + u.name);
+            if (!(u.visited = false)) {
+                u.visited = true;
+                if (u.adjacentV != null) {
+                    for (Vertex vertex : u.adjacentV) {
+                        if (!(vertex.visited) || (vertex.startVertex && after_first)) {
+                            stack.push(vertex);
+                            if (vertex.startVertex) {
+                                System.out.println("Cycle found starting at Vertex: " + vertex.name);
+                                return true;
+                            }
+                        }
+                    }
+                }
+                if (u.mate != null) {
+                    if (!(u.mate.visited) || (u.startVertex && after_first)) {
+                        stack.push(u.mate);
+                    }
+                }
+            }
+            after_first = true;
+        }
+        return false;
+    }
+
+
+
+    public void remove_matching_edge(Vertex v){
+
+        v.mate = null;
+    }
+
+    public BipartiteGraph clone() throws CloneNotSupportedException{
+
+        return (BipartiteGraph) super.clone();
+
+    }
+
+    public void remove_associated_edges(Vertex v){
+
+        v.mate.adjacentV = null;
+        v.mate = null;
+        v.adjacentV = null;
+
+        vertexList.remove(v);
+        vertexList.remove(v.mate);
+    }
+
+    public void exchange_edges(){
+        // **Needs to be used in depth first search method so right edges are changed**
+
+        for (Vertex v: vertexList){
+            // if vertex/edge is currently in the matching reverse it and remove it from matching
+            if (v.mate != null){
+                v.mate.adjacentV.add(v);
+                v.mate = null;
+            }
+            if (v.adjacentV != null){
+                // Needs fixed
+                v.mate = v.adjacentV.get(0);
+
+                v.adjacentV.remove(0);
+            }
+
+
+        }
+    }
+
+
     public static void main(String[] args) {
 
         /**
