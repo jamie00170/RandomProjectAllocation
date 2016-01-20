@@ -35,14 +35,23 @@ public class BostonSerial {
         ArrayList<String> student_list = new ArrayList<>();
         for (String name : student_preferences.keySet()) {
             student_list.add(name);
-
         }
 
+        ArrayList<String> names_to_remove = new ArrayList<>();
         for (String name : student_list) {
+            if (student_preferences.get(name).isEmpty()){
+                names_to_remove.add(name);
+            }
             if (student_allocation.get(name).equals(new Fraction(1))) {
                 student_preferences.remove(name);
             }
+
         }
+
+        for (String name : names_to_remove){
+            student_preferences.remove(name);
+        }
+
 
         ArrayList<String> items_to_remove = new ArrayList<>();
 
@@ -60,6 +69,7 @@ public class BostonSerial {
             }
             preferences.removeAll(items_to_remove);
         }
+
     }
 
     public static boolean check_sizes(Map<String, Fraction> resource_allocation){
@@ -83,8 +93,10 @@ public class BostonSerial {
         for (String student : student_preferences.keySet()){
             // Get the students preferences
             ArrayList<String> preferences =  student_preferences.get(student);
-            System.out.println(student + " " + preferences.get(0));
-            current_projects.put(preferences.get(0), current_projects.get(preferences.get(0)).add(new Fraction(1)));
+            if (!preferences.isEmpty()) {
+                System.out.println(student + " " + preferences.get(0));
+                current_projects.put(preferences.get(0), current_projects.get(preferences.get(0)).add(new Fraction(1)));
+            }
         }
         return current_projects;
     }
@@ -234,6 +246,8 @@ public class BostonSerial {
                 // get the students list of preferences
                 ArrayList<String> preferences = student_preferences.get(name);
                 // get their first available choice - matched choices have been removed to always index 0
+                if (preferences.isEmpty())
+                    continue;
                 String current_project = preferences.get(0);
                 // if the student has picked a project that is already matched then skip the student
                 if (project_allocation.get(current_project).compareTo(new Fraction(1)) >= 0)

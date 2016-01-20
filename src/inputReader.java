@@ -1,3 +1,5 @@
+import org.apache.commons.math3.fraction.Fraction;
+
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -76,6 +78,10 @@ public class inputReader {
             System.out.println("Project list: " + project_list.toString());
 
             System.out.println("Student Preferences: " + student_preferences.toString());
+
+            Main.probabilisticSerialDictatorship(student_preferences, project_list);
+            //BostonSerial bs = new BostonSerial();
+            //bs.bostonSerial(student_preferences, project_list);
 
         }catch (FileNotFoundException e){
             System.out.println("Specified file could not be found!");
