@@ -242,7 +242,6 @@ public class BipartiteGraph {
             if (v.adjacentV != null){
                 // Needs fixed
                 v.mate = v.adjacentV.get(0);
-
                 v.adjacentV.remove(0);
             }
 

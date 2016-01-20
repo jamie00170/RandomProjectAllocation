@@ -64,7 +64,7 @@ public class RandomSerialDictatorshipTies {
 
 
     public static void enum_perfect_matchings_iter(BipartiteGraph G, String[][] M){
-        // 1. If G has no edge stop
+        // Step 1: If G has no edge, stop
         if (!(G.hasEdge())){
             return;
         }
@@ -123,13 +123,19 @@ public class RandomSerialDictatorshipTies {
 
 
     public static void enum_perfect_matchings(BipartiteGraph G, String[][] M){
+        // Step 1: Find a perfect matching M of G and output M. If M is not found, stop.
+        // Already found M in with RSDT algorithm
+
         // Transform undirected graph into a directed graph
         G = undirectedToDirected(G);
         System.out.println("-------------------------------------------");
         for (Vertex v : G.vertexList){
             System.out.println(v.toString());
         }
+        // Step 2: Step 2: Trim unnecessary edges from G by a strongly connected component
+        // decomposition algorithm with D(G, M)
         // TODO - Trim unnecessary edges from G by a strongly connected component decomposition algorithm
+        // Step 3: Call Enum Perfect Matchings Iter (G, M)
         enum_perfect_matchings_iter(G, M);
     }
 
@@ -169,51 +175,51 @@ public class RandomSerialDictatorshipTies {
             i++;
         }
 
-
         // 1. Construct undirected bipartite graph where V = (N U A) and E = empty
         BipartiteGraph bG = new BipartiteGraph(student_list, project_list);
 
         // 2. for each agent in order of current permutation
         String[] permutation = {"Student1", "Student2", "Student3"};
-        i = 0;
-        while (i < permutation.length) {
-            if (student_preferences.containsKey(permutation[i])) {
-                String name = permutation[i];
 
-                // Until end of student's indifference classes is reached or student is matched
-                j = 0;
-                while (j < student_preferences.get(name).size()) {
-                    // 3. Look at the agents ith indifference class
-                    String[] indifference_class = student_preferences.get(name).get(j);
+        //ArrayList<String[]> permutations = new ArrayList<>();
 
-                    //4. provisionally add (i, a) to E for all a in agent i's current indifference class
+        for (String student : permutation) {
+            // Until end of student's indifference classes is reached or student is matched
+            j = 0;
+            while (j < student_preferences.get(student).size()) {
+                // 3. Look at the agents ith indifference class
+                String[] indifference_class = student_preferences.get(student).get(j);
+
+                //4. provisionally add (i, a) to E for all a in agent i's current indifference class
+                for (String project : indifference_class) {
+                    //4.1 bG.newEdge(i, a) - for all a in i's indifference class
+                    bG.new_provisional_edge(student, project);
+                }
+                Vertex end_v;
+                if ((end_v = bG.searchAP()) != null) {
+                    // 5.1. augment along path and modify E accordingly - augment()
+                    bG.augment(end_v);
+                    /**
+                     System.out.println("Printing Graph.....");
+                     for (Vertex v : bG.vertexList){
+                     System.out.println(v.toString());
+                     }
+                     **/
+                } else {
+                    // 5.2 provisionally added edges are removed
                     for (String project : indifference_class) {
                         //4.1 bG.newEdge(i, a) - for all a in i's indifference class
-                        bG.new_provisional_edge(name, project);
+                        bG.remove_provisional_edge(student, project);
                     }
-                    Vertex end_v;
-                    if ((end_v = bG.searchAP()) != null) {
-                        // 5.1. augment along path and modify E accordingly - augment()
-                        bG.augment(end_v);
-                        System.out.println("Printing Graph.....");
-                        for (Vertex v : bG.vertexList){
-                            System.out.println(v.toString());
-                        }
-                    } else {
-                        // 5.2 provisionally added edges are removed
-                        for (String project : indifference_class) {
-                            //4.1 bG.newEdge(i, a) - for all a in i's indifference class
-                            bG.remove_provisional_edge(name, project);
-                        }
-                    }
-                    // 5.3 move onto agent i's next indifference class until reach end of choices/classes
-                    j++;
                 }
-                i++;
-                // increment appropriate values in matrix at end of permutation i.e. where a vertex has a mate (matching edge)
-
+                // 5.3 move onto agent i's next indifference class until reach end of choices/classes
+                j++;
             }
+            i++;
+            // increment appropriate values in matrix at end of permutation i.e. where a vertex has a mate (matching edge)
+
         }
+
         System.out.println("Printing Graph.....");
         for (Vertex v : bG.vertexList){
             System.out.println(v.toString());
@@ -292,7 +298,6 @@ public class RandomSerialDictatorshipTies {
             for (String[] indiffer_class : aL1){
                 System.out.println(Arrays.toString(indiffer_class));
             }
-
         }
 
 
