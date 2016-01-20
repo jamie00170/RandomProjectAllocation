@@ -1,6 +1,7 @@
 import java.util.*;
-import org.apache.commons.math.fraction.Fraction;
-import org.apache.commons.math.fraction.FractionConversionException;
+import org.apache.commons.math3.fraction.Fraction;
+import org.apache.commons.math3.fraction.FractionConversionException;
+
 
 /**
  * Created by Jamie on 15/11/2015.
@@ -9,6 +10,7 @@ import org.apache.commons.math.fraction.FractionConversionException;
 
 public class BostonSerial {
 
+    /**
     public static Map<String, Fraction> getCurrentProjects(Map<String, ArrayList<String>> student_preferences, Map<String, Fraction> current_projects, Integer p){
 
         // reset current projects
@@ -24,6 +26,7 @@ public class BostonSerial {
         }
         return current_projects;
     }
+     **/
 
 
     public static void removeMatched(Map<String, ArrayList<String>> student_preferences, Map<String, Fraction> project_allocation, Map<String, Fraction> student_allocation){
@@ -59,14 +62,31 @@ public class BostonSerial {
         }
     }
 
-    public static boolean check_sizes(Map<String, Double> resource_allocation){
-        Collection<Double> scores = resource_allocation.values();
+    public static boolean check_sizes(Map<String, Fraction> resource_allocation){
+        Collection<Fraction> scores = resource_allocation.values();
         int num_of_projects_used = 0;
-        for (double score : scores){
-            if (score == 1.0)
+        for (Fraction score : scores){
+            if (score.equals(new Fraction(1)))
                 num_of_projects_used++;
         }
         return (num_of_projects_used == scores.size()) || resource_allocation.isEmpty();
+    }
+
+
+    public static Map<String, Fraction> getCurrentProjects(Map<String, ArrayList<String>> student_preferences, Map<String, Fraction> current_projects){
+
+        // reset current projects
+        for(String project : current_projects.keySet()){
+            current_projects.put(project, current_projects.get(project).subtract(current_projects.get(project)));
+        }
+
+        for (String student : student_preferences.keySet()){
+            // Get the students preferences
+            ArrayList<String> preferences =  student_preferences.get(student);
+            System.out.println(student + " " + preferences.get(0));
+            current_projects.put(preferences.get(0), current_projects.get(preferences.get(0)).add(new Fraction(1)));
+        }
+        return current_projects;
     }
 
     public static Fraction stringToFraction(String fraction_string){
@@ -193,10 +213,10 @@ public class BostonSerial {
             current_projects.put((String) project_list.get(k), new Fraction(0));
             k++;
         }
-        int p = 0;
-        while(p < project_allocation.size()){
+        //int p = 0;
+        while(!(check_sizes(project_allocation) || check_sizes(student_allocation) || student_preferences.isEmpty())){
             // Get current projects being consumed by students
-            Map<String, Fraction> currentProjects = getCurrentProjects(student_preferences, current_projects, p);
+            Map<String, Fraction> currentProjects = getCurrentProjects(student_preferences, current_projects);
             System.out.println("Current Projects: " + currentProjects.toString());
 
             // Get the maximum amount each project can be incremented by
@@ -214,7 +234,7 @@ public class BostonSerial {
                 // get the students list of preferences
                 ArrayList<String> preferences = student_preferences.get(name);
                 // get their first available choice - matched choices have been removed to always index 0
-                String current_project = preferences.get(p);
+                String current_project = preferences.get(0);
                 // if the student has picked a project that is already matched then skip the student
                 if (project_allocation.get(current_project).compareTo(new Fraction(1)) >= 0)
                     continue;
@@ -236,8 +256,13 @@ public class BostonSerial {
                     smallest_space = stu_all.get(name);
                 }
 
+                Fraction incrementValue;
+                if (num_of_students_consuming.compareTo(new Fraction(0)) > 0) {
+                    incrementValue = ((new Fraction(1).divide(num_of_students_consuming)).subtract(smallest_space));
+                } else {
+                    incrementValue = new Fraction(0);
+                }
 
-                Fraction incrementValue = ((new Fraction(1).divide(num_of_students_consuming)).subtract(smallest_space));
 
                 System.out.println("Smallest Space: " + smallest_space);
                 System.out.println("Number of students: " + num_of_students_consuming);
@@ -247,7 +272,7 @@ public class BostonSerial {
                 // Increment values in the matrix
                 incrementValue(matrix, name, current_project, incrementValue);
             }
-            p++;
+            //p++;
             System.out.println("Student Allocation: " + student_allocation.toString());
             System.out.println("Project Allocation: " + project_allocation.toString());
             System.out.println("Student preferences before removal: " + student_preferences.toString());

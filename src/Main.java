@@ -1,5 +1,5 @@
-import org.apache.commons.math.fraction.Fraction;
-import org.apache.commons.math.fraction.FractionConversionException;
+import org.apache.commons.math3.fraction.Fraction;
+import org.apache.commons.math3.fraction.FractionConversionException;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
@@ -102,10 +102,10 @@ public class Main {
     public static void main(String[] args) {
 
 
-        ArrayList<String> project_list = generateprojects(3);
+        ArrayList<String> project_list = generateprojects(4);
         System.out.println("Project List:" + project_list.toString());
 
-        Map<String, ArrayList<String>> student_preferences = generateStudents(3 , project_list);
+        Map<String, ArrayList<String>> student_preferences = generateStudents(4 , project_list);
 
         System.out.println("Student Preferences: " + student_preferences.toString());
 
@@ -237,7 +237,6 @@ public class Main {
         }
         System.out.println(student_allocation.toString());
         //System.out.println(student_preferences.toString());
-
 
 
         Map<String, Fraction> current_projects = new HashMap<>();
