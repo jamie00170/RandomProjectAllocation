@@ -126,6 +126,7 @@ public class BipartiteGraph {
                     }
                 }
             }
+
         }
 
         for (Vertex v : vertexList) {
@@ -163,12 +164,13 @@ public class BipartiteGraph {
         return false;
     }
 
-    public boolean depth_first_search(Vertex startVertex) {
+    public boolean find_cycle(Vertex startVertex) {
 
-        System.out.println("\n\nBeginning Depth First Search.......\n");
+        System.out.println("\n\nBeginning Depth First Search to find cycle .......\n");
 
         Stack<Vertex> stack = new Stack<>();
 
+        // Set up vertices and push the start vertex onto the stack
         for (Vertex v : this.vertexList) {
             v.visited = false;
             v.startVertex = false;
@@ -180,15 +182,25 @@ public class BipartiteGraph {
 
 
         boolean after_first = false;
+
         while (!(stack.empty())) {
+            // Pop the top vertex on the stack and store it in u
             Vertex u = stack.pop();
+            // Print that u has been visited
             System.out.println("Visited: " + u.name);
+            // If u hasn't already been visited
             if (!(u.visited = false)) {
                 u.visited = true;
+                // If u has an adjacent vertex
                 if (u.adjacentV != null) {
+                    // For each of u's adjacent vertices
                     for (Vertex vertex : u.adjacentV) {
+                        // if vertex (one of u's adjacent vertices) has not been visited or is the startVertex and the algorithm
+                        // has already looked at the first vertex
                         if (!(vertex.visited) || (vertex.startVertex && after_first)) {
                             stack.push(vertex);
+                            // If the vertex is th start vertex then we have come back to the start and therefore there
+                            // is a cycle starting at the startVertex
                             if (vertex.startVertex) {
                                 System.out.println("Cycle found starting at Vertex: " + vertex.name);
                                 return true;
@@ -204,6 +216,7 @@ public class BipartiteGraph {
             }
             after_first = true;
         }
+        System.out.println("No cycle Found!");
         return false;
     }
 
@@ -239,14 +252,30 @@ public class BipartiteGraph {
                 v.mate.adjacentV.add(v);
                 v.mate = null;
             }
-            if (v.adjacentV != null){
+            if (v.adjacentV.size() > 0){
                 // Needs fixed
                 v.mate = v.adjacentV.get(0);
                 v.adjacentV.remove(0);
             }
+        }
+    }
 
+    public static BipartiteGraph undirectedToDirected(BipartiteGraph bG){
+
+        for (Vertex v: bG.vertexList) {
+            if (v.mate != null && v.isStudent) {
+                Vertex u = v.mate;
+                u.mate = null;
+            }
+            // if v is a student make its adjacent v null, i.e remove adjacent edges pointing from students to projets
+            if (v.adjacentV != null && v.isStudent){
+                v.adjacentV = new ArrayList<Vertex>();
+            }
 
         }
+
+
+        return bG;
     }
 
 
@@ -326,18 +355,37 @@ public class BipartiteGraph {
 
         BipartiteGraph bG2 = new BipartiteGraph(student_list, project_list);
 
+        /**
         bG2.new_provisional_edge("Student1", "Project1");
         bG2.new_matching_edge("Student1", "Project2");
         bG2.new_provisional_edge("Student2", "Project2");
-        bG2.new_provisional_edge("Student1", "Project2");
+        bG2.new_matching_edge("Student2", "Project1");
+         **/
 
+        bG2.new_matching_edge("Student1", "Project1");
+        bG2.new_matching_edge("Student2", "Project2");
+        bG2.new_matching_edge("Student3", "Project3");
+
+        bG2.new_provisional_edge("Project2", "Student1");
+        bG2.new_provisional_edge("Project1", "Student2");
+
+        bG2 = undirectedToDirected(bG2);
+
+        boolean isCycle = false;
+        Vertex startVertex;
         for (Vertex v : bG2.vertexList){
-            System.out.println(v.toString());
+            if (v.name.equals("Student1")){
+                startVertex = v;
+                isCycle = bG2.find_cycle(startVertex);
+                if (isCycle){
+                    bG2.exchange_edges();
+                }
+            }
         }
 
-        Vertex end_v = bG2.searchAP();
 
-        bG2.augment(end_v);
+        //Vertex end_v = bG2.searchAP();
+        //bG2.augment(end_v);
 
         for (Vertex v : bG2.vertexList){
             System.out.println(v.toString());

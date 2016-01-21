@@ -69,22 +69,24 @@ public class RandomSerialDictatorshipTies {
             return;
         }
         // 2. Try to find a cycle in G by DFS therefore confirming if there is another perfect matching
-        boolean isCycle = false;
+        boolean isCycle;
         int i = 0;
-        while (!isCycle) { // - Cycle could start from any vertex?
-            isCycle = G.depth_first_search(G.vertexList.get(i));
+        while (i < G.vertexList.size()){// - Cycle could start from any vertex?
+            isCycle = G.find_cycle(G.vertexList.get(i));
+            if (isCycle){
+                // Step 4: Find a perfect matching M' by exchanging edges along the cycle. Output M'
+                G.exchange_edges();
+                // output M'
+                calculate_values_of_matrix(M, G);
+            }
             i++;
+            // 3. If there is no cycle found stop algorithm
+            if ((i == G.vertexList.size()) && !isCycle){
+                System.out.println("Algorithm Stopped no cycle found!");
+                return;
+            }
         }
 
-        // 3. If there is no cycle found stop alogrithm
-        if (!isCycle){
-            System.out.println("Algorithm Stopped no cycle found!");
-            return;
-        }
-
-        if (isCycle){
-            G.exchange_edges();
-        }
         // use vertex G.vertexList.get(i-1) as edge, e when .mate is not null then the vertex is also in the matching
         Vertex edgeFrom = G.vertexList.get(i-1);
         int j = 1;
@@ -93,23 +95,21 @@ public class RandomSerialDictatorshipTies {
             j++;
         }
 
-
         try {
-            BipartiteGraph g_plus = G.clone();
 
+            BipartiteGraph g_plus = G.clone();
             // Generate G+(e)
             g_plus.remove_associated_edges(edgeFrom);
-
+            // Call enum_perfect_matchings_iter(G+(e), M)
             enum_perfect_matchings_iter(g_plus, M);
+
         }catch (CloneNotSupportedException e){
             e.printStackTrace();
         }
-        // Call enum_perfect_matchings_iter(G+(e), M)
-
 
         try {
-            BipartiteGraph g_minus = G.clone();
 
+            BipartiteGraph g_minus = G.clone();
             // Generate G-(e)
             g_minus.remove_matching_edge(edgeFrom);
             // Call enum_perfect_matchings_iter(G-(e), M')
