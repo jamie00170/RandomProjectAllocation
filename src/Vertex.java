@@ -36,12 +36,16 @@ public class Vertex {
         return_string = return_string.concat(this.name + "\n");
         if (this.mate != null)
             return_string = return_string.concat("Mate: " + this.mate.name + "\n");
-        /**
+
         if (this.adjacentV != null) {
-            String adjacentString = this.adjacentV.toString();
-            return_string = return_string.concat("Adjacent Vertices: " + adjacentString + "\n");
+            int i = 0;
+            while (i < this.adjacentV.size()) {
+                String adjacentString = this.adjacentV.get(i).name;
+                return_string = return_string.concat("Adjacent Vertices: " + adjacentString + "\n");
+                i++;
+            }
         }
-         **/
+
         return return_string;
     }
 

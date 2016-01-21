@@ -146,9 +146,51 @@ public class BipartiteGraph {
         List<Vertex> toRemove = new ArrayList<>();
 
         for (Vertex v : vertexList) {
-            if (v.name.equals(student) || v.name.equals(project)){
-                v.adjacentV = new ArrayList<Vertex>();
+            if (v.name.equals(student)){
+                if (v.adjacentV.size() <= 1) {
+                    v.adjacentV = new ArrayList<Vertex>();
+                } else {
+                    for (Vertex u : vertexList) {
+                        if (u.name.equals(project)){
+                            v.adjacentV.remove(u);
+                        }
+                    }
+
+                }
             }
+            if (v.name.equals(project)){
+                if (v.adjacentV.size() <= 1) {
+                    v.adjacentV = new ArrayList<Vertex>();
+                } else {
+                    for (Vertex u : vertexList) {
+                        if (u.name.equals(student)){
+                            v.adjacentV.remove(u);
+                        }
+                    }
+
+                }
+            }
+
+        }
+
+
+    }
+
+    public void cleanUp(){
+
+        for (Vertex v : this.vertexList){
+            if (v.mate != null){
+                if (v.adjacentV.size() > 0 ){
+                    for (Vertex u : v.adjacentV){
+                        if (u.name.equals(v.mate.name)){
+                            System.out.println("Removing provisonal edge between: " + v.name + " " + u.name);
+                            this.remove_provisional_edge(v.name, u.name);
+                        }
+                    }
+                }
+
+            }
+
         }
 
 
@@ -371,6 +413,11 @@ public class BipartiteGraph {
 
         bG2 = undirectedToDirected(bG2);
 
+        for (Vertex v : bG2.vertexList){
+            System.out.println(v.toString());
+        }
+
+        System.out.println("------------------------------");
         boolean isCycle = false;
         Vertex startVertex;
         for (Vertex v : bG2.vertexList){

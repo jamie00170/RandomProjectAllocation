@@ -75,9 +75,18 @@ public class RandomSerialDictatorshipTies {
             isCycle = G.find_cycle(G.vertexList.get(i));
             if (isCycle){
                 // Step 4: Find a perfect matching M' by exchanging edges along the cycle. Output M'
+                System.out.println("Exchanging edges......");
+                System.out.println("Current Matching....");
+                for (String[] row : M){
+                    System.out.println(Arrays.toString(row));
+                }
                 G.exchange_edges();
                 // output M'
+                System.out.println("New matching......");
                 calculate_values_of_matrix(M, G);
+                for (String[] row : M){
+                    System.out.println(Arrays.toString(row));
+                }
             }
             i++;
             // 3. If there is no cycle found stop algorithm
@@ -128,7 +137,14 @@ public class RandomSerialDictatorshipTies {
 
         // Transform undirected graph into a directed graph
         G = undirectedToDirected(G);
+        /**
+        G.remove_provisional_edge("Student3", "Project2");
+        G.remove_provisional_edge("Student3", "Project1");
+        G.remove_provisional_edge("Student3", "Project3");
+        G.remove_provisional_edge("Student2", "Project3");
+         **/
         System.out.println("-------------------------------------------");
+        System.out.println("Graph input to emun_perfect_matchings_iter");
         for (Vertex v : G.vertexList){
             System.out.println(v.toString());
         }
@@ -228,6 +244,19 @@ public class RandomSerialDictatorshipTies {
         // Calculate values for matrix from graph
         calculate_values_of_matrix(matrix, bG);
 
+        // Clean up graph, i.e. remove adjacent edges where there is a matching one
+        bG.cleanUp();
+
+        /**
+        bG.remove_provisional_edge("Student1", "Project1");
+        bG.remove_provisional_edge("Project3", "Student3");
+        bG.remove_provisional_edge("Project2", "Student3");
+         ***/
+
+        System.out.println("Printing graph after clean up....");
+        for (Vertex v : bG.vertexList){
+            System.out.println(v.toString());
+        }
         // call perfect emum here?
         enum_perfect_matchings(bG, matrix);
 
@@ -282,7 +311,6 @@ public class RandomSerialDictatorshipTies {
         project_list.add("Project3");
 
         HashMap<String, ArrayList<String[]>> student_preferences = generateStudents(3, project_list);
-
 
         ArrayList<String[]> ar1 = new ArrayList<>();
 
