@@ -2,6 +2,7 @@
  * Created by Jamie on 30/11/2015.
  */
 
+import java.lang.reflect.Array;
 import java.util.*;
 
 public class RandomSerialDictatorship {
@@ -64,8 +65,8 @@ public class RandomSerialDictatorship {
     }
 
 
-    static String[][] permute(List<String> student_list, int k, Map<String, ArrayList<String>> student_preferences, ArrayList<String> project_list, String[][] matrix){
-        String[] permutation;
+    static String[][] permute(ArrayList<String> student_list, int k, Map<String, ArrayList<String>> student_preferences, ArrayList<String> project_list, String[][] matrix){
+        String[] permutation = new String[student_list.size()];
         // Initialise projects_allocated array
         ArrayList<String> projects_allocated = new ArrayList<>();
 
@@ -75,7 +76,7 @@ public class RandomSerialDictatorship {
             java.util.Collections.swap(student_list, k, n);
         }
         if (k == student_list.size() -1){
-            permutation = (String[]) student_list.toArray();
+            permutation = student_list.toArray(permutation);
             System.out.println(Arrays.toString(permutation));
             // run rsd code here for permutation
 
@@ -162,16 +163,15 @@ public class RandomSerialDictatorship {
         }
 
 
-        String[] student_list = new String[student_preferences.size()];
-        int l = 0;
+        //String[] student_list = new String[student_preferences.size()];
+        ArrayList<String> student_list = new ArrayList<>();
         for (String name : student_preferences.keySet()){
-            student_list[l] = name;
-            l++;
+            student_list.add(name);
         }
-        System.out.println("Student list:" + Arrays.toString(student_list));
+        System.out.println("Student list:" + student_list);
 
 
-        matrix = RandomSerialDictatorship.permute(java.util.Arrays.asList(student_list), 0, student_preferences, project_list, matrix);
+        matrix = RandomSerialDictatorship.permute(student_list, 0, student_preferences, project_list, matrix);
 
         int p = 1;
         while( p < matrix.length){
@@ -180,7 +180,7 @@ public class RandomSerialDictatorship {
                 try {
                     Double double_value = Double.parseDouble(matrix[p][f]);
 
-                    matrix[p][f] = Double.toString(double_value / factorial(student_list.length));
+                    matrix[p][f] = Double.toString(double_value / factorial(student_list.size()));
                 } catch (NumberFormatException e){
                     e.printStackTrace();
                 }

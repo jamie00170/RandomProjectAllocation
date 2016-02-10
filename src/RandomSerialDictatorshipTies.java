@@ -7,13 +7,13 @@ import java.util.*;
  */
 public class RandomSerialDictatorshipTies {
 
-    public static void calculate_values_of_matrix(String[][] matrix, BipartiteGraph bG){
+    public static String[][] calculate_values_of_matrix(String[][] matrix, BipartiteGraph bG){
         for (Vertex v : bG.vertexList){
             if (v.mate != null){
                 incrementValue(matrix, v.name, v.mate.name, 1.0);
             }
         }
-
+        return matrix;
     }
 
 
@@ -69,9 +69,9 @@ public class RandomSerialDictatorshipTies {
             return;
         }
         // 2. Try to find a cycle in G by DFS therefore confirming if there is another perfect matching
-        boolean isCycle;
+        boolean isCycle = false;
         int i = 0;
-        while (i < G.vertexList.size()){// - Cycle could start from any vertex?
+        while (i < G.vertexList.size() && !isCycle){// - Cycle could start from any vertex?
             isCycle = G.find_cycle(G.vertexList.get(i));
             if (isCycle){
                 // Step 4: Find a perfect matching M' by exchanging edges along the cycle. Output M'
@@ -83,10 +83,11 @@ public class RandomSerialDictatorshipTies {
                 G.exchange_edges();
                 // output M'
                 System.out.println("New matching......");
-                calculate_values_of_matrix(M, G);
+                M = calculate_values_of_matrix(M, G);
                 for (String[] row : M){
                     System.out.println(Arrays.toString(row));
                 }
+
             }
             i++;
             // 3. If there is no cycle found stop algorithm
@@ -96,8 +97,10 @@ public class RandomSerialDictatorshipTies {
             }
         }
 
+        System.out.println("Index of edge from: " + i);
         // use vertex G.vertexList.get(i-1) as edge, e when .mate is not null then the vertex is also in the matching
         Vertex edgeFrom = G.vertexList.get(i-1);
+        System.out.println("Edge From: " + edgeFrom.name);
         int j = 1;
         while (edgeFrom.mate == null){
             edgeFrom = G.vertexList.get(i-j);
@@ -130,19 +133,13 @@ public class RandomSerialDictatorshipTies {
 
     }
 
-
     public static void enum_perfect_matchings(BipartiteGraph G, String[][] M){
         // Step 1: Find a perfect matching M of G and output M. If M is not found, stop.
         // Already found M in with RSDT algorithm
 
         // Transform undirected graph into a directed graph
         G = undirectedToDirected(G);
-        /**
-        G.remove_provisional_edge("Student3", "Project2");
-        G.remove_provisional_edge("Student3", "Project1");
-        G.remove_provisional_edge("Student3", "Project3");
-        G.remove_provisional_edge("Student2", "Project3");
-         **/
+
         System.out.println("-------------------------------------------");
         System.out.println("Graph input to emun_perfect_matchings_iter");
         for (Vertex v : G.vertexList){
@@ -247,19 +244,12 @@ public class RandomSerialDictatorshipTies {
         // Clean up graph, i.e. remove adjacent edges where there is a matching one
         bG.cleanUp();
 
-        /**
-        bG.remove_provisional_edge("Student1", "Project1");
-        bG.remove_provisional_edge("Project3", "Student3");
-        bG.remove_provisional_edge("Project2", "Student3");
-         ***/
-
         System.out.println("Printing graph after clean up....");
         for (Vertex v : bG.vertexList){
             System.out.println(v.toString());
         }
         // call perfect emum here?
         enum_perfect_matchings(bG, matrix);
-
 
         for (String[] row : matrix){
             System.out.println(Arrays.toString(row));
@@ -313,12 +303,16 @@ public class RandomSerialDictatorshipTies {
         HashMap<String, ArrayList<String[]>> student_preferences = generateStudents(3, project_list);
 
         ArrayList<String[]> ar1 = new ArrayList<>();
-
         String[] pref1 = {"Project1", "Project2"};
-
         ar1.add(pref1);
 
+        ArrayList<String[]> ar2 = new ArrayList<>();
+        String[] pref2 = {"Project1", "Project2"};
+        ar2.add(pref2);
+
+
         student_preferences.put("Student1", ar1 );
+        student_preferences.put("Student2", ar2);
 
         for (Map.Entry<String, ArrayList<String[]>> entry : student_preferences.entrySet()){
             System.out.println(entry.getKey());

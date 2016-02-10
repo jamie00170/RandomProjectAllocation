@@ -143,53 +143,52 @@ public class BipartiteGraph {
 
     public void remove_provisional_edge(String student, String project){
 
-        List<Vertex> toRemove = new ArrayList<>();
+        //List<Vertex> toRemove = new ArrayList<>();
 
         for (Vertex v : vertexList) {
-            if (v.name.equals(student)){
-                if (v.adjacentV.size() <= 1) {
-                    v.adjacentV = new ArrayList<Vertex>();
-                } else {
-                    for (Vertex u : vertexList) {
-                        if (u.name.equals(project)){
-                            v.adjacentV.remove(u);
-                        }
+            if (v.name.equals(student)) {
+                for (Vertex u : vertexList) {
+                    if (u.name.equals(project)) {
+                        v.adjacentV.remove(u);
                     }
-
                 }
             }
-            if (v.name.equals(project)){
-                if (v.adjacentV.size() <= 1) {
-                    v.adjacentV = new ArrayList<Vertex>();
-                } else {
-                    for (Vertex u : vertexList) {
-                        if (u.name.equals(student)){
-                            v.adjacentV.remove(u);
-                        }
+            if (v.name.equals(project)) {
+                for (Vertex u : vertexList) {
+                    if (u.name.equals(student)) {
+                        v.adjacentV.remove(u);
                     }
-
                 }
-            }
 
+            }
         }
-
-
     }
+
 
     public void cleanUp(){
 
+        ArrayList<String> edges_to_remove = new ArrayList<>();
+
         for (Vertex v : this.vertexList){
-            if (v.mate != null){
-                if (v.adjacentV.size() > 0 ){
-                    for (Vertex u : v.adjacentV){
-                        if (u.name.equals(v.mate.name)){
-                            System.out.println("Removing provisonal edge between: " + v.name + " " + u.name);
-                            this.remove_provisional_edge(v.name, u.name);
+            if (v.isStudent) {
+                if (v.mate != null) {
+                    if (v.adjacentV.size() > 0) {
+                        for (Vertex u : v.adjacentV) {
+                            if (u.name.equals(v.mate.name)) {
+                                edges_to_remove.add(v.name);
+                                edges_to_remove.add(u.name);
+                            }
                         }
                     }
                 }
-
             }
+        }
+
+        int i = 0;
+        while (i + 1 < edges_to_remove.size()){
+            System.out.println("Removing provisional edge between: " + edges_to_remove.get(i) + " " + edges_to_remove.get(i+1));
+            this.remove_provisional_edge(edges_to_remove.get(i), edges_to_remove.get(i + 1));
+            i = i + 2;
 
         }
 
@@ -311,11 +310,15 @@ public class BipartiteGraph {
             }
             // if v is a student make its adjacent v null, i.e remove adjacent edges pointing from students to projets
             if (v.adjacentV != null && v.isStudent){
+                // Have to make adjacent edge point to student
+                for (Vertex u :  v.adjacentV){
+                    u.adjacentV.add(v);
+                }
+                // then make student's adjacent edges null
                 v.adjacentV = new ArrayList<Vertex>();
             }
 
         }
-
 
         return bG;
     }

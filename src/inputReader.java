@@ -43,6 +43,7 @@ public class inputReader {
             int number_supervisors = Integer.parseInt(br.readLine());
 
             i = 0;
+            //String[] student_list = new String[number_students];
             ArrayList<String> student_list = new ArrayList<>();
             while (i < (number_students)){
                 student_list.add(br.readLine());
@@ -79,7 +80,61 @@ public class inputReader {
 
             System.out.println("Student Preferences: " + student_preferences.toString());
 
-            Main.probabilisticSerialDictatorship(student_preferences, project_list);
+            // Set up
+            // Create matrix
+            String[][] matrix = new String[(student_preferences.size() + 1)][(project_list.size() + 1)];
+
+            matrix[0][0] = "-";
+            i = 1;
+            for (String student : student_preferences.keySet()) {
+                matrix[i][0] = student;
+                i++;
+            }
+
+
+            int j = 1;
+            for (String project : project_list){
+
+                matrix[0][j] = project;
+                j++;
+            }
+
+            i = 1;
+            while( i < matrix.length){
+                j = 1;
+                while (j < matrix[i].length){
+                    matrix[i][j] = "0";
+                    j++;
+                }
+                i++;
+            }
+
+
+            matrix = RandomSerialDictatorship.permute(student_list, 0, student_preferences, project_list, matrix);
+
+            int p = 1;
+            while( p < matrix.length){
+                int f = 1;
+                while (f < matrix[p].length){
+                    try {
+                        Double double_value = Double.parseDouble(matrix[p][f]);
+
+                        matrix[p][f] = Double.toString(double_value / RandomSerialDictatorship.factorial(student_list.size()));
+                    } catch (NumberFormatException e){
+                        e.printStackTrace();
+                    }
+                    f++;
+                }
+                p++;
+            }
+
+            for (String[] row : matrix){
+                System.out.println(Arrays.toString(row));
+            }
+
+
+
+            //Main.probabilisticSerialDictatorship(student_preferences, project_list);
             //BostonSerial bs = new BostonSerial();
             //bs.bostonSerial(student_preferences, project_list);
 
