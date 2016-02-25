@@ -57,8 +57,6 @@ public class RandomSerialDictatorshipTies {
             }
 
         }
-
-
         return bG;
     }
 
@@ -69,29 +67,39 @@ public class RandomSerialDictatorshipTies {
             return;
         }
         // 2. Try to find a cycle in G by DFS therefore confirming if there is another perfect matching
-        boolean isCycle = false;
+       HashSet<Vertex> verticesInCycle = new HashSet<>();
         int i = 0;
-        while (i < G.vertexList.size() && !isCycle){// - Cycle could start from any vertex?
-            isCycle = G.find_cycle(G.vertexList.get(i));
-            if (isCycle){
-                // Step 4: Find a perfect matching M' by exchanging edges along the cycle. Output M'
-                System.out.println("Exchanging edges......");
+        while (i < G.vertexList.size() && !verticesInCycle.isEmpty()){// - Cycle could start from any vertex?
+            verticesInCycle = G.find_cycle(G.vertexList.get(i));
+            if (!verticesInCycle.isEmpty()){
+                // Step 4: Find a perfect matching M' by exchanging edges along the cycle. Output M'
+                System.out.println("Current graph...");
+                for (Vertex v : G.vertexList){
+                    System.out.println(v);
+                }
+
                 System.out.println("Current Matching....");
                 for (String[] row : M){
                     System.out.println(Arrays.toString(row));
                 }
-                G.exchange_edges();
+                System.out.println("Exchanging edges......");
+                G.exchange_edges(verticesInCycle);
                 // output M'
                 System.out.println("New matching......");
                 M = calculate_values_of_matrix(M, G);
                 for (String[] row : M){
                     System.out.println(Arrays.toString(row));
                 }
+                System.out.println("Graph after exchaning edges...");
+                for (Vertex v : G.vertexList){
+                    System.out.println(v);
+                }
+                return;
 
             }
             i++;
             // 3. If there is no cycle found stop algorithm
-            if ((i == G.vertexList.size()) && !isCycle){
+            if ((i == G.vertexList.size()) && verticesInCycle.isEmpty()){
                 System.out.println("Algorithm Stopped no cycle found!");
                 return;
             }
@@ -100,17 +108,25 @@ public class RandomSerialDictatorshipTies {
         System.out.println("Index of edge from: " + i);
         // use vertex G.vertexList.get(i-1) as edge, e when .mate is not null then the vertex is also in the matching
         Vertex edgeFrom = G.vertexList.get(i-1);
-        System.out.println("Edge From: " + edgeFrom.name);
+        /**
         int j = 1;
         while (edgeFrom.mate == null){
             edgeFrom = G.vertexList.get(i-j);
             j++;
         }
+        System.out.println("Edge From: " + edgeFrom.name);
+         **/
 
         try {
 
             BipartiteGraph g_plus = G.clone();
             // Generate G+(e)
+            /**
+            System.out.println("Printing g_plus...");
+            for (Vertex v : g_plus.vertexList){
+                System.out.println(v);
+            }
+             **/
             g_plus.remove_associated_edges(edgeFrom);
             // Call enum_perfect_matchings_iter(G+(e), M)
             enum_perfect_matchings_iter(g_plus, M);

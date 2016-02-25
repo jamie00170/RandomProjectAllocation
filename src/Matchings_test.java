@@ -42,7 +42,7 @@ public class Matchings_test {
     }
 
 
-    public static HashMap<String, String> randomSerialDictatorship(HashMap<String, ArrayList<String>> student_preferences, ArrayList<String> project_list, ArrayList<String> priority_list){
+    public static HashMap<String, String> randomSerialDictatorship(HashMap<String, ArrayList<String>> student_preferences, ArrayList<String> project_list, ImmutableList<String> priority_list){
 
         HashMap<String, String> matching = new HashMap<>();
         // Initialise projects_allocated array
@@ -86,7 +86,7 @@ public class Matchings_test {
     }
 
 
-    public static void enum_all_matchings(ArrayList<String> student_list, List<String> project_list, HashMap<String, ArrayList<String>> student_preferences , HashMap<String, String> matching){
+    public boolean enum_all_matchings(ArrayList<String> student_list, List<String> project_list, HashMap<String, ArrayList<String>> student_preferences , HashMap<String, String> matching){
 
         // generate all permutations of project list and match project_list[i] in current permutation to student_list[i]
         // to create a matching also unmatched project to be added to project list
@@ -106,7 +106,7 @@ public class Matchings_test {
         // for each possible matching
         for (Object project : project_permutations){
             ImmutableList<String> project_permutation = (ImmutableList<String>) project;
-            System.out.println("Current permutation: " + project_permutation);
+            //System.out.println("Current permutation: " + project_permutation);
             int i = 0;
             boolean student_worse_off_than_M = false;
             boolean student_better_off_than_M = false;
@@ -117,17 +117,17 @@ public class Matchings_test {
                 // TODO if student not in matching make their ith_choice in M integer.MaxValue
                 String students_project_in_matching = matching.get(student_list.get(i));
 
-                System.out.println("Current_student: " + student_list.get(i));
-                System.out.println("Students project in M: " + students_project_in_matching );
-                System.out.println("Students project is M'" + students_project_in_current_permutation);
+                //System.out.println("Current_student: " + student_list.get(i));
+                //System.out.println("Students project in M: " + students_project_in_matching );
+                //System.out.println("Students project is M'" + students_project_in_current_permutation);
                 ArrayList<String> students_preferences = student_preferences.get(student_list.get(i));
-                System.out.println("Current students preference list: " + students_preferences);
+                //System.out.println("Current students preference list: " + students_preferences);
                 // Check if the current student is worse off than in M
                 int ith_choice_in_M = students_preferences.indexOf(students_project_in_matching);
-                System.out.println("ith choice in M: " + ith_choice_in_M);
+                //System.out.println("ith choice in M: " + ith_choice_in_M);
                 // get the project the student is matched to in M
                 int ith_choice_in_current_permutation = project_permutation.indexOf(students_project_in_current_permutation);
-                System.out.println("ith choice in M': " + ith_choice_in_current_permutation);
+                //System.out.println("ith choice in M': " + ith_choice_in_current_permutation);
                 // compare the porjects based on the index value in studentpreferences
                 if (ith_choice_in_M < ith_choice_in_current_permutation){
                     student_worse_off_than_M = true;
@@ -139,19 +139,20 @@ public class Matchings_test {
             }
             if (student_better_off_than_M && student_worse_off_than_M){
                 System.out.println("Matching is not Pareto optimal!");
-                break;
+                return false;
             }
 
         }
 
         System.out.println("Matching is pareto optimal!");
+        return true;
     }
 
     public static void main(String[] args) {
 
-        ArrayList<String> project_list = generateprojects(4);
+        ArrayList<String> project_list = generateprojects(6);
 
-        HashMap<String, ArrayList<String>> student_preferences = generateStudents(4, project_list);
+        HashMap<String, ArrayList<String>> student_preferences = generateStudents(6, project_list);
 
         ArrayList<String> student_list = new ArrayList<>();
 
@@ -166,13 +167,26 @@ public class Matchings_test {
 
         //A matching where the student is the key and the project they are matched to in the matching is the value
         HashMap<String, String> matching = new HashMap<>();
-        matching = randomSerialDictatorship(student_preferences, project_list, student_list);
 
-        System.out.println("Matching: " + matching);
+        Collection student_col = student_list;
+        Collection<ImmutableList<String>> student_permutations = Collections2.permutations(student_col);
+
+        int i = 0;
+        for (Object student : student_permutations) {
+            ImmutableList<String> student_permutation = (ImmutableList<String>) student;
+            matching = randomSerialDictatorship(student_preferences, project_list, student_permutation);
+
+            System.out.println("Matching: " + matching);
+
+            System.out.println("------------------ enum all matchings running on permutation number: " + i + " --------------------");
+            i++;
+            Matchings_test mt = new Matchings_test();
+            mt.enum_all_matchings(student_list, project_list, student_preferences, matching);
+
+        }
 
 
-        System.out.println("------------------enum all matchings running--------------------");
-        enum_all_matchings(student_list, project_list, student_preferences, matching);
+
 
     }
 }

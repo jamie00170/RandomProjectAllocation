@@ -51,10 +51,10 @@ public class RandomSerialDictatorship {
 
     }
 
-    public static Map<String, ArrayList<String>> generateStudents(int num_of_students, ArrayList<String> project_list) {
+    public static HashMap<String, ArrayList<String>> generateStudents(int num_of_students, ArrayList<String> project_list) {
 
 
-        Map<String, ArrayList<String>> student_preferences = new HashMap<>();
+        HashMap<String, ArrayList<String>> student_preferences = new HashMap<>();
         int j = 1;
         while (j <= num_of_students) {
             Collections.shuffle(project_list);
@@ -65,7 +65,7 @@ public class RandomSerialDictatorship {
     }
 
 
-    static String[][] permute(ArrayList<String> student_list, int k, Map<String, ArrayList<String>> student_preferences, ArrayList<String> project_list, String[][] matrix){
+    static String[][] permute(ArrayList<String> student_list, int k, HashMap<String, ArrayList<String>> student_preferences, ArrayList<String> project_list, String[][] matrix){
         String[] permutation = new String[student_list.size()];
         // Initialise projects_allocated array
         ArrayList<String> projects_allocated = new ArrayList<>();
@@ -75,7 +75,7 @@ public class RandomSerialDictatorship {
             permute(student_list, k+1, student_preferences, project_list, matrix);
             java.util.Collections.swap(student_list, k, n);
         }
-        if (k == student_list.size() -1){
+        if (k == student_list.size() -1) {
             permutation = student_list.toArray(permutation);
             System.out.println(Arrays.toString(permutation));
             // run rsd code here for permutation
@@ -117,6 +117,28 @@ public class RandomSerialDictatorship {
             }
 
         }
+        /**
+        HashMap<String, String> matching = new HashMap<>();
+
+        // Run enum all matchings here?
+        int i = 1;
+        while(i < matrix.length){
+            int j = 1;
+            while (j < matrix[i].length) {
+                matching.put(matrix[i][0], matrix[0][j]);
+                j++;
+                }
+            i++;
+        }
+
+        boolean isParetoOptimal;
+        Matchings_test mt = new Matchings_test();
+        isParetoOptimal =  mt.enum_all_matchings(student_list, project_list, student_preferences, matching);
+        if(!isParetoOptimal){
+            System.out.println("A matching was found that is not Pareto Optimal");
+            System.exit(1);
+        }
+         **/
 
         return matrix;
     }
@@ -125,10 +147,10 @@ public class RandomSerialDictatorship {
     public static void main(String[] args){
 
 
-        ArrayList<String> project_list = generateprojects(20);
+        ArrayList<String> project_list = generateprojects(5);
         System.out.println("Project List:" + project_list.toString());
 
-        Map<String, ArrayList<String>> student_preferences = generateStudents(20 , project_list);
+        HashMap<String, ArrayList<String>> student_preferences = generateStudents(5 , project_list);
 
         System.out.println("Student Preferences: " + student_preferences.toString());
         ArrayList<String> priority_list = new ArrayList<>();

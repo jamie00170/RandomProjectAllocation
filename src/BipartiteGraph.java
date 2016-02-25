@@ -5,7 +5,7 @@ import java.util.*;
 /**
  * Created by Jamie on 06/12/2015.
  */
-public class BipartiteGraph {
+public class BipartiteGraph implements Cloneable {
 
     public List<Vertex> vertexList;
 
@@ -205,10 +205,11 @@ public class BipartiteGraph {
         return false;
     }
 
-    public boolean find_cycle(Vertex startVertex) {
+    public HashSet<Vertex> find_cycle(Vertex startVertex) {
 
         System.out.println("\n\nBeginning Depth First Search to find cycle .......\n");
 
+        HashSet<Vertex> verticesInCycle = new HashSet<>();
         Stack<Vertex> stack = new Stack<>();
 
         // Set up vertices and push the start vertex onto the stack
@@ -240,11 +241,17 @@ public class BipartiteGraph {
                         // has already looked at the first vertex
                         if (!(vertex.visited) || (vertex.startVertex && after_first)) {
                             stack.push(vertex);
+                            verticesInCycle.add(vertex);
                             // If the vertex is th start vertex then we have come back to the start and therefore there
                             // is a cycle starting at the startVertex
                             if (vertex.startVertex) {
                                 System.out.println("Cycle found starting at Vertex: " + vertex.name);
-                                return true;
+                                System.out.println("Linked list containing path..");
+                                for (Vertex v : verticesInCycle){
+                                    System.out.println(v);
+                                }
+                                System.out.println("\n\n");
+                                return verticesInCycle;
                             }
                         }
                     }
@@ -252,15 +259,15 @@ public class BipartiteGraph {
                 if (u.mate != null) {
                     if (!(u.mate.visited) || (u.startVertex && after_first)) {
                         stack.push(u.mate);
+                        verticesInCycle.add(u.mate);
                     }
                 }
             }
             after_first = true;
         }
         System.out.println("No cycle Found!");
-        return false;
+        return verticesInCycle;
     }
-
 
 
     public void remove_matching_edge(Vertex v){
@@ -276,27 +283,31 @@ public class BipartiteGraph {
 
     public void remove_associated_edges(Vertex v){
 
-        v.mate.adjacentV = null;
-        v.mate = null;
-        v.adjacentV = null;
+        if (v.mate != null) {
+            v.mate.adjacentV = null;
+            v.mate = null;
+        }
+        if (v.adjacentV != null) v.adjacentV = null;
 
         vertexList.remove(v);
         vertexList.remove(v.mate);
     }
 
-    public void exchange_edges(){
+    public void exchange_edges(HashSet<Vertex> verticesInCycle){
         // **Needs to be used in depth first search method so right edges are changed**
 
-        for (Vertex v: vertexList){
-            // if vertex/edge is currently in the matching reverse it and remove it from matching
-            if (v.mate != null){
-                v.mate.adjacentV.add(v);
-                v.mate = null;
-            }
+        for (Vertex v: verticesInCycle){
+            // if edge is not currently in the matching reverse it therefore adding it to the matching
             if (v.adjacentV.size() > 0){
                 // Needs fixed
                 v.mate = v.adjacentV.get(0);
                 v.adjacentV.remove(0);
+            }
+
+            // if vertex/edge is currently in the matching reverse it and remove it from matching
+            if (v.mate != null){
+                v.adjacentV.add(v);
+                v.mate = null;
             }
         }
     }
@@ -319,7 +330,6 @@ public class BipartiteGraph {
             }
 
         }
-
         return bG;
     }
 
@@ -416,19 +426,20 @@ public class BipartiteGraph {
 
         bG2 = undirectedToDirected(bG2);
 
+        System.out.println("Graph input.....");
         for (Vertex v : bG2.vertexList){
             System.out.println(v.toString());
         }
 
         System.out.println("------------------------------");
-        boolean isCycle = false;
+        HashSet<Vertex> verticesInCycle = new HashSet<>();
         Vertex startVertex;
         for (Vertex v : bG2.vertexList){
             if (v.name.equals("Student1")){
                 startVertex = v;
-                isCycle = bG2.find_cycle(startVertex);
-                if (isCycle){
-                    bG2.exchange_edges();
+                verticesInCycle = bG2.find_cycle(startVertex);
+                if (!verticesInCycle.isEmpty()){
+                    bG2.exchange_edges(verticesInCycle);
                 }
             }
         }
@@ -437,6 +448,7 @@ public class BipartiteGraph {
         //Vertex end_v = bG2.searchAP();
         //bG2.augment(end_v);
 
+        System.out.println("Graph after exchaning edges.....");
         for (Vertex v : bG2.vertexList){
             System.out.println(v.toString());
         }
