@@ -70,7 +70,7 @@ public class Main {
 
 
 
-    public static void incrementValue(String[][] matrix, String student, String project, Fraction calculated_value){
+    public static String[][] incrementValue(String[][] matrix, String student, String project, Fraction calculated_value){
         int i = 0;
         int j;
 
@@ -93,9 +93,15 @@ public class Main {
         String matrix_value = matrix[coordinates[0]][coordinates[1]];
         Fraction f = stringToFraction(matrix_value);
 
+        System.out.println("Incrementing value: " + matrix[coordinates[0]][0] + " and " + matrix[0][coordinates[1]] + " with value: " + calculated_value);
+
         f = f.add(calculated_value);
         String frac_string = f.toString();
+
+
         matrix[coordinates[0]][coordinates[1]] = frac_string;
+
+        return matrix;
 
     }
 
@@ -272,14 +278,15 @@ public class Main {
             // Need to check there is not a tie in the max project
             System.out.println("Max project ties: " + projects_in_tie);
             if (projects_in_tie.size() > 1){ // There is a tie
-                Fraction smallest_space_avaiable = new Fraction(1);
+                Fraction smallest_space_avaiable = new Fraction(0);
                 for (String project : projects_in_tie){
-                    if (project_allocation.get(project).compareTo(smallest_space_avaiable) < 0){
+                    if (project_allocation.get(project).compareTo(smallest_space_avaiable) > 0){
                         // Stores the value of smallest space available for the current round
-                        smallest_space_avaiable = new Fraction(1).subtract(project_allocation.get(project));
+                        smallest_space_avaiable = project_allocation.get(project);
+                        max_project = project;
                     }
                 }
-                amount_remaining_of_max_project = smallest_space_avaiable;
+                amount_remaining_of_max_project = new Fraction(1).subtract(smallest_space_avaiable);
             }else{
                 amount_remaining_of_max_project = new Fraction(1).subtract(project_allocation.get(max_project)).abs();
             }
@@ -289,24 +296,6 @@ public class Main {
 
 
             Fraction increment_for_round = amount_remaining_of_max_project.divide(current_projects.get(max_project));
-            System.out.println("Increment for round before check: " + increment_for_round);
-            // Or
-            // for project in current projects
-            //    if project_allocation.get(project) + increment > 1
-            //       use 1 - proj_allocation.get(project) / num students consuming
-            /**
-            Fraction increment_before_check = increment_for_round;
-            for (Map.Entry<String, Fraction> entry : current_projects.entrySet()){
-                // If there is a student consuming the project in the current round
-                if (entry.getValue().compareTo(new Fraction(1)) >= 0) {
-                    Double value_of_entry = project_allocation.get(entry.getKey()).add(increment_before_check).doubleValue();
-                    System.out.println("Value of entry: " + value_of_entry + " for project: " + entry.getKey());
-                    if (value_of_entry.compareTo(1.0) > 0) {
-                        increment_for_round = new Fraction(1).subtract(project_allocation.get(entry.getKey())).divide(current_projects.get(entry.getKey()));
-                    }
-                }
-            }
-             **/
 
             System.out.println("Increment: " + increment_for_round);
             // for each student that hasn't yet been matched
@@ -318,10 +307,11 @@ public class Main {
                         continue;
                 String current_project = preferences.get(0);
 
+
                 student_allocation.put(name, student_allocation.get(name).add(increment_for_round));
                 project_allocation.put(current_project, project_allocation.get(current_project).add(increment_for_round));
                 // Increment values in the matrix
-                incrementValue(matrix, name, current_project, increment_for_round);
+                matrix = incrementValue(matrix, name, current_project, increment_for_round);
             }
             System.out.println("Student Allocation: " + student_allocation.toString());
             System.out.println("Project Allocation: " + project_allocation.toString());

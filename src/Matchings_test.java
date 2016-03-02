@@ -192,6 +192,7 @@ public class Matchings_test {
             Fraction currentColumnTotal = new Fraction(0);
             while (i < matrix[j].length) {
                 currentColumnTotal = currentColumnTotal.add(stringToFraction(matrix[i][j]));
+                System.out.println(stringToFraction(matrix[i][j]));
                 i++;
             }
             System.out.println("Current column total: " + currentColumnTotal);
