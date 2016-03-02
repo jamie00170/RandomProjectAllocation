@@ -22,10 +22,10 @@ public class Main {
 
     }
 
-    public static Map<String, ArrayList<String>> generateStudents(int num_of_students, ArrayList<String> project_list) {
+    public static HashMap<String, ArrayList<String>> generateStudents(int num_of_students, ArrayList<String> project_list) {
 
 
-        Map<String, ArrayList<String>> student_preferences = new HashMap<>();
+        HashMap<String, ArrayList<String>> student_preferences = new HashMap<>();
         int j = 1;
         while (j <= num_of_students) {
             Collections.shuffle(project_list);
@@ -101,20 +101,16 @@ public class Main {
 
     public static void main(String[] args) {
 
-
         ArrayList<String> project_list = generateprojects(10);
         System.out.println("Project List:" + project_list.toString());
 
-        Map<String, ArrayList<String>> student_preferences = generateStudents(10 , project_list);
+        HashMap<String, ArrayList<String>> student_preferences = generateStudents(10 , project_list);
 
         System.out.println("Student Preferences: " + student_preferences.toString());
-
 
         probabilisticSerialDictatorship(student_preferences, project_list);
         //BostonSerial bs = new BostonSerial();
         //bs.bostonSerial(student_preferences, project_list);
-
-
     }
 
     public static int factorial(int n) {
@@ -198,7 +194,7 @@ public class Main {
     }
 
 
-    public static void probabilisticSerialDictatorship(Map<String, ArrayList<String>> student_preferences, ArrayList<String> project_list){
+    public static String[][] probabilisticSerialDictatorship(Map<String, ArrayList<String>> student_preferences, ArrayList<String> project_list){
 
         // Create matrix
         String[][] matrix = new String[(student_preferences.size() + 1)][(project_list.size() + 1)];
@@ -259,30 +255,60 @@ public class Main {
         // while projects are still to be allocated or students are fully matched i.e have a combined total of 1
         while(!(check_sizes(project_allocation) || check_sizes(student_allocation) || student_preferences.isEmpty())){
             // Get current projects being consumed by students
-            Map<String, Fraction> currentProjects = getCurrentProjects(student_preferences, current_projects);
-            System.out.println("Current Projects: " + currentProjects.toString());
+            getCurrentProjects(student_preferences, current_projects);
 
-            // Get the maximum amount each project can be incremented by
-            // 1/highest number of students consuming a project - max(current_projects.values())
-
-            //Double max_increment = (1/(Collections.max(current_projects.values())));
-            Fraction max_increment = (new Fraction(1).divide(Collections.max(current_projects.values())));
-
-            // Get the most project with most students consuming then
-            // access the project_Allocation to get amount remaining
-            // divide that number by number of students consuming
-
-            // Iterate over entry set if value == max value
-            // key == max_project
+            System.out.println("Current projects:" + current_projects);
             String max_project = "";
+            ArrayList<String> projects_in_tie = new ArrayList<>();
             for (Map.Entry<String, Fraction> entry : current_projects.entrySet()){
-                if (entry.getValue().equals(Collections.max(current_projects.values()))){
+                // Stores, in fraction form, the highest number of students consuming a project in the current round
+                Fraction max_num_students_consuming = Collections.max(current_projects.values());
+                if (entry.getValue().equals(max_num_students_consuming)){
                     max_project = entry.getKey();
+                    projects_in_tie.add(max_project);
                 }
             }
-            //Double amount_remaing_of_max_project = 1.0 - project_allocation.get(max_project);
-            Fraction amount_remaing_of_max_project = new Fraction(1).subtract(project_allocation.get(max_project));
+            Fraction amount_remaining_of_max_project;
+            // Need to check there is not a tie in the max project
+            System.out.println("Max project ties: " + projects_in_tie);
+            if (projects_in_tie.size() > 1){ // There is a tie
+                Fraction smallest_space_avaiable = new Fraction(1);
+                for (String project : projects_in_tie){
+                    if (project_allocation.get(project).compareTo(smallest_space_avaiable) < 0){
+                        // Stores the value of smallest space available for the current round
+                        smallest_space_avaiable = new Fraction(1).subtract(project_allocation.get(project));
+                    }
+                }
+                amount_remaining_of_max_project = smallest_space_avaiable;
+            }else{
+                amount_remaining_of_max_project = new Fraction(1).subtract(project_allocation.get(max_project)).abs();
+            }
 
+            System.out.println("amomp: " +  amount_remaining_of_max_project);
+            System.out.println("Max project:" + max_project);
+
+
+            Fraction increment_for_round = amount_remaining_of_max_project.divide(current_projects.get(max_project));
+            System.out.println("Increment for round before check: " + increment_for_round);
+            // Or
+            // for project in current projects
+            //    if project_allocation.get(project) + increment > 1
+            //       use 1 - proj_allocation.get(project) / num students consuming
+            /**
+            Fraction increment_before_check = increment_for_round;
+            for (Map.Entry<String, Fraction> entry : current_projects.entrySet()){
+                // If there is a student consuming the project in the current round
+                if (entry.getValue().compareTo(new Fraction(1)) >= 0) {
+                    Double value_of_entry = project_allocation.get(entry.getKey()).add(increment_before_check).doubleValue();
+                    System.out.println("Value of entry: " + value_of_entry + " for project: " + entry.getKey());
+                    if (value_of_entry.compareTo(1.0) > 0) {
+                        increment_for_round = new Fraction(1).subtract(project_allocation.get(entry.getKey())).divide(current_projects.get(entry.getKey()));
+                    }
+                }
+            }
+             **/
+
+            System.out.println("Increment: " + increment_for_round);
             // for each student that hasn't yet been matched
             for (String name : student_preferences.keySet()){
                 // get the students list of preferences
@@ -291,20 +317,11 @@ public class Main {
                 if (preferences.isEmpty())
                         continue;
                 String current_project = preferences.get(0);
-                // Find out the number of student consuming this students current project
-                //Double num_of_students_consuming = current_projects.get(current_project);
-                // Find the amount of the project yet to be assigned
-                //Double amount_of_project_remaining = (1.0 - (project_allocation.get(current_project)));
 
-                //System.out.println(name +" has: " + (amount_of_project_remaining/num_of_students_consuming) + "percentage of being matched to" + current_project);
-                // increment student allocation + project allocation
-                // TAKE ACCOUNT OF AMOUNT OF PROJECT REMAINING
-                //System.out.println("Increment: " + max_increment * amount_remaing_of_max_project);
-                System.out.println("Increment: " + max_increment.multiply(amount_remaing_of_max_project));
-                student_allocation.put(name, student_allocation.get(name).add(max_increment.multiply(amount_remaing_of_max_project)));
-                project_allocation.put(current_project, project_allocation.get(current_project).add((max_increment.multiply(amount_remaing_of_max_project))));
+                student_allocation.put(name, student_allocation.get(name).add(increment_for_round));
+                project_allocation.put(current_project, project_allocation.get(current_project).add(increment_for_round));
                 // Increment values in the matrix
-                incrementValue(matrix, name, current_project, (max_increment.multiply(amount_remaing_of_max_project)));
+                incrementValue(matrix, name, current_project, increment_for_round);
             }
             System.out.println("Student Allocation: " + student_allocation.toString());
             System.out.println("Project Allocation: " + project_allocation.toString());
@@ -320,6 +337,7 @@ public class Main {
         for (String[] row : matrix){
             System.out.println(Arrays.toString(row));
         }
+        return matrix;
     }
 
 

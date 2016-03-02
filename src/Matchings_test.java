@@ -2,6 +2,8 @@ import java.lang.reflect.Array;
 import java.util.*;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableList;
+import org.apache.commons.math3.fraction.Fraction;
+import org.apache.commons.math3.fraction.FractionConversionException;
 
 /**
  * Created by Jamie on 31/01/2016.
@@ -148,7 +150,105 @@ public class Matchings_test {
         return true;
     }
 
+    public static Fraction stringToFraction(String fraction_string){
+
+        Fraction f;
+
+        if (fraction_string.length() == 5){
+            Double numerator = Double.parseDouble(fraction_string.substring(0,1));
+            Double denominator = Double.parseDouble(fraction_string.substring(4));
+
+            Double fraction_value = numerator/denominator;
+
+            try {
+                f = new Fraction(fraction_value);
+                return f;
+            } catch (FractionConversionException e ){
+                e.printStackTrace();
+            }
+
+        }else if (fraction_string.length() == 1){
+
+            try {
+                Double fraction_value = Double.parseDouble(fraction_string);
+
+                f = new Fraction(fraction_value);
+                return f;
+            } catch (FractionConversionException e) {
+                e.printStackTrace();
+            }
+        }
+        // Need to add clauses for different length numerators and denominators i.e. 19/20
+
+        return new Fraction(0);
+    }
+
+    public static boolean checkRowsColumns(String[][] matrix){
+        //Check columns
+        // Check rows
+        int j = 1; // ignore first row
+        while (j < matrix.length) {
+            int i = 1; // ignore first column in each row
+            Fraction currentColumnTotal = new Fraction(0);
+            while (i < matrix[j].length) {
+                currentColumnTotal = currentColumnTotal.add(stringToFraction(matrix[i][j]));
+                i++;
+            }
+            System.out.println("Current column total: " + currentColumnTotal);
+
+            if (!currentColumnTotal.equals(new Fraction(1))) {
+                return false;
+            }
+            j++;
+        }
+
+        // Check rows
+        int i = 1; // ignore first row
+        while (i < matrix.length){
+            j = 1; // ignore first column in each row
+            Fraction currentRowTotal = new Fraction(0);
+            while (j < matrix[i].length){
+                currentRowTotal = currentRowTotal.add(stringToFraction(matrix[i][j]));
+                j++;
+            }
+
+            System.out.println("Current row total: " + currentRowTotal);
+
+            if (!currentRowTotal.equals(new Fraction(1))){
+                return false;
+            }
+            i++;
+        }
+        return true;
+    }
+
+    public static void runCheckRowsColumnBostonSerial(HashMap<String, ArrayList<String>> student_preferences,  ArrayList<String> project_list){
+        BostonSerial bs = new BostonSerial();
+        String[][] matrix = bs.bostonSerial(student_preferences, project_list);
+
+        if (checkRowsColumns(matrix)){
+            System.out.println("All rows and columns add up to 1");
+        }else{
+            System.out.println("There is a row or column that doesn't add up to 1");
+        }
+    }
+
+    public static void runCheckRowsColumnProalisticSerial(HashMap<String, ArrayList<String>> student_preferences,  ArrayList<String> project_list){
+
+        String[][] matrix = Main.probabilisticSerialDictatorship(student_preferences, project_list);
+
+        if(checkRowsColumns(matrix)){
+            System.out.println("All rows and columns add up to 1");
+        }else{
+            System.out.println("There is a row or column that doesn't add up to 1");
+        }
+
+
+    }
+
+
     public static void main(String[] args) {
+
 
         ArrayList<String> project_list = generateprojects(6);
 
@@ -163,6 +263,35 @@ public class Matchings_test {
         System.out.println("Student List: " + student_list.toString());
         System.out.println("Project List:" + project_list.toString());
         System.out.println("Student Preferences: " + student_preferences.toString());
+
+
+        /**
+        ArrayList<String> project_list = new ArrayList<>();
+        project_list.add("Project1");
+        project_list.add("Project2");
+        project_list.add("Project3");
+
+        HashMap<String, ArrayList<String>> student_preferences = new HashMap<>();
+
+        student_preferences.put("Student1", project_list);
+        student_preferences.put("Student2", project_list);
+
+        ArrayList<String> alternate_project_list = new ArrayList<>();
+        alternate_project_list.add("Project1");
+        alternate_project_list.add("Project3");
+        alternate_project_list.add("Project2");
+
+        student_preferences.put("Student3", alternate_project_list);
+         **/
+
+
+        //System.out.println("Running columns and rows check on Boston Serial....");
+        //runCheckRowsColumnBostonSerial(student_preferences, project_list);
+
+        System.out.println("Running columns and rows check on probabilistic serial.....");
+        runCheckRowsColumnProalisticSerial(student_preferences, project_list);
+
+        System.exit(0);
 
 
         //A matching where the student is the key and the project they are matched to in the matching is the value
@@ -184,6 +313,8 @@ public class Matchings_test {
             mt.enum_all_matchings(student_list, project_list, student_preferences, matching);
 
         }
+
+
 
 
 

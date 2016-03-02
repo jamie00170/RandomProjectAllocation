@@ -134,7 +134,7 @@ public class inputReader {
 
 
 
-            //Main.probabilisticSerialDictatorship(student_preferences, project_list);
+            Main.probabilisticSerialDictatorship(student_preferences, project_list);
             //BostonSerial bs = new BostonSerial();
             //bs.bostonSerial(student_preferences, project_list);
 

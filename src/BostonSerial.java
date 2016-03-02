@@ -83,7 +83,7 @@ public class BostonSerial {
     }
 
 
-    public static Map<String, Fraction> getCurrentProjects(Map<String, ArrayList<String>> student_preferences, Map<String, Fraction> current_projects){
+    public static HashMap<String, Fraction> getCurrentProjects(HashMap<String, ArrayList<String>> student_preferences, HashMap<String, Fraction> current_projects){
 
         // reset current projects
         for(String project : current_projects.keySet()){
@@ -167,7 +167,7 @@ public class BostonSerial {
 
 
 
-    public void bostonSerial(Map<String, ArrayList<String>> student_preferences, ArrayList<String> project_list){
+    public String[][] bostonSerial(HashMap<String, ArrayList<String>> student_preferences, ArrayList<String> project_list){
 
         // Create matrix
         String[][] matrix = new String[(student_preferences.size() + 1)][(project_list.size() + 1)];
@@ -199,10 +199,10 @@ public class BostonSerial {
 
 
         // Stores the amount left of each project to be consumed
-        Map<String, Fraction> project_allocation = new HashMap<>();
+        HashMap<String, Fraction> project_allocation = new HashMap<>();
 
         // Stores the amount of each student left to be consumed
-        Map<String, Fraction> student_allocation = new HashMap<>();
+        HashMap<String, Fraction> student_allocation = new HashMap<>();
 
 
         i = 0;
@@ -219,7 +219,7 @@ public class BostonSerial {
         //System.out.println(student_preferences.toString());
 
 
-        Map<String, Fraction> current_projects = new HashMap<>();
+        HashMap<String, Fraction> current_projects = new HashMap<>();
         int k = 0;
         while (k < project_list.size()){
             current_projects.put((String) project_list.get(k), new Fraction(0));
@@ -228,7 +228,7 @@ public class BostonSerial {
         //int p = 0;
         while(!(check_sizes(project_allocation) || check_sizes(student_allocation) || student_preferences.isEmpty())){
             // Get current projects being consumed by students
-            Map<String, Fraction> currentProjects = getCurrentProjects(student_preferences, current_projects);
+            HashMap<String, Fraction> currentProjects = getCurrentProjects(student_preferences, current_projects);
             System.out.println("Current Projects: " + currentProjects.toString());
 
             // Get the maximum amount each project can be incremented by
@@ -239,6 +239,8 @@ public class BostonSerial {
             stu_all.putAll(student_allocation);
             HashMap<String, Fraction> proj_all = new HashMap<>();
             proj_all.putAll(project_allocation);
+            System.out.println("proj_all: " + proj_all);
+            System.out.println("stu_all: " + stu_all);
 
             // for each student that hasn't yet been matched
             for (String name : student_preferences.keySet()){
@@ -263,24 +265,66 @@ public class BostonSerial {
                 // increment student allocation + project allocation
                 // TAKE ACCOUNT OF AMOUNT OF PROJECT REMAINING
                 //Fraction smallest_space = Math.min((proj_all.get(current_project)), (stu_all.get(name)));
+
+
+                /**
                 Fraction smallest_space;
-                if (proj_all.get(current_project).compareTo(stu_all.get(name)) < 0 ) {
-                    smallest_space = proj_all.get(current_project);
+
+                // convert to double so compare is possible
+                Double proj_all_value = proj_all.get(current_project).doubleValue();
+                Double stu_all_value = stu_all.get(name).doubleValue();
+
+                if (proj_all_value.compareTo(stu_all_value) < 0 ) {
+                    System.out.println("Proj allocation is smallest space");
+                    smallest_space = new Fraction(proj_all_value);
                 } else {
-                    smallest_space = stu_all.get(name);
+                    System.out.println("Stu allocation is smallest space");
+                    smallest_space = new Fraction(stu_all_value);
+                }
+                //smallest_space = smallest_space.divide(num_of_students_consuming);
+                 **/
+
+                Fraction biggest_space_avaiable;
+                Fraction normal_increment = new Fraction(1).divide(num_of_students_consuming);
+
+                Double proj_all_value = proj_all.get(current_project).doubleValue();
+                Double stu_all_value = stu_all.get(name).doubleValue();
+                if (proj_all_value.compareTo(stu_all_value) > 0){
+                    biggest_space_avaiable = new Fraction(proj_all_value);
+                }else{
+                    biggest_space_avaiable = new Fraction(stu_all_value);
                 }
 
+                biggest_space_avaiable = new Fraction(1).subtract(biggest_space_avaiable);
+                System.out.println("biggest avaible space: " + biggest_space_avaiable);
+                System.out.println("normal increment" + normal_increment);
+
+                Double biggest_space_avaiable_value = biggest_space_avaiable.doubleValue();
+                Double normal_increment_value = normal_increment.doubleValue();
+
+                Fraction incrementValue;
+                if (biggest_space_avaiable_value.compareTo(normal_increment_value) < 0){
+                    incrementValue = biggest_space_avaiable;
+                }else{
+                    incrementValue = normal_increment;
+                }
+
+
+                /**
                 Fraction incrementValue;
                 if (num_of_students_consuming.compareTo(new Fraction(0)) > 0) {
                     incrementValue = ((new Fraction(1).divide(num_of_students_consuming)).subtract(smallest_space));
                 } else {
                     incrementValue = new Fraction(0);
                 }
+                 **/
 
 
-                System.out.println("Smallest Space: " + smallest_space);
-                System.out.println("Number of students: " + num_of_students_consuming);
-                System.out.println("Increment: " + incrementValue);
+                System.out.println("Student: " + name + " Project: " + current_project);
+                System.out.println("Biggest available Space: " + biggest_space_avaiable);
+                //System.out.println("Number of students: " + num_of_students_consuming);
+                System.out.println("Increment: " + incrementValue + "\n");
+
                 student_allocation.put(name, student_allocation.get(name).add(incrementValue));
                 project_allocation.put(current_project, project_allocation.get(current_project).add(incrementValue));
                 // Increment values in the matrix
@@ -294,11 +338,46 @@ public class BostonSerial {
             removeMatched(student_preferences, project_allocation, student_allocation);
             System.out.println("Student preferences: " + student_preferences.toString());
         }
-        System.out.println("Student Allocation: " + student_allocation.toString());
-        System.out.println("Project Allocation: " + project_allocation.toString());
+        //System.out.println("Student Allocation: " + student_allocation.toString());
+        //System.out.println("Project Allocation: " + project_allocation.toString());
 
         for (String[] row : matrix){
             System.out.println(Arrays.toString(row));
         }
+
+        return matrix;
+    }
+
+    public static void main(String[] args){
+
+        Fraction f1 = new Fraction(0.33333333333333);
+        Fraction f2 = new Fraction(0);
+
+        Fraction f3 = new Fraction(0.33333333333);
+        Fraction f4 = new Fraction(0);
+
+        Double f3_value = f3.doubleValue();
+        Double f4_value = f4.doubleValue();
+
+        System.out.println("f3_value: " + f3_value);
+        System.out.println("f4_value: " + f4_value);
+
+
+        Fraction smallest_space;
+        if (f3_value.compareTo(f4_value) > 0){
+            smallest_space = new Fraction(f3_value);
+        }else{
+            smallest_space = new Fraction(f4_value);
+        }
+        System.out.println("Smallest space: " + smallest_space);
+
+
+        if (new Fraction(1/3).compareTo(new Fraction(0)) > 0){
+            smallest_space = new Fraction(1/3);
+        }else{
+            smallest_space = new Fraction(0);
+        }
+
+        System.out.println(smallest_space);
     }
 }
