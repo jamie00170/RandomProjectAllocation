@@ -184,32 +184,38 @@ public class Matchings_test {
     }
 
     public static boolean checkRowsColumns(String[][] matrix){
+
+        /**
         //Check columns
-        // Check rows
-        int j = 1; // ignore first row
-        while (j < matrix.length) {
-            int i = 1; // ignore first column in each row
+        int i = 1; // ignore first row
+        while (i < matrix.length) {
+            int j = 1; // ignore first column in each row
             Fraction currentColumnTotal = new Fraction(0);
-            while (i < matrix[j].length) {
-                currentColumnTotal = currentColumnTotal.add(stringToFraction(matrix[i][j]));
-                System.out.println(stringToFraction(matrix[i][j]));
-                i++;
+            while (j < matrix[i].length) {// TODO : fix this will loop for number of projects instead of students
+                currentColumnTotal = currentColumnTotal.add(stringToFraction(matrix[j][i]));
+                System.out.println(stringToFraction(matrix[j][i]));
+                j++;
             }
             System.out.println("Current column total: " + currentColumnTotal);
 
             if (!currentColumnTotal.equals(new Fraction(1))) {
-                return false;
+                //return false;
             }
-            j++;
+            i++;
         }
+         **/
+
 
         // Check rows
         int i = 1; // ignore first row
         while (i < matrix.length){
-            j = 1; // ignore first column in each row
+            int j = 1; // ignore first column in each row
             Fraction currentRowTotal = new Fraction(0);
             while (j < matrix[i].length){
                 currentRowTotal = currentRowTotal.add(stringToFraction(matrix[i][j]));
+                System.out.println(stringToFraction(matrix[i][j]));
+                System.out.println("Current Row Total: " + currentRowTotal);
+
                 j++;
             }
 
@@ -226,6 +232,7 @@ public class Matchings_test {
     public static void runCheckRowsColumnBostonSerial(HashMap<String, ArrayList<String>> student_preferences,  ArrayList<String> project_list){
         BostonSerial bs = new BostonSerial();
         String[][] matrix = bs.bostonSerial(student_preferences, project_list);
+
 
         if (checkRowsColumns(matrix)){
             System.out.println("All rows and columns add up to 1");

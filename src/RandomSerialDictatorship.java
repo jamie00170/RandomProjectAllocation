@@ -2,6 +2,9 @@
  * Created by Jamie on 30/11/2015.
  */
 
+import org.apache.commons.math3.fraction.Fraction;
+import org.apache.commons.math3.fraction.FractionConversionException;
+
 import java.lang.reflect.Array;
 import java.util.*;
 
@@ -29,6 +32,39 @@ public class RandomSerialDictatorship {
         Double value = Double.parseDouble(matrix[coordinates[0]][coordinates[1]]);
         value += calculated_value;
         matrix[coordinates[0]][coordinates[1]] = Double.toString(value);
+    }
+
+    public static Fraction stringToFraction(String fraction_string){
+
+        Fraction f;
+
+        if (fraction_string.length() == 5){
+            Double numerator = Double.parseDouble(fraction_string.substring(0,1));
+            Double denominator = Double.parseDouble(fraction_string.substring(4));
+
+            Double fraction_value = numerator/denominator;
+
+            try {
+                f = new Fraction(fraction_value);
+                return f;
+            } catch (FractionConversionException e ){
+                e.printStackTrace();
+            }
+
+        }else if (fraction_string.length() == 1){
+
+            try {
+                Double fraction_value = Double.parseDouble(fraction_string);
+
+                f = new Fraction(fraction_value);
+                return f;
+            } catch (FractionConversionException e) {
+                e.printStackTrace();
+            }
+        }
+        // Need to add clauses for different length numerators and denominators i.e. 19/20
+
+        return new Fraction(0);
     }
 
     public static int factorial(int n) {
@@ -195,6 +231,8 @@ public class RandomSerialDictatorship {
 
         matrix = RandomSerialDictatorship.permute(student_list, 0, student_preferences, project_list, matrix);
 
+        int divisor = factorial(student_list.size());
+
         int p = 1;
         while( p < matrix.length){
             int f = 1;
@@ -202,7 +240,9 @@ public class RandomSerialDictatorship {
                 try {
                     Double double_value = Double.parseDouble(matrix[p][f]);
 
-                    matrix[p][f] = Double.toString(double_value / factorial(student_list.size()));
+                    Fraction fraction = new Fraction(double_value / divisor);
+
+                    matrix[p][f] = fraction.toString();
                 } catch (NumberFormatException e){
                     e.printStackTrace();
                 }

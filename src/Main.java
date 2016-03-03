@@ -70,7 +70,7 @@ public class Main {
 
 
 
-    public static String[][] incrementValue(String[][] matrix, String student, String project, Fraction calculated_value){
+    public static int[] getCoordinates(String[][] matrix, String student, String project){
         int i = 0;
         int j;
 
@@ -90,18 +90,17 @@ public class Main {
         }
 
         //Double value = Double.parseDouble(matrix[coordinates[0]][coordinates[1]]);
-        String matrix_value = matrix[coordinates[0]][coordinates[1]];
-        Fraction f = stringToFraction(matrix_value);
+        //String matrix_value = matrix[coordinates[0]][coordinates[1]];
+        //Fraction f = stringToFraction(matrix_value);
 
-        System.out.println("Incrementing value: " + matrix[coordinates[0]][0] + " and " + matrix[0][coordinates[1]] + " with value: " + calculated_value);
-
-        f = f.add(calculated_value);
-        String frac_string = f.toString();
+        //System.out.println("Incrementing value: " + matrix[coordinates[0]][0] + " and " + matrix[0][coordinates[1]] + " with value: " + increment_value);
+        //Double f_value = f.doubleValue() + increment_value.doubleValue();
 
 
-        matrix[coordinates[0]][coordinates[1]] = frac_string;
 
-        return matrix;
+        //matrix[coordinates[0]][coordinates[1]] = new_fraction.toString();
+
+        return coordinates;
 
     }
 
@@ -265,37 +264,24 @@ public class Main {
 
             System.out.println("Current projects:" + current_projects);
             String max_project = "";
-            ArrayList<String> projects_in_tie = new ArrayList<>();
-            for (Map.Entry<String, Fraction> entry : current_projects.entrySet()){
-                // Stores, in fraction form, the highest number of students consuming a project in the current round
-                Fraction max_num_students_consuming = Collections.max(current_projects.values());
-                if (entry.getValue().equals(max_num_students_consuming)){
+            HashMap<String, Fraction> max_increment_for_projects = new HashMap<>();
+            for (String project: current_projects.keySet()){
+                if (!(current_projects.get(project).equals(new Fraction(0)))){
+                    Fraction max_increment_for_current_project = new Fraction(1).subtract(project_allocation.get(project)).divide(current_projects.get(project));
+                    max_increment_for_projects.put(project, max_increment_for_current_project );
+                }
+            }
+
+            Fraction increment_for_round = Collections.min(max_increment_for_projects.values());
+
+            System.out.println("Max increments for projects: " +  max_increment_for_projects);
+            for (Map.Entry<String, Fraction> entry : max_increment_for_projects.entrySet()){
+                if (entry.getValue().equals(increment_for_round))
                     max_project = entry.getKey();
-                    projects_in_tie.add(max_project);
-                }
-            }
-            Fraction amount_remaining_of_max_project;
-            // Need to check there is not a tie in the max project
-            System.out.println("Max project ties: " + projects_in_tie);
-            if (projects_in_tie.size() > 1){ // There is a tie
-                Fraction smallest_space_avaiable = new Fraction(0);
-                for (String project : projects_in_tie){
-                    if (project_allocation.get(project).compareTo(smallest_space_avaiable) > 0){
-                        // Stores the value of smallest space available for the current round
-                        smallest_space_avaiable = project_allocation.get(project);
-                        max_project = project;
-                    }
-                }
-                amount_remaining_of_max_project = new Fraction(1).subtract(smallest_space_avaiable);
-            }else{
-                amount_remaining_of_max_project = new Fraction(1).subtract(project_allocation.get(max_project)).abs();
+                    break;
             }
 
-            System.out.println("amomp: " +  amount_remaining_of_max_project);
             System.out.println("Max project:" + max_project);
-
-
-            Fraction increment_for_round = amount_remaining_of_max_project.divide(current_projects.get(max_project));
 
             System.out.println("Increment: " + increment_for_round);
             // for each student that hasn't yet been matched
@@ -307,11 +293,20 @@ public class Main {
                         continue;
                 String current_project = preferences.get(0);
 
-
                 student_allocation.put(name, student_allocation.get(name).add(increment_for_round));
                 project_allocation.put(current_project, project_allocation.get(current_project).add(increment_for_round));
                 // Increment values in the matrix
-                matrix = incrementValue(matrix, name, current_project, increment_for_round);
+                int[] coordinates = getCoordinates(matrix, name, current_project);
+                String matrix_value = matrix[coordinates[0]][coordinates[1]];
+                Fraction f = stringToFraction(matrix_value);
+
+                Fraction new_matrix_value = f.add(increment_for_round);
+
+
+                System.out.println("incrementing: " + increment_for_round + " to " + name + " and " + current_project);
+                System.out.println("old value: " + f + " new value: " + new_matrix_value);
+                matrix[coordinates[0]][coordinates[1]] = new_matrix_value.toString();
+
             }
             System.out.println("Student Allocation: " + student_allocation.toString());
             System.out.println("Project Allocation: " + project_allocation.toString());
