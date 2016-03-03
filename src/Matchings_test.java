@@ -2,8 +2,8 @@ import java.lang.reflect.Array;
 import java.util.*;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableList;
-import org.apache.commons.math3.fraction.Fraction;
-import org.apache.commons.math3.fraction.FractionConversionException;
+import org.apache.commons.math.fraction.Fraction;
+import org.apache.commons.math.fraction.FractionConversionException;
 
 /**
  * Created by Jamie on 31/01/2016.

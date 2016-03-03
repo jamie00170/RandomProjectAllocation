@@ -2,8 +2,8 @@
  * Created by Jamie on 30/11/2015.
  */
 
-import org.apache.commons.math3.fraction.Fraction;
-import org.apache.commons.math3.fraction.FractionConversionException;
+import org.apache.commons.math.fraction.Fraction;
+import org.apache.commons.math.fraction.FractionConversionException;
 
 import java.lang.reflect.Array;
 import java.util.*;
@@ -244,6 +244,8 @@ public class RandomSerialDictatorship {
 
                     matrix[p][f] = fraction.toString();
                 } catch (NumberFormatException e){
+                    e.printStackTrace();
+                }catch (FractionConversionException e){
                     e.printStackTrace();
                 }
                 f++;

@@ -1,4 +1,4 @@
-import org.apache.commons.math3.fraction.Fraction;
+import org.apache.commons.math.fraction.Fraction;
 
 import java.io.*;
 import java.util.ArrayList;

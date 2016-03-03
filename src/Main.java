@@ -1,5 +1,5 @@
-import org.apache.commons.math3.fraction.Fraction;
-import org.apache.commons.math3.fraction.FractionConversionException;
+import org.apache.commons.math.fraction.Fraction;
+import org.apache.commons.math.fraction.FractionConversionException;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
@@ -64,7 +64,7 @@ public class Main {
             }
         }
         // Need to add clauses for different length numerators and denominators i.e. 19/20
-
+        System.out.println("FRACTION NOT TRANSFORMED TO STRING");
         return new Fraction(0);
     }
 
@@ -298,16 +298,21 @@ public class Main {
                 // Increment values in the matrix
                 int[] coordinates = getCoordinates(matrix, name, current_project);
                 String matrix_value = matrix[coordinates[0]][coordinates[1]];
+                System.out.println("matix value: " + matrix_value);
                 Fraction f = stringToFraction(matrix_value);
 
                 Fraction new_matrix_value = f.add(increment_for_round);
-
 
                 System.out.println("incrementing: " + increment_for_round + " to " + name + " and " + current_project);
                 System.out.println("old value: " + f + " new value: " + new_matrix_value);
                 matrix[coordinates[0]][coordinates[1]] = new_matrix_value.toString();
 
             }
+
+            for (String[] row : matrix){
+                System.out.println(Arrays.toString(row));
+            }
+
             System.out.println("Student Allocation: " + student_allocation.toString());
             System.out.println("Project Allocation: " + project_allocation.toString());
             System.out.println("Student preferences before removal: " + student_preferences.toString());

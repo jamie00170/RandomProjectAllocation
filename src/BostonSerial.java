@@ -1,6 +1,6 @@
 import java.util.*;
-import org.apache.commons.math3.fraction.Fraction;
-import org.apache.commons.math3.fraction.FractionConversionException;
+import org.apache.commons.math.fraction.Fraction;
+import org.apache.commons.math.fraction.FractionConversionException;
 
 
 /**
@@ -287,48 +287,52 @@ public class BostonSerial {
                 Fraction biggest_space_avaiable;
                 Fraction normal_increment = new Fraction(1).divide(num_of_students_consuming);
 
-                Double proj_all_value = proj_all.get(current_project).doubleValue();
-                Double stu_all_value = stu_all.get(name).doubleValue();
-                if (proj_all_value.compareTo(stu_all_value) > 0){
-                    biggest_space_avaiable = new Fraction(proj_all_value);
-                }else{
-                    biggest_space_avaiable = new Fraction(stu_all_value);
+                try {
+                    Double proj_all_value = proj_all.get(current_project).doubleValue();
+                    Double stu_all_value = stu_all.get(name).doubleValue();
+                    if (proj_all_value.compareTo(stu_all_value) > 0) {
+                        biggest_space_avaiable = new Fraction(proj_all_value);
+                    } else {
+                        biggest_space_avaiable = new Fraction(stu_all_value);
+                    }
+
+                    biggest_space_avaiable = new Fraction(1).subtract(biggest_space_avaiable);
+                    System.out.println("biggest avaible space: " + biggest_space_avaiable);
+                    System.out.println("normal increment" + normal_increment);
+
+                    Double biggest_space_avaiable_value = biggest_space_avaiable.doubleValue();
+                    Double normal_increment_value = normal_increment.doubleValue();
+
+                    Fraction incrementValue;
+                    if (biggest_space_avaiable_value.compareTo(normal_increment_value) < 0) {
+                        incrementValue = biggest_space_avaiable;
+                    } else {
+                        incrementValue = normal_increment;
+                    }
+
+
+                    /**
+                     Fraction incrementValue;
+                     if (num_of_students_consuming.compareTo(new Fraction(0)) > 0) {
+                     incrementValue = ((new Fraction(1).divide(num_of_students_consuming)).subtract(smallest_space));
+                     } else {
+                     incrementValue = new Fraction(0);
+                     }
+                     **/
+
+
+                    System.out.println("Student: " + name + " Project: " + current_project);
+                    System.out.println("Biggest available Space: " + biggest_space_avaiable);
+                    //System.out.println("Number of students: " + num_of_students_consuming);
+                    System.out.println("Increment: " + incrementValue + "\n");
+
+                    student_allocation.put(name, student_allocation.get(name).add(incrementValue));
+                    project_allocation.put(current_project, project_allocation.get(current_project).add(incrementValue));
+                    // Increment values in the matrix
+                    incrementValue(matrix, name, current_project, incrementValue);
+                }catch(FractionConversionException e){
+                    e.printStackTrace();
                 }
-
-                biggest_space_avaiable = new Fraction(1).subtract(biggest_space_avaiable);
-                System.out.println("biggest avaible space: " + biggest_space_avaiable);
-                System.out.println("normal increment" + normal_increment);
-
-                Double biggest_space_avaiable_value = biggest_space_avaiable.doubleValue();
-                Double normal_increment_value = normal_increment.doubleValue();
-
-                Fraction incrementValue;
-                if (biggest_space_avaiable_value.compareTo(normal_increment_value) < 0){
-                    incrementValue = biggest_space_avaiable;
-                }else{
-                    incrementValue = normal_increment;
-                }
-
-
-                /**
-                Fraction incrementValue;
-                if (num_of_students_consuming.compareTo(new Fraction(0)) > 0) {
-                    incrementValue = ((new Fraction(1).divide(num_of_students_consuming)).subtract(smallest_space));
-                } else {
-                    incrementValue = new Fraction(0);
-                }
-                 **/
-
-
-                System.out.println("Student: " + name + " Project: " + current_project);
-                System.out.println("Biggest available Space: " + biggest_space_avaiable);
-                //System.out.println("Number of students: " + num_of_students_consuming);
-                System.out.println("Increment: " + incrementValue + "\n");
-
-                student_allocation.put(name, student_allocation.get(name).add(incrementValue));
-                project_allocation.put(current_project, project_allocation.get(current_project).add(incrementValue));
-                // Increment values in the matrix
-                incrementValue(matrix, name, current_project, incrementValue);
             }
             //p++;
             System.out.println("Student Allocation: " + student_allocation.toString());
@@ -350,6 +354,7 @@ public class BostonSerial {
 
     public static void main(String[] args){
 
+        /**
         Fraction f1 = new Fraction(0.33333333333333);
         Fraction f2 = new Fraction(0);
 
@@ -379,5 +384,6 @@ public class BostonSerial {
         }
 
         System.out.println(smallest_space);
+         **/
     }
 }
