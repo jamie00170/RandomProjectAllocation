@@ -10,70 +10,7 @@ import java.util.*;
 // Specification + problem description +
 public class Main {
 
-    public static ArrayList<String> generateprojects(int num_of_projects) {
-
-        ArrayList<String> project_list = new ArrayList<>();
-        int i = 1;
-        while (i <= num_of_projects) {
-            project_list.add("Project" + i);
-            i++;
-        }
-        return project_list;
-
-    }
-
-    public static HashMap<String, ArrayList<String>> generateStudents(int num_of_students, ArrayList<String> project_list, int size_of_preference_list) {
-
-
-        HashMap<String, ArrayList<String>> student_preferences = new HashMap<>();
-
-        int j = 1;
-        while (j <= num_of_students) {
-            Collections.shuffle(project_list);
-            student_preferences.put("Student" + j, new ArrayList<>(project_list.subList(0, size_of_preference_list)));
-            j++;
-        }
-        return student_preferences;
-    }
-
-    public static Fraction stringToFraction(String fraction_string){
-
-        Fraction f;
-
-        fraction_string = fraction_string.replaceAll("\\s","");
-        String[] data = fraction_string.split("/");
-        //System.out.println("string split:" + Arrays.toString(data));
-
-
-        if (data.length > 1) {
-            Double numerator = Double.parseDouble(data[0]);
-            Double denominator = Double.parseDouble(data[1]);
-
-            Double fraction_value = numerator / denominator;
-
-
-            try {
-                f = new Fraction(fraction_value);
-                return f;
-            } catch (FractionConversionException e) {
-                e.printStackTrace();
-            }
-        }else{
-
-            Double fraction_value = Double.parseDouble(data[0]);
-            try {
-                f = new Fraction(fraction_value);
-                return f;
-            } catch (FractionConversionException e) {
-                e.printStackTrace();
-            }
-        }
-
-
-        System.out.println("FRACTION NOT TRANSFORMED TO STRING");
-        return new Fraction(0);
-    }
-
+    private static UtilityMethods utilityMethods = new UtilityMethods();
 
     public static int[] getCoordinates(String[][] matrix, String student, String project){
         int i = 0;
@@ -100,102 +37,25 @@ public class Main {
 
     public static void main(String[] args) {
 
-        ArrayList<String> project_list = generateprojects(400);
+
+
+        ArrayList<String> project_list = utilityMethods.generateprojects(50);
+
         System.out.println("Project List:" + project_list.toString());
 
         int size_of_preference_list = 6;
 
-        HashMap<String, ArrayList<String>> student_preferences = generateStudents(200 , project_list, size_of_preference_list);
+        HashMap<String, ArrayList<String>> student_preferences = utilityMethods.generateStudents(20 , project_list, size_of_preference_list);
 
         System.out.println("Student Preferences: " + student_preferences.toString());
 
-        probabilisticSerialDictatorship(student_preferences, project_list);
-        //BostonSerial bs = new BostonSerial();
-        //bs.bostonSerial(student_preferences, project_list);
-    }
-
-    public static int factorial(int n) {
-        int fact = 1; // this  will be the result
-        for (int i = 1; i <= n; i++) {
-            fact *= i;
-        }
-        return fact;
-    }
-
-    public static boolean check_sizes(Map<String, Fraction> resource_allocation){
-        Collection<Fraction> scores = resource_allocation.values();
-        int num_of_projects_used = 0;
-        for (Fraction score : scores){
-           if (score.equals(new Fraction(1)))
-               num_of_projects_used++;
-        }
-        return (num_of_projects_used == scores.size()) || resource_allocation.isEmpty();
+        //probabilisticSerialDictatorship(student_preferences, project_list);
+        BostonSerial bs = new BostonSerial();
+        bs.bostonSerial(student_preferences, project_list);
     }
 
 
-    public static Map<String, Fraction> getCurrentProjects(Map<String, ArrayList<String>> student_preferences, Map<String, Fraction> current_projects){
-
-        // reset current projects
-        for(String project : current_projects.keySet()){
-            current_projects.put(project, current_projects.get(project).subtract(current_projects.get(project)));
-        }
-
-        for (String student : student_preferences.keySet()){
-            // Get the students preferences
-            ArrayList<String> preferences =  student_preferences.get(student);
-            if (!preferences.isEmpty()) {
-                System.out.println(student + " " + preferences.get(0));
-                current_projects.put(preferences.get(0), current_projects.get(preferences.get(0)).add(new Fraction(1)));
-            }
-        }
-        return current_projects;
-    }
-
-    public static void removeMatched(Map<String, ArrayList<String>> student_preferences, Map<String, Fraction> project_allocation, Map<String, Fraction> student_allocation){
-
-        //System.out.println("Attempting to remove matched students and projects .... ");
-        ArrayList<String> student_list = new ArrayList<>();
-        for (String name : student_preferences.keySet()) {
-            student_list.add(name);
-        }
-
-        ArrayList<String> names_to_remove = new ArrayList<>();
-        for (String name : student_list) {
-            if (student_preferences.get(name).isEmpty()){
-                names_to_remove.add(name);
-            }
-            if (student_allocation.get(name).equals(new Fraction(1))) {
-                student_preferences.remove(name);
-            }
-
-        }
-
-        for (String name : names_to_remove){
-            student_preferences.remove(name);
-        }
-
-
-        ArrayList<String> items_to_remove = new ArrayList<>();
-
-        for (String name : student_preferences.keySet()) {
-            // Get students list of ranked choices
-            ArrayList<String> preferences = student_preferences.get(name);
-            // Loop through their choices
-            for (String project : preferences) {
-                // If the choice has been fully matched remove it from the preferences list
-                if (project_allocation.get(project).equals(new Fraction(1))) {
-                    // remove project from preferences list
-                    //System.out.println("Removing " + project);
-                    items_to_remove.add(project);
-                }
-            }
-            preferences.removeAll(items_to_remove);
-        }
-
-    }
-
-
-    public static String[][] probabilisticSerialDictatorship(Map<String, ArrayList<String>> student_preferences, ArrayList<String> project_list){
+    public static String[][] probabilisticSerialDictatorship(HashMap<String, ArrayList<String>> student_preferences, ArrayList<String> project_list){
 
         // Create matrix
         String[][] matrix = new String[(student_preferences.size() + 1)][(project_list.size() + 1)];
@@ -246,7 +106,7 @@ public class Main {
         //System.out.println(student_preferences.toString());
 
 
-        Map<String, Fraction> current_projects = new HashMap<>();
+        HashMap<String, Fraction> current_projects = new HashMap<>();
         int k = 0;
         while (k < project_list.size()){
             current_projects.put(project_list.get(k), new Fraction(0));
@@ -254,9 +114,9 @@ public class Main {
         }
 
         // while projects are still to be allocated or students are fully matched i.e have a combined total of 1
-        while(!(check_sizes(project_allocation) || check_sizes(student_allocation) || student_preferences.isEmpty())){
+        while(!(utilityMethods.check_sizes(project_allocation) || utilityMethods.check_sizes(student_allocation) || student_preferences.isEmpty())){
             // Get current projects being consumed by students
-            getCurrentProjects(student_preferences, current_projects);
+            utilityMethods.getCurrentProjects(student_preferences, current_projects);
 
             System.out.println("Current projects:" + current_projects);
             String max_project = "";
@@ -275,9 +135,11 @@ public class Main {
 
                 System.out.println("Max increments for projects: " + max_increment_for_projects);
                 for (Map.Entry<String, Fraction> entry : max_increment_for_projects.entrySet()) {
-                    if (entry.getValue().equals(increment_for_round))
+                    if (entry.getValue().equals(increment_for_round)) {
                         max_project = entry.getKey();
-                    break;
+                        break;
+                    }
+
                 }
                 System.out.println("Max project:" + max_project);
 
@@ -299,7 +161,7 @@ public class Main {
                     int[] coordinates = getCoordinates(matrix, name, current_project);
                     String matrix_value = matrix[coordinates[0]][coordinates[1]];
                     System.out.println("Current matrix value: " + matrix_value);
-                    Fraction f = stringToFraction(matrix_value);
+                    Fraction f = utilityMethods.stringToFraction(matrix_value);
 
                     Fraction new_matrix_value = f.add(increment_for_round);
                     System.out.println("Current matrix value transformed into a fraction: " + f);
@@ -312,15 +174,11 @@ public class Main {
                 }
             }
 
-            //for (String[] row : matrix){
-            //    System.out.println(Arrays.toString(row));
-            //}
-
             System.out.println("Student Allocation: " + student_allocation.toString());
             System.out.println("Project Allocation: " + project_allocation.toString());
             System.out.println("Student preferences before removal: " + student_preferences.toString());
             // Removed matched Students and Projects
-            removeMatched(student_preferences, project_allocation, student_allocation);
+            utilityMethods.removeMatched(student_preferences, project_allocation, student_allocation);
             System.out.println("Student preferences: " + student_preferences.toString());
         }
 
@@ -333,7 +191,4 @@ public class Main {
         return matrix;
     }
 
-
-
-        //System.out.println(current_projects.toString());
     }

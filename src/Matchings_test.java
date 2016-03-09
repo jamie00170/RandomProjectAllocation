@@ -10,13 +10,7 @@ import org.apache.commons.math3.fraction.FractionConversionException;
  */
 public class Matchings_test {
 
-    public static int factorial(int n) {
-        int fact = 1; // this  will be the result
-        for (int i = 1; i <= n; i++) {
-            fact *= i;
-        }
-        return fact;
-    }
+    private static UtilityMethods utilityMethods = new UtilityMethods();
 
     public static ArrayList<String> generateprojects(int num_of_projects) {
 
@@ -277,25 +271,6 @@ public class Matchings_test {
         System.out.println("Project List:" + project_list.toString());
         System.out.println("Student Preferences: " + student_preferences.toString());
 
-
-        /**
-        ArrayList<String> project_list = new ArrayList<>();
-        project_list.add("Project1");
-        project_list.add("Project2");
-        project_list.add("Project3");
-
-        HashMap<String, ArrayList<String>> student_preferences = new HashMap<>();
-
-        student_preferences.put("Student1", project_list);
-        student_preferences.put("Student2", project_list);
-
-        ArrayList<String> alternate_project_list = new ArrayList<>();
-        alternate_project_list.add("Project1");
-        alternate_project_list.add("Project3");
-        alternate_project_list.add("Project2");
-
-        student_preferences.put("Student3", alternate_project_list);
-         **/
 
 
         System.out.println("Running columns and rows check on Boston Serial....");

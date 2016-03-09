@@ -1,5 +1,7 @@
 
 
+import org.apache.commons.math3.fraction.Fraction;
+
 import java.util.*;
 
 /**
@@ -7,42 +9,18 @@ import java.util.*;
  */
 public class RandomSerialDictatorshipTies {
 
+    private static UtilityMethods utilityMethods = new UtilityMethods();
+
+
     public static String[][] calculate_values_of_matrix(String[][] matrix, BipartiteGraph bG){
         for (Vertex v : bG.vertexList){
             if (v.mate != null){
-                incrementValue(matrix, v.name, v.mate.name, 1.0);
+               utilityMethods.incrementValue(matrix, v.name, v.mate.name, new Fraction(1));
             }
         }
         return matrix;
     }
 
-
-    public static void incrementValue(String[][] matrix, String student, String project, Double calculated_value){
-        int i = 0;
-        int j;
-
-        int[] coordinates = new int[2];
-
-        while( i < matrix.length){
-            j = 0;
-            while (j < matrix[i].length){
-                // only have to search first column and row
-                if(matrix[i][j].equals(student))
-                    coordinates[0] = i;
-                if(matrix[i][j].equals(project))
-                    coordinates[1] = j;
-                j++;
-            }
-            i++;
-        }
-
-        if (!(coordinates[0] == 0 && coordinates[1] ==0)) {
-            Double value = Double.parseDouble(matrix[coordinates[0]][coordinates[1]]);
-            value += calculated_value;
-            matrix[coordinates[0]][coordinates[1]] = Double.toString(value);
-        }
-
-    }
 
     public static BipartiteGraph undirectedToDirected(BipartiteGraph bG){
 

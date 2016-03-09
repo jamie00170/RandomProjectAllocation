@@ -2,7 +2,6 @@ import java.util.*;
 import org.apache.commons.math3.fraction.Fraction;
 import org.apache.commons.math3.fraction.FractionConversionException;
 
-
 /**
  * Created by Jamie on 15/11/2015.
  */
@@ -10,165 +9,7 @@ import org.apache.commons.math3.fraction.FractionConversionException;
 
 public class BostonSerial {
 
-    /**
-    public static Map<String, Fraction> getCurrentProjects(Map<String, ArrayList<String>> student_preferences, Map<String, Fraction> current_projects, Integer p){
-
-        // reset current projects
-        for(String project : current_projects.keySet()){
-            current_projects.put(project, current_projects.get(project).subtract(current_projects.get(project)));
-        }
-
-        for (String student : student_preferences.keySet()){
-            // Get the students preferences
-            ArrayList<String> preferences =  student_preferences.get(student);
-            System.out.println(student + " " + preferences.get(p));
-            current_projects.put(preferences.get(p), current_projects.get(preferences.get(p)).add(new Fraction(1)));
-        }
-        return current_projects;
-    }
-     **/
-
-
-    public static void removeMatched(Map<String, ArrayList<String>> student_preferences, Map<String, Fraction> project_allocation, Map<String, Fraction> student_allocation){
-
-        //System.out.println("Attempting to remove matched students and projects .... ");
-        ArrayList<String> student_list = new ArrayList<>();
-        for (String name : student_preferences.keySet()) {
-            student_list.add(name);
-        }
-
-        ArrayList<String> names_to_remove = new ArrayList<>();
-        for (String name : student_list) {
-            if (student_preferences.get(name).isEmpty()){
-                names_to_remove.add(name);
-            }
-            if (student_allocation.get(name).equals(new Fraction(1))) {
-                student_preferences.remove(name);
-            }
-
-        }
-
-        for (String name : names_to_remove){
-            student_preferences.remove(name);
-        }
-
-
-        ArrayList<String> items_to_remove = new ArrayList<>();
-
-        for (String name : student_preferences.keySet()) {
-            // Get students list of ranked choices
-            ArrayList<String> preferences = student_preferences.get(name);
-            // Loop through their choices
-            for (String project : preferences) {
-                // If the choice has been fully matched remove it from the preferences list
-                if (project_allocation.get(project).equals(new Fraction(1))) {
-                    // remove project from preferences list
-                    //System.out.println("Removing " + project);
-                    items_to_remove.add(project);
-                }
-            }
-            preferences.removeAll(items_to_remove);
-        }
-
-    }
-
-    public static boolean check_sizes(Map<String, Fraction> resource_allocation){
-        Collection<Fraction> scores = resource_allocation.values();
-        int num_of_projects_used = 0;
-        for (Fraction score : scores){
-            if (score.equals(new Fraction(1)))
-                num_of_projects_used++;
-        }
-        return (num_of_projects_used == scores.size()) || resource_allocation.isEmpty();
-    }
-
-
-    public static HashMap<String, Fraction> getCurrentProjects(HashMap<String, ArrayList<String>> student_preferences, HashMap<String, Fraction> current_projects){
-
-        // reset current projects
-        for(String project : current_projects.keySet()){
-            current_projects.put(project, current_projects.get(project).subtract(current_projects.get(project)));
-        }
-
-        for (String student : student_preferences.keySet()){
-            // Get the students preferences
-            ArrayList<String> preferences =  student_preferences.get(student);
-            if (!preferences.isEmpty()) {
-                System.out.println(student + " " + preferences.get(0));
-                current_projects.put(preferences.get(0), current_projects.get(preferences.get(0)).add(new Fraction(1)));
-            }
-        }
-        return current_projects;
-    }
-
-    public static Fraction stringToFraction(String fraction_string){
-
-        Fraction f;
-
-        fraction_string = fraction_string.replaceAll("\\s","");
-        String[] data = fraction_string.split("/");
-        //System.out.println("string split:" + Arrays.toString(data));
-
-
-        if (data.length > 1) {
-            Double numerator = Double.parseDouble(data[0]);
-            Double denominator = Double.parseDouble(data[1]);
-
-            Double fraction_value = numerator / denominator;
-
-
-            try {
-                f = new Fraction(fraction_value);
-                return f;
-            } catch (FractionConversionException e) {
-                e.printStackTrace();
-            }
-        }else{
-
-            Double fraction_value = Double.parseDouble(data[0]);
-            try {
-                f = new Fraction(fraction_value);
-                return f;
-            } catch (FractionConversionException e) {
-                e.printStackTrace();
-            }
-        }
-
-
-        System.out.println("FRACTION NOT TRANSFORMED TO STRING");
-        return new Fraction(0);
-    }
-
-
-    public static void incrementValue(String[][] matrix, String student, String project, Fraction calculated_value){
-        int i = 0;
-        int j;
-
-        int[] coordinates = new int[2];
-
-        while( i < matrix.length){
-            j = 0;
-            while (j < matrix[i].length){
-                // only have to search first column and row
-                if(matrix[i][j].equals(student))
-                    coordinates[0] = i;
-                if(matrix[i][j].equals(project))
-                    coordinates[1] = j;
-                j++;
-            }
-            i++;
-        }
-
-        //Double value = Double.parseDouble(matrix[coordinates[0]][coordinates[1]]);
-        String matrix_value = matrix[coordinates[0]][coordinates[1]];
-        Fraction f = stringToFraction(matrix_value);
-
-        f = f.add(calculated_value);
-        String frac_string = f.toString();
-        matrix[coordinates[0]][coordinates[1]] = frac_string;
-
-    }
-
+    private static UtilityMethods utilityMethods = new UtilityMethods();
 
 
     public String[][] bostonSerial(HashMap<String, ArrayList<String>> student_preferences, ArrayList<String> project_list){
@@ -235,7 +76,7 @@ public class BostonSerial {
         HashMap<String, Fraction> max_student_increments = new HashMap<>();
 
 
-        while(!(check_sizes(project_allocation) || check_sizes(student_allocation) || student_preferences.isEmpty())){
+        while(!(utilityMethods.check_sizes(project_allocation) || utilityMethods.check_sizes(student_allocation) || student_preferences.isEmpty())){
 
             //Clear max student and max project increment hash maps
             max_project_increments.clear();
@@ -243,7 +84,7 @@ public class BostonSerial {
 
 
             // Get current projects being consumed by students
-            HashMap<String, Fraction> currentProjects = getCurrentProjects(student_preferences, current_projects);
+            HashMap<String, Fraction> currentProjects = utilityMethods.getCurrentProjects(student_preferences, current_projects);
             System.out.println("Current Projects: " + currentProjects.toString());
 
             // Store the max each project can be incremented by for the current round
@@ -270,10 +111,8 @@ public class BostonSerial {
 
             }
 
-
             System.out.println("Max increments for projects: " + max_project_increments);
             System.out.println("Max increments for students: " + max_student_increments);
-
 
             // for each student that hasn't yet been matched
             for (String name : student_preferences.keySet()) {
@@ -308,19 +147,17 @@ public class BostonSerial {
                 student_allocation.put(name, student_allocation.get(name).add(incrementValue));
                 project_allocation.put(current_project, project_allocation.get(current_project).add(incrementValue));
                 // Increment values in the matrix
-                incrementValue(matrix, name, current_project, incrementValue);
+                utilityMethods.incrementValue(matrix, name, current_project, incrementValue);
 
             }
-            //p++;
+
             System.out.println("Student Allocation: " + student_allocation.toString());
             System.out.println("Project Allocation: " + project_allocation.toString());
             System.out.println("Student preferences before removal: " + student_preferences.toString());
             // Removed matched Students and Projects
-            removeMatched(student_preferences, project_allocation, student_allocation);
+            utilityMethods.removeMatched(student_preferences, project_allocation, student_allocation);
             System.out.println("Student preferences: " + student_preferences.toString());
         }
-        //System.out.println("Student Allocation: " + student_allocation.toString());
-        //System.out.println("Project Allocation: " + project_allocation.toString());
 
         for (String[] row : matrix){
             System.out.println(Arrays.toString(row));
@@ -329,38 +166,4 @@ public class BostonSerial {
         return matrix;
     }
 
-    public static void main(String[] args){
-
-        /**
-        Fraction f1 = new Fraction(0.33333333333333);
-        Fraction f2 = new Fraction(0);
-
-        Fraction f3 = new Fraction(0.33333333333);
-        Fraction f4 = new Fraction(0);
-
-        Double f3_value = f3.doubleValue();
-        Double f4_value = f4.doubleValue();
-
-        System.out.println("f3_value: " + f3_value);
-        System.out.println("f4_value: " + f4_value);
-
-
-        Fraction smallest_space;
-        if (f3_value.compareTo(f4_value) > 0){
-            smallest_space = new Fraction(f3_value);
-        }else{
-            smallest_space = new Fraction(f4_value);
-        }
-        System.out.println("Smallest space: " + smallest_space);
-
-
-        if (new Fraction(1/3).compareTo(new Fraction(0)) > 0){
-            smallest_space = new Fraction(1/3);
-        }else{
-            smallest_space = new Fraction(0);
-        }
-
-        System.out.println(smallest_space);
-         **/
-    }
 }

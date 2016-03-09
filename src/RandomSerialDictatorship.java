@@ -10,100 +10,7 @@ import java.util.*;
 
 public class RandomSerialDictatorship {
 
-    public static void incrementValue(String[][] matrix, String student, String project, Double calculated_value){
-        int i = 0;
-        int j;
-
-        int[] coordinates = new int[2];
-
-        while( i < matrix.length){
-            j = 0;
-            while (j < matrix[i].length){
-                // only have to search first column and row
-                if(matrix[i][j].equals(student))
-                    coordinates[0] = i;
-                if(matrix[i][j].equals(project))
-                    coordinates[1] = j;
-                j++;
-            }
-            i++;
-        }
-
-        Double value = Double.parseDouble(matrix[coordinates[0]][coordinates[1]]);
-        value += calculated_value;
-        matrix[coordinates[0]][coordinates[1]] = Double.toString(value);
-    }
-
-    public static Fraction stringToFraction(String fraction_string){
-
-        Fraction f;
-
-        fraction_string = fraction_string.replaceAll("\\s","");
-        String[] data = fraction_string.split("/");
-        System.out.println("string split:" + Arrays.toString(data));
-
-
-        if (data.length > 1) {
-            Double numerator = Double.parseDouble(data[0]);
-            Double denominator = Double.parseDouble(data[1]);
-
-            Double fraction_value = numerator / denominator;
-
-
-            try {
-                f = new Fraction(fraction_value);
-                return f;
-            } catch (FractionConversionException e) {
-                e.printStackTrace();
-            }
-        }else{
-
-            Double fraction_value = Double.parseDouble(data[0]);
-            try {
-                f = new Fraction(fraction_value);
-                return f;
-            } catch (FractionConversionException e) {
-                e.printStackTrace();
-            }
-        }
-
-
-        System.out.println("FRACTION NOT TRANSFORMED TO STRING");
-        return new Fraction(0);
-    }
-
-    public static int factorial(int n) {
-        int fact = 1; // this  will be the result
-        for (int i = 1; i <= n; i++) {
-            fact *= i;
-        }
-        return fact;
-    }
-
-    public static ArrayList<String> generateprojects(int num_of_projects) {
-
-        ArrayList<String> project_list = new ArrayList<>();
-        int i = 1;
-        while (i <= num_of_projects) {
-            project_list.add("Project" + i);
-            i++;
-        }
-        return project_list;
-
-    }
-
-    public static HashMap<String, ArrayList<String>> generateStudents(int num_of_students, ArrayList<String> project_list) {
-
-
-        HashMap<String, ArrayList<String>> student_preferences = new HashMap<>();
-        int j = 1;
-        while (j <= num_of_students) {
-            Collections.shuffle(project_list);
-            student_preferences.put("Student" + j, new ArrayList<>(project_list));
-            j++;
-        }
-        return student_preferences;
-    }
+    private static UtilityMethods utilityMethods = new UtilityMethods();
 
 
     static String[][] permute(ArrayList<String> student_list, int k, HashMap<String, ArrayList<String>> student_preferences, ArrayList<String> project_list, String[][] matrix){
@@ -144,7 +51,7 @@ public class RandomSerialDictatorship {
                         } else {
                             // Match the student to their choice
                             System.out.println(name + " " + preferences.get(j));
-                            incrementValue(matrix, name, preferences.get(j), 1.0);
+                            utilityMethods.incrementValue(matrix, name, preferences.get(j), new Fraction(1));
                             // Add the project to the projects_allocated list
                             projects_allocated.add(preferences.get(j));
                             break;
@@ -188,10 +95,10 @@ public class RandomSerialDictatorship {
     public static void main(String[] args){
 
 
-        ArrayList<String> project_list = generateprojects(5);
+        ArrayList<String> project_list = utilityMethods.generateprojects(5);
         System.out.println("Project List:" + project_list.toString());
 
-        HashMap<String, ArrayList<String>> student_preferences = generateStudents(5 , project_list);
+        HashMap<String, ArrayList<String>> student_preferences = utilityMethods.generateStudents(5, project_list, 3);
 
         System.out.println("Student Preferences: " + student_preferences.toString());
         ArrayList<String> priority_list = new ArrayList<>();
@@ -236,7 +143,7 @@ public class RandomSerialDictatorship {
 
         matrix = RandomSerialDictatorship.permute(student_list, 0, student_preferences, project_list, matrix);
 
-        int divisor = factorial(student_list.size());
+        int divisor = utilityMethods.factorial(student_list.size());
 
         int p = 1;
         while( p < matrix.length){
