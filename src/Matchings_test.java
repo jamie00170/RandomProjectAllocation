@@ -156,7 +156,7 @@ public class Matchings_test {
 
         fraction_string = fraction_string.replaceAll("\\s","");
         String[] data = fraction_string.split("/");
-        System.out.println("string split:" + Arrays.toString(data));
+        //System.out.println("string split:" + Arrays.toString(data));
 
 
         if (data.length > 1) {
@@ -190,7 +190,7 @@ public class Matchings_test {
 
     public static boolean checkRowsColumns(String[][] matrix){
 
-        /**
+
         //Check columns
         int i = 1; // ignore first row
         while (i < matrix.length) {
@@ -198,28 +198,28 @@ public class Matchings_test {
             Fraction currentColumnTotal = new Fraction(0);
             while (j < matrix[i].length) {// TODO : fix this will loop for number of projects instead of students
                 currentColumnTotal = currentColumnTotal.add(stringToFraction(matrix[j][i]));
-                System.out.println(stringToFraction(matrix[j][i]));
+                //System.out.println(stringToFraction(matrix[j][i]));
                 j++;
             }
             System.out.println("Current column total: " + currentColumnTotal);
 
             if (!currentColumnTotal.equals(new Fraction(1))) {
-                //return false;
+                return false;
             }
             i++;
         }
-         **/
+
 
 
         // Check rows
-        int i = 1; // ignore first row
+        i = 1; // ignore first row
         while (i < matrix.length){
             int j = 1; // ignore first column in each row
             Fraction currentRowTotal = new Fraction(0);
             while (j < matrix[i].length){
                 currentRowTotal = currentRowTotal.add(stringToFraction(matrix[i][j]));
-                System.out.println(stringToFraction(matrix[i][j]));
-                System.out.println("Current Row Total: " + currentRowTotal);
+                //System.out.println(stringToFraction(matrix[i][j]));
+                //System.out.println("Current Row Total: " + currentRowTotal);
 
                 j++;
             }
@@ -263,9 +263,9 @@ public class Matchings_test {
     public static void main(String[] args) {
 
 
-        ArrayList<String> project_list = generateprojects(6);
+        ArrayList<String> project_list = generateprojects(3);
 
-        HashMap<String, ArrayList<String>> student_preferences = generateStudents(6, project_list);
+        HashMap<String, ArrayList<String>> student_preferences = generateStudents(3, project_list);
 
         ArrayList<String> student_list = new ArrayList<>();
 
@@ -298,11 +298,11 @@ public class Matchings_test {
          **/
 
 
-        //System.out.println("Running columns and rows check on Boston Serial....");
-        //runCheckRowsColumnBostonSerial(student_preferences, project_list);
+        System.out.println("Running columns and rows check on Boston Serial....");
+        runCheckRowsColumnBostonSerial(student_preferences, project_list);
 
-        System.out.println("Running columns and rows check on probabilistic serial.....");
-        runCheckRowsColumnProalisticSerial(student_preferences, project_list);
+        //System.out.println("Running columns and rows check on probabilistic serial.....");
+        //runCheckRowsColumnProalisticSerial(student_preferences, project_list);
 
         System.exit(0);
 

@@ -67,9 +67,9 @@ public class RandomSerialDictatorshipTies {
             return;
         }
         // 2. Try to find a cycle in G by DFS therefore confirming if there is another perfect matching
-       HashSet<Vertex> verticesInCycle = new HashSet<>();
+        HashSet<Vertex> verticesInCycle = new HashSet<>();
         int i = 0;
-        while (i < G.vertexList.size() && !verticesInCycle.isEmpty()){// - Cycle could start from any vertex?
+        while (i < G.vertexList.size()){// - Cycle could start from any vertex?
             verticesInCycle = G.find_cycle(G.vertexList.get(i));
             if (!verticesInCycle.isEmpty()){
                 // Step 4: Find a perfect matching M' by exchanging edges along the cycle. Output M'
@@ -107,7 +107,7 @@ public class RandomSerialDictatorshipTies {
 
         System.out.println("Index of edge from: " + i);
         // use vertex G.vertexList.get(i-1) as edge, e when .mate is not null then the vertex is also in the matching
-        Vertex edgeFrom = G.vertexList.get(i-1);
+        Vertex edgeFrom = G.vertexList.get(i);
         /**
         int j = 1;
         while (edgeFrom.mate == null){

@@ -80,6 +80,7 @@ public class inputReader {
 
             System.out.println("Student Preferences: " + student_preferences.toString());
 
+            /**
             // Set up
             // Create matrix
             String[][] matrix = new String[(student_preferences.size() + 1)][(project_list.size() + 1)];
@@ -132,11 +133,12 @@ public class inputReader {
                 System.out.println(Arrays.toString(row));
             }
 
+            **/
 
 
             //Main.probabilisticSerialDictatorship(student_preferences, project_list);
-            //BostonSerial bs = new BostonSerial();
-            //bs.bostonSerial(student_preferences, project_list);
+            BostonSerial bs = new BostonSerial();
+            bs.bostonSerial(student_preferences, project_list);
 
         }catch (FileNotFoundException e){
             System.out.println("Specified file could not be found!");

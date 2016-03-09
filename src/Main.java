@@ -22,14 +22,15 @@ public class Main {
 
     }
 
-    public static HashMap<String, ArrayList<String>> generateStudents(int num_of_students, ArrayList<String> project_list) {
+    public static HashMap<String, ArrayList<String>> generateStudents(int num_of_students, ArrayList<String> project_list, int size_of_preference_list) {
 
 
         HashMap<String, ArrayList<String>> student_preferences = new HashMap<>();
+
         int j = 1;
         while (j <= num_of_students) {
             Collections.shuffle(project_list);
-            student_preferences.put("Student" + j, new ArrayList<>(project_list));
+            student_preferences.put("Student" + j, new ArrayList<>(project_list.subList(0, size_of_preference_list)));
             j++;
         }
         return student_preferences;
@@ -41,7 +42,7 @@ public class Main {
 
         fraction_string = fraction_string.replaceAll("\\s","");
         String[] data = fraction_string.split("/");
-        System.out.println("string split:" + Arrays.toString(data));
+        //System.out.println("string split:" + Arrays.toString(data));
 
 
         if (data.length > 1) {
@@ -93,27 +94,18 @@ public class Main {
             i++;
         }
 
-        //Double value = Double.parseDouble(matrix[coordinates[0]][coordinates[1]]);
-        //String matrix_value = matrix[coordinates[0]][coordinates[1]];
-        //Fraction f = stringToFraction(matrix_value);
-
-        //System.out.println("Incrementing value: " + matrix[coordinates[0]][0] + " and " + matrix[0][coordinates[1]] + " with value: " + increment_value);
-        //Double f_value = f.doubleValue() + increment_value.doubleValue();
-
-
-
-        //matrix[coordinates[0]][coordinates[1]] = new_fraction.toString();
-
         return coordinates;
 
     }
 
     public static void main(String[] args) {
 
-        ArrayList<String> project_list = generateprojects(10);
+        ArrayList<String> project_list = generateprojects(400);
         System.out.println("Project List:" + project_list.toString());
 
-        HashMap<String, ArrayList<String>> student_preferences = generateStudents(10 , project_list);
+        int size_of_preference_list = 6;
+
+        HashMap<String, ArrayList<String>> student_preferences = generateStudents(200 , project_list, size_of_preference_list);
 
         System.out.println("Student Preferences: " + student_preferences.toString());
 
@@ -276,46 +268,53 @@ public class Main {
                 }
             }
 
-            Fraction increment_for_round = Collections.min(max_increment_for_projects.values());
+            Fraction increment_for_round;
+            if (!max_increment_for_projects.isEmpty()) {
+                increment_for_round = Collections.min(max_increment_for_projects.values());
 
-            System.out.println("Max increments for projects: " +  max_increment_for_projects);
-            for (Map.Entry<String, Fraction> entry : max_increment_for_projects.entrySet()){
-                if (entry.getValue().equals(increment_for_round))
-                    max_project = entry.getKey();
+
+                System.out.println("Max increments for projects: " + max_increment_for_projects);
+                for (Map.Entry<String, Fraction> entry : max_increment_for_projects.entrySet()) {
+                    if (entry.getValue().equals(increment_for_round))
+                        max_project = entry.getKey();
                     break;
-            }
+                }
+                System.out.println("Max project:" + max_project);
 
-            System.out.println("Max project:" + max_project);
+                System.out.println("Increment: " + increment_for_round);
 
-            System.out.println("Increment: " + increment_for_round);
-            // for each student that hasn't yet been matched
-            for (String name : student_preferences.keySet()){
-                // get the students list of preferences
-                ArrayList<String> preferences = student_preferences.get(name);
-                // get their first available choice - matched choices have been removed to always index 0
-                if (preferences.isEmpty())
+
+                // for each student that hasn't yet been matched
+                for (String name : student_preferences.keySet()) {
+                    // get the students list of preferences
+                    ArrayList<String> preferences = student_preferences.get(name);
+                    // get their first available choice - matched choices have been removed to always index 0
+                    if (preferences.isEmpty())
                         continue;
-                String current_project = preferences.get(0);
+                    String current_project = preferences.get(0);
 
-                student_allocation.put(name, student_allocation.get(name).add(increment_for_round));
-                project_allocation.put(current_project, project_allocation.get(current_project).add(increment_for_round));
-                // Increment values in the matrix
-                int[] coordinates = getCoordinates(matrix, name, current_project);
-                String matrix_value = matrix[coordinates[0]][coordinates[1]];
-                System.out.println("matix value: " + matrix_value);
-                Fraction f = stringToFraction(matrix_value);
+                    student_allocation.put(name, student_allocation.get(name).add(increment_for_round));
+                    project_allocation.put(current_project, project_allocation.get(current_project).add(increment_for_round));
+                    // Increment values in the matrix
+                    int[] coordinates = getCoordinates(matrix, name, current_project);
+                    String matrix_value = matrix[coordinates[0]][coordinates[1]];
+                    System.out.println("Current matrix value: " + matrix_value);
+                    Fraction f = stringToFraction(matrix_value);
 
-                Fraction new_matrix_value = f.add(increment_for_round);
+                    Fraction new_matrix_value = f.add(increment_for_round);
+                    System.out.println("Current matrix value transformed into a fraction: " + f);
 
-                System.out.println("incrementing: " + increment_for_round + " to " + name + " and " + current_project);
-                System.out.println("old value: " + f + " new value: " + new_matrix_value);
-                matrix[coordinates[0]][coordinates[1]] = new_matrix_value.toString();
+                    System.out.println("incrementing: " + increment_for_round + " to " + name + " and " + current_project);
+                    System.out.println("New matrix value: " + new_matrix_value);
+                    System.out.println();
+                    matrix[coordinates[0]][coordinates[1]] = new_matrix_value.toString();
 
+                }
             }
 
-            for (String[] row : matrix){
-                System.out.println(Arrays.toString(row));
-            }
+            //for (String[] row : matrix){
+            //    System.out.println(Arrays.toString(row));
+            //}
 
             System.out.println("Student Allocation: " + student_allocation.toString());
             System.out.println("Project Allocation: " + project_allocation.toString());
