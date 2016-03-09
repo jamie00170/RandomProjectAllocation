@@ -61,7 +61,7 @@ public class BostonSerial {
             student_allocation.put((String) name, new Fraction(0));
         }
         System.out.println(student_allocation.toString());
-        //System.out.println(student_preferences.toString());
+        System.out.println(student_preferences.toString());
 
 
         HashMap<String, Fraction> current_projects = new HashMap<>();

@@ -1,10 +1,6 @@
 import org.apache.commons.math3.fraction.Fraction;
 import org.apache.commons.math3.fraction.FractionConversionException;
 
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
 import java.util.*;
 
 // Specification + problem description +
@@ -55,7 +51,7 @@ public class Main {
     }
 
 
-    public static String[][] probabilisticSerialDictatorship(HashMap<String, ArrayList<String>> student_preferences, ArrayList<String> project_list){
+    public String[][] probabilisticSerialDictatorship(HashMap<String, ArrayList<String>> student_preferences, ArrayList<String> project_list){
 
         // Create matrix
         String[][] matrix = new String[(student_preferences.size() + 1)][(project_list.size() + 1)];
@@ -103,7 +99,7 @@ public class Main {
             student_allocation.put((String) name, new Fraction(0));
         }
         System.out.println(student_allocation.toString());
-        //System.out.println(student_preferences.toString());
+        System.out.println(student_preferences.toString());
 
 
         HashMap<String, Fraction> current_projects = new HashMap<>();
