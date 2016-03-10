@@ -13,7 +13,7 @@ public class RandomSerialDictatorship {
     private static UtilityMethods utilityMethods = new UtilityMethods();
 
 
-    static String[][] permute(ArrayList<String> student_list, int k, HashMap<String, ArrayList<String>> student_preferences, ArrayList<String> project_list, String[][] matrix){
+    public String[][] permute(ArrayList<String> student_list, int k, HashMap<String, ArrayList<String>> student_preferences, ArrayList<String> project_list, String[][] matrix){
         String[] permutation = new String[student_list.size()];
         // Initialise projects_allocated array
         ArrayList<String> projects_allocated = new ArrayList<>();
@@ -95,10 +95,10 @@ public class RandomSerialDictatorship {
     public static void main(String[] args){
 
 
-        ArrayList<String> project_list = utilityMethods.generateprojects(5);
+        ArrayList<String> project_list = utilityMethods.generateprojects(8);
         System.out.println("Project List:" + project_list.toString());
 
-        HashMap<String, ArrayList<String>> student_preferences = utilityMethods.generateStudents(5, project_list, 3);
+        HashMap<String, ArrayList<String>> student_preferences = utilityMethods.generateStudents(8, project_list, 8);
 
         System.out.println("Student Preferences: " + student_preferences.toString());
         ArrayList<String> priority_list = new ArrayList<>();
@@ -140,8 +140,9 @@ public class RandomSerialDictatorship {
         }
         System.out.println("Student list:" + student_list);
 
+        RandomSerialDictatorship rsd = new RandomSerialDictatorship();
 
-        matrix = RandomSerialDictatorship.permute(student_list, 0, student_preferences, project_list, matrix);
+        matrix = rsd.permute(student_list, 0, student_preferences, project_list, matrix);
 
         int divisor = utilityMethods.factorial(student_list.size());
 

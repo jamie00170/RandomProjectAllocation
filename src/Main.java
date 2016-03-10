@@ -35,13 +35,13 @@ public class Main {
 
 
 
-        ArrayList<String> project_list = utilityMethods.generateprojects(50);
+        ArrayList<String> project_list = utilityMethods.generateprojects(300);
 
         System.out.println("Project List:" + project_list.toString());
 
         int size_of_preference_list = 6;
 
-        HashMap<String, ArrayList<String>> student_preferences = utilityMethods.generateStudents(20 , project_list, size_of_preference_list);
+        HashMap<String, ArrayList<String>> student_preferences = utilityMethods.generateStudents(300 , project_list, size_of_preference_list);
 
         System.out.println("Student Preferences: " + student_preferences.toString());
 
