@@ -87,8 +87,9 @@ public class EvaluationExperiments {
             BostonSerial bs = new BostonSerial();
             String[][] bs_matching =  bs.bostonSerial(student_preferences, project_list);
 
-            Main main = new Main();
-            String[][] ps_matching = main.probabilisticSerialDictatorship(student_preferences_copy2, project_list);
+            ProbalisticSerial ps = new ProbalisticSerial();
+
+            String[][] ps_matching = ps.probabilisticSerialDictatorship(student_preferences_copy2, project_list);
 
             /////////////////////////////////////RSD////////////////////////////////////////////////////////
 

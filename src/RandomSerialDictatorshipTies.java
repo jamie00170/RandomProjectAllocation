@@ -51,10 +51,10 @@ public class RandomSerialDictatorshipTies {
             verticesInCycle = G.find_cycle(G.vertexList.get(i));
             if (!verticesInCycle.isEmpty()){
                 // Step 4: Find a perfect matching M' by exchanging edges along the cycle. Output M'
-                System.out.println("Current graph...");
-                for (Vertex v : G.vertexList){
-                    System.out.println(v);
-                }
+                //System.out.println("Current graph...");
+                //for (Vertex v : G.vertexList){
+                //    System.out.println(v);
+                //}
 
                 System.out.println("Current Matching....");
                 for (String[] row : M){
@@ -64,8 +64,8 @@ public class RandomSerialDictatorshipTies {
                 G.exchange_edges(verticesInCycle);
                 // output M'
                 System.out.println("New matching......");
-                M = calculate_values_of_matrix(M, G);
-                for (String[] row : M){
+                String[][] matching_to_output = calculate_values_of_matrix(M, G);
+                for (String[] row : matching_to_output){
                     System.out.println(Arrays.toString(row));
                 }
                 System.out.println("Graph after exchaning edges...");

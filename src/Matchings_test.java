@@ -242,9 +242,9 @@ public class Matchings_test {
 
     public static void runCheckRowsColumnProalisticSerial(HashMap<String, ArrayList<String>> student_preferences,  ArrayList<String> project_list){
 
-        Main main = new Main();
+       ProbalisticSerial ps = new ProbalisticSerial();
 
-        String[][] matrix = main.probabilisticSerialDictatorship(student_preferences, project_list);
+        String[][] matrix = ps.probabilisticSerialDictatorship(student_preferences, project_list);
 
         if(checkRowsColumns(matrix)){
             System.out.println("All rows and columns add up to 1");

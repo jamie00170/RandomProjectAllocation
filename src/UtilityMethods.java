@@ -174,4 +174,29 @@ public class UtilityMethods {
         }
 
     }
+
+    public int[] getCoordinates(String[][] matrix, String student, String project){
+        int i = 0;
+        int j;
+
+        int[] coordinates = new int[2];
+
+        while( i < matrix.length){
+            j = 0;
+            while (j < matrix[i].length){
+                // only have to search first column and row
+                if(matrix[i][j].equals(student))
+                    coordinates[0] = i;
+                if(matrix[i][j].equals(project))
+                    coordinates[1] = j;
+                j++;
+            }
+            i++;
+        }
+
+        return coordinates;
+
+    }
+
+
 }
