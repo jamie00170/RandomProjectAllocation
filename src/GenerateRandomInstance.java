@@ -34,23 +34,38 @@ public class GenerateRandomInstance {
     }
 
 
-    public static HashMap<String, ArrayList<String[]>> generateRandomInstance(HashMap<String, ArrayList<String[]>> student_preferences, double t){
+    public static HashMap<String, ArrayList<String[]>> generateRandomInstanceWithTies(HashMap<String, ArrayList<String[]>> student_preferences, double t){
 
         for (String student: student_preferences.keySet()){
 
             ArrayList<String[]> preference_list = student_preferences.get(student);
             int i = 0;
-            while(i < preference_list.size()-1) {
+            int index_of_current_indifference_class = 0;
+
+            int initial_size_of_preference_list = preference_list.size() -1;
+
+            while(i < initial_size_of_preference_list) {
                 double rand = Math.random();
-                String[] current_indifference_class = preference_list.get(i);
-                if (rand < t){
-                    current_indifference_class = concat(current_indifference_class, preference_list.get(i+1));
-                    System.out.println("new indifference class: " + Arrays.toString(current_indifference_class));
-                    preference_list.remove(i);
-                    preference_list.remove(i+1);
-                    preference_list.add(i, current_indifference_class);
+                String[] current_indifference_class = preference_list.get(index_of_current_indifference_class);
+                if (rand <= t){
+                    System.out.println("Current student: " + student);
+                    System.out.println("current indifference class: " + Arrays.toString(current_indifference_class));
+
+                    String[] next_indifference_class = preference_list.get(index_of_current_indifference_class + 1);
+                    String[] new_indifference_class = concat(current_indifference_class, next_indifference_class);
+
+                    System.out.println("new indifference class: " + Arrays.toString(new_indifference_class));
+
+                    preference_list.remove(index_of_current_indifference_class + 1);
+                    preference_list.remove(index_of_current_indifference_class);
+
+                    preference_list.add(index_of_current_indifference_class, new_indifference_class);
+
+                }else{
+                    index_of_current_indifference_class++;
                 }
                 i++;
+
             }
 
         }
@@ -73,19 +88,6 @@ public class GenerateRandomInstance {
 
         HashMap<String, ArrayList<String[]>> student_preferences = generateStudents(3, project_list);
 
-        /**
-        ArrayList<String[]> ar1 = new ArrayList<>();
-        String[] pref1 = {"Project1", "Project2"};
-        ar1.add(pref1);
-
-        ArrayList<String[]> ar2 = new ArrayList<>();
-        String[] pref2 = {"Project1", "Project2"};
-        ar2.add(pref2);
-
-
-        student_preferences.put("Student1", ar1);
-        student_preferences.put("Student2", ar2);
-         **/
 
         for (Map.Entry<String, ArrayList<String[]>> entry: student_preferences.entrySet()){
             System.out.println(entry.getKey());
@@ -97,7 +99,7 @@ public class GenerateRandomInstance {
 
 
         System.out.println("Generating random instance.....");
-        generateRandomInstance(student_preferences, 1);
+        generateRandomInstanceWithTies(student_preferences, 0.5);
 
 
         for (Map.Entry<String, ArrayList<String[]>> entry: student_preferences.entrySet()){

@@ -65,28 +65,7 @@ public class RandomSerialDictatorship {
             }
 
         }
-        /**
-        HashMap<String, String> matching = new HashMap<>();
-
-        // Run enum all matchings here?
-        int i = 1;
-        while(i < matrix.length){
-            int j = 1;
-            while (j < matrix[i].length) {
-                matching.put(matrix[i][0], matrix[0][j]);
-                j++;
-                }
-            i++;
-        }
-
-        boolean isParetoOptimal;
-        Matchings_test mt = new Matchings_test();
-        isParetoOptimal =  mt.enum_all_matchings(student_list, project_list, student_preferences, matching);
-        if(!isParetoOptimal){
-            System.out.println("A matching was found that is not Pareto Optimal");
-            System.exit(1);
-        }
-         **/
+        
 
         return matrix;
     }

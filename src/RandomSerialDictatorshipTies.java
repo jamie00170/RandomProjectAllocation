@@ -289,7 +289,7 @@ public class RandomSerialDictatorshipTies {
                 System.out.println(Arrays.toString(indiffer_class));
             }
         }
-        
+
         RandomSerialWithTies(student_preferences, project_list);
 
     }
