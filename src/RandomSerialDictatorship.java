@@ -95,42 +95,14 @@ public class RandomSerialDictatorship {
     public static void main(String[] args){
 
 
-        ArrayList<String> project_list = utilityMethods.generateprojects(8);
+        ArrayList<String> project_list = utilityMethods.generateprojects(3);
         System.out.println("Project List:" + project_list.toString());
 
-        HashMap<String, ArrayList<String>> student_preferences = utilityMethods.generateStudents(8, project_list, 8);
+        HashMap<String, ArrayList<String>> student_preferences = utilityMethods.generateStudents(3, project_list, 3);
 
         System.out.println("Student Preferences: " + student_preferences.toString());
-        ArrayList<String> priority_list = new ArrayList<>();
 
-        // Set up
-        // Create matrix
-        String[][] matrix = new String[(student_preferences.size() + 1)][(project_list.size() + 1)];
-
-        matrix[0][0] = "-";
-        int i = 1;
-        for (String student : student_preferences.keySet()) {
-            matrix[i][0] = student;
-            i++;
-        }
-
-
-        int j = 1;
-        for (String project : project_list){
-
-            matrix[0][j] = project;
-            j++;
-        }
-
-        i = 1;
-        while( i < matrix.length){
-            j = 1;
-            while (j < matrix[i].length){
-                matrix[i][j] = "0";
-                j++;
-            }
-            i++;
-        }
+        String[][] matrix = utilityMethods.setUpMatrix(student_preferences.keySet(), project_list);
 
 
         //String[] student_list = new String[student_preferences.size()];
@@ -146,25 +118,8 @@ public class RandomSerialDictatorship {
 
         int divisor = utilityMethods.factorial(student_list.size());
 
-        int p = 1;
-        while( p < matrix.length){
-            int f = 1;
-            while (f < matrix[p].length){
-                try {
-                    Double double_value = Double.parseDouble(matrix[p][f]);
-
-                    Fraction fraction = new Fraction(double_value / divisor);
-
-                    matrix[p][f] = fraction.toString();
-                } catch (NumberFormatException e){
-                    e.printStackTrace();
-                }catch (FractionConversionException e){
-                    e.printStackTrace();
-                }
-                f++;
-            }
-            p++;
-        }
+        // divide all values in the matrix by factorial of the size of the  student list
+        matrix = utilityMethods.divideMatrixByFactorial(matrix, divisor);
 
         for (String[] row : matrix){
             System.out.println(Arrays.toString(row));

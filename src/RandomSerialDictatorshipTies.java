@@ -147,40 +147,14 @@ public class RandomSerialDictatorshipTies {
     }
 
 
-    public static void RandomSerialWithTies(Map<String, ArrayList<String[]>> student_preferences, ArrayList<String> project_list){
+    public static void RandomSerialWithTies(HashMap<String, ArrayList<String[]>> student_preferences, ArrayList<String> project_list){
 
         ArrayList<String> student_list = new ArrayList<>();
         for (String student: student_preferences.keySet()){
             student_list.add(student);
         }
 
-        // Create matrix
-        String[][] matrix = new String[(student_preferences.size() + 1)][(project_list.size() + 1)];
-
-        matrix[0][0] = "-";
-        int i = 1;
-        for (String student : student_preferences.keySet()) {
-            matrix[i][0] = student;
-            i++;
-        }
-
-
-        int j = 1;
-        for (String project : project_list){
-
-            matrix[0][j] = project;
-            j++;
-        }
-
-        i = 1;
-        while( i < matrix.length){
-            j = 1;
-            while (j < matrix[i].length){
-                matrix[i][j] = "0";
-                j++;
-            }
-            i++;
-        }
+        String[][] matrix = utilityMethods.setUpMatrix(student_preferences.keySet(), project_list);
 
         // 1. Construct undirected bipartite graph where V = (N U A) and E = empty
         BipartiteGraph bG = new BipartiteGraph(student_list, project_list);
@@ -192,7 +166,7 @@ public class RandomSerialDictatorshipTies {
 
         for (String student : permutation) {
             // Until end of student's indifference classes is reached or student is matched
-            j = 0;
+            int j = 0;
             while (j < student_preferences.get(student).size()) {
                 // 3. Look at the agents ith indifference class
                 String[] indifference_class = student_preferences.get(student).get(j);
@@ -222,7 +196,7 @@ public class RandomSerialDictatorshipTies {
                 // 5.3 move onto agent i's next indifference class until reach end of choices/classes
                 j++;
             }
-            i++;
+
             // increment appropriate values in matrix at end of permutation i.e. where a vertex has a mate (matching edge)
 
         }
@@ -315,8 +289,7 @@ public class RandomSerialDictatorshipTies {
                 System.out.println(Arrays.toString(indiffer_class));
             }
         }
-
-
+        
         RandomSerialWithTies(student_preferences, project_list);
 
     }

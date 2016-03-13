@@ -198,5 +198,65 @@ public class UtilityMethods {
 
     }
 
+    public String[][] setUpMatrix(Set<String> student_list, ArrayList<String> project_list ){
+
+        // Set up
+        // Create matrix
+        String[][] matrix = new String[(student_list.size() + 1)][(project_list.size() + 1)];
+
+        matrix[0][0] = "-";
+        int i = 1;
+        for (String student : student_list) {
+            matrix[i][0] = student;
+            i++;
+        }
+
+
+        int j = 1;
+        for (String project : project_list){
+
+            matrix[0][j] = project;
+            j++;
+        }
+
+        i = 1;
+        while( i < matrix.length){
+            j = 1;
+            while (j < matrix[i].length){
+                matrix[i][j] = "0";
+                j++;
+            }
+            i++;
+        }
+
+        return matrix;
+    }
+
+    public String[][] divideMatrixByFactorial(String[][] matrix, int factorial){
+
+        int p = 1;
+        while( p < matrix.length){
+            int f = 1;
+            while (f < matrix[p].length){
+                try {
+                    Double double_value = Double.parseDouble(matrix[p][f]);
+
+                    Fraction fraction = new Fraction(double_value / factorial);
+
+                    matrix[p][f] = fraction.toString();
+                } catch (NumberFormatException e){
+                    e.printStackTrace();
+                }catch (FractionConversionException e){
+                    e.printStackTrace();
+                }
+                f++;
+            }
+            p++;
+        }
+
+        return matrix;
+
+    }
+
 
 }
