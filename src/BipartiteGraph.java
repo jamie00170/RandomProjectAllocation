@@ -307,7 +307,15 @@ public class BipartiteGraph implements Cloneable {
 
             // Add edges to be added to the matching to the hash map
             if (v.adjacentV.size() > 0) {
-                edges_to_add.put(v, v.adjacentV.get(0));
+                int i = 0;
+                while(i < v.adjacentV.size()){
+                    if (verticesInCycle.contains(v.adjacentV.get(i))){
+                        edges_to_add.put(v, v.adjacentV.get(i));
+                        break;
+                    }
+                    i++;
+                }
+
                 // TODO : Fix could be more than one in adjacent verticies
             }
             // Add edges to be removed to hash map

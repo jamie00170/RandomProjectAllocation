@@ -11,6 +11,7 @@ import java.util.Scanner;
  */
 public class inputReader {
 
+    private static UtilityMethods utilityMethods = new UtilityMethods();
 
     public static void main(String[] args) {
         BufferedReader br = null;
@@ -22,7 +23,13 @@ public class inputReader {
             Scanner sc = new Scanner(System.in);
             System.out.println("Enter the name of the file to use as input: ");
 
-            filename = sc.next();
+            filename = sc.nextLine();
+
+            System.out.println("Enter the name of the algortihm to run : RSD, PS or BS ");
+
+            String alg;
+            alg = sc.nextLine();
+
 
             br = new BufferedReader(new FileReader(filename));
 
@@ -80,65 +87,27 @@ public class inputReader {
 
             System.out.println("Student Preferences: " + student_preferences.toString());
 
-            /**
-            // Set up
-            // Create matrix
-            String[][] matrix = new String[(student_preferences.size() + 1)][(project_list.size() + 1)];
 
-            matrix[0][0] = "-";
-            i = 1;
-            for (String student : student_preferences.keySet()) {
-                matrix[i][0] = student;
-                i++;
-            }
+            if (alg.equals("PS")) {
+                ProbalisticSerial ps = new ProbalisticSerial();
+                ps.probabilisticSerialDictatorship(student_preferences, project_list);
+            }else if (alg.equals("BS")){
+                BostonSerial bs = new BostonSerial();
+                bs.bostonSerial(student_preferences, project_list);
+            }else if (alg.equals("RSD")){
 
+                String[][] matrix = utilityMethods.setUpMatrix(student_preferences.keySet(), project_list);
 
-            int j = 1;
-            for (String project : project_list){
+                RandomSerialDictatorship randomSerialDictatorship = new RandomSerialDictatorship();
+                matrix = randomSerialDictatorship.permute(student_list, 0, student_preferences, project_list, matrix);
 
-                matrix[0][j] = project;
-                j++;
-            }
+                matrix = utilityMethods.divideMatrixByFactorial(matrix, utilityMethods.factorial(student_list.size()));
 
-            i = 1;
-            while( i < matrix.length){
-                j = 1;
-                while (j < matrix[i].length){
-                    matrix[i][j] = "0";
-                    j++;
+                for (String[] row : matrix){
+                    System.out.println(Arrays.toString(row));
                 }
-                i++;
             }
 
-
-            matrix = RandomSerialDictatorship.permute(student_list, 0, student_preferences, project_list, matrix);
-
-            int p = 1;
-            while( p < matrix.length){
-                int f = 1;
-                while (f < matrix[p].length){
-                    try {
-                        Double double_value = Double.parseDouble(matrix[p][f]);
-
-                        matrix[p][f] = Double.toString(double_value / RandomSerialDictatorship.factorial(student_list.size()));
-                    } catch (NumberFormatException e){
-                        e.printStackTrace();
-                    }
-                    f++;
-                }
-                p++;
-            }
-
-            for (String[] row : matrix){
-                System.out.println(Arrays.toString(row));
-            }
-
-            **/
-
-
-            //Main.probabilisticSerialDictatorship(student_preferences, project_list);
-            BostonSerial bs = new BostonSerial();
-            bs.bostonSerial(student_preferences, project_list);
 
         }catch (FileNotFoundException e){
             System.out.println("Specified file could not be found!");

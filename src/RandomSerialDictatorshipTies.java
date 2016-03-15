@@ -87,7 +87,6 @@ public class RandomSerialDictatorshipTies {
                 for (Vertex v : G.vertexList){
                     System.out.println(v);
                 }
-                return;
 
             }
             i++;
@@ -100,7 +99,7 @@ public class RandomSerialDictatorshipTies {
 
         System.out.println("Index of edge from: " + i);
         // use vertex G.vertexList.get(i-1) as edge, e when .mate is not null then the vertex is also in the matching
-        Vertex edgeFrom = G.vertexList.get(i);
+        Vertex edgeFrom = G.vertexList.get(i); // e
         /**
         int j = 1;
         while (edgeFrom.mate == null){
@@ -114,12 +113,12 @@ public class RandomSerialDictatorshipTies {
 
             BipartiteGraph g_plus = G.clone();
             // Generate G+(e)
-            /**
+
             System.out.println("Printing g_plus...");
             for (Vertex v : g_plus.vertexList){
                 System.out.println(v);
             }
-             **/
+
             g_plus.remove_associated_edges(edgeFrom);
             // Call enum_perfect_matchings_iter(G+(e), M)
             enum_perfect_matchings_iter(g_plus, M);
@@ -132,6 +131,11 @@ public class RandomSerialDictatorshipTies {
 
             BipartiteGraph g_minus = G.clone();
             // Generate G-(e)
+            System.out.println("Printing g_plus...");
+            for (Vertex v : g_minus.vertexList){
+                System.out.println(v);
+            }
+
             g_minus.remove_matching_edge(edgeFrom.name, edgeFrom.mate.name);
             // Call enum_perfect_matchings_iter(G-(e), M')
             enum_perfect_matchings_iter(g_minus, M);
@@ -175,15 +179,27 @@ public class RandomSerialDictatorshipTies {
         BipartiteGraph bG = new BipartiteGraph(student_list, project_list);
 
         // 2. for each agent in order of current permutation
-        String[] permutation = {"Student2", "Student1", "Student3"};
+        String[] permutation = new String[student_list.size()];
 
+        System.out.println("Student list: " + student_list);
+
+        int k = 0;
+        while (k < student_list.size()){
+            permutation[k] = student_list.get(k);
+            k++;
+        }
+
+        System.out.println("Permutation: " + Arrays.toString(permutation));
         //ArrayList<String[]> permutations = new ArrayList<>();
 
         for (String student : permutation) {
             // Until end of student's indifference classes is reached or student is matched
             int j = 0;
+            System.out.println("Student: " + student);
+
             while (j < student_preferences.get(student).size()) {
                 // 3. Look at the agents ith indifference class
+                System.out.println("Student indifference class: " + Arrays.toString(student_preferences.get(student).get(j)));
                 String[] indifference_class = student_preferences.get(student).get(j);
 
                 //4. provisionally add (i, a) to E for all a in agent i's current indifference class
@@ -195,12 +211,7 @@ public class RandomSerialDictatorshipTies {
                 if ((end_v = bG.searchAP()) != null) {
                     // 5.1. augment along path and modify E accordingly - augment()
                     bG.augment(end_v);
-                    /**
-                     System.out.println("Printing Graph.....");
-                     for (Vertex v : bG.vertexList){
-                     System.out.println(v.toString());
-                     }
-                     **/
+
                 } else {
                     // 5.2 provisionally added edges are removed
                     for (String project : indifference_class) {
@@ -210,6 +221,9 @@ public class RandomSerialDictatorshipTies {
                 }
                 // 5.3 move onto agent i's next indifference class until reach end of choices/classes
                 j++;
+                if (j == student_preferences.get(student).size()){
+                    System.out.println(student + " not matched in the current iteration because none of their choices are are available");
+                }
             }
 
             // increment appropriate values in matrix at end of permutation i.e. where a vertex has a mate (matching edge)
@@ -221,10 +235,12 @@ public class RandomSerialDictatorshipTies {
             System.out.println(v.toString());
         }
 
+        /**
         System.out.println("Printing matrix.....");
         for (String[] row: matrix){
             System.out.println(Arrays.toString(row));
         }
+         **/
 
         // Calculate values for matrix from graph
         calculate_initial_values_of_matrix(matrix, bG);
@@ -281,36 +297,25 @@ public class RandomSerialDictatorshipTies {
 
     public static void main(String[] args){
 
-        // Create a sample student_preferences and project list
 
-        ArrayList<String> project_list = new ArrayList<>();
-        project_list.add("Project1");
-        project_list.add("Project2");
-        project_list.add("Project3");
+        ArrayList<String> project_list = utilityMethods.generateprojects(3);
 
-        HashMap<String, ArrayList<String[]>> student_preferences = generateStudents(3, project_list);
+        GenerateRandomInstance generateRandomInstance = new GenerateRandomInstance();
 
-        ArrayList<String[]> ar1 = new ArrayList<>();
-        String[] pref1 = {"Project1", "Project2"};
-        ar1.add(pref1);
+        HashMap<String, ArrayList<String[]>> student_preferences = new HashMap<>();
 
-        ArrayList<String[]> ar2 = new ArrayList<>();
-        String[] pref2 = {"Project1", "Project2"};
-        ar2.add(pref2);
+        student_preferences = generateRandomInstance.generateStudents(3, project_list);
 
+        student_preferences = generateRandomInstance.generateRandomInstanceWithTies(student_preferences, 0.7);
 
-        student_preferences.put("Student1", ar1 );
-        student_preferences.put("Student2", ar2);
-
-        for (Map.Entry<String, ArrayList<String[]>> entry : student_preferences.entrySet()){
+        for (Map.Entry<String, ArrayList<String[]>> entry: student_preferences.entrySet()){
             System.out.println(entry.getKey());
-            ArrayList<String[]> aL1 = entry.getValue();
-            for (String[] indiffer_class : aL1){
-                System.out.println(Arrays.toString(indiffer_class));
+            for (String[] indifference_class : entry.getValue()){
+                System.out.print(Arrays.toString(indifference_class) + " ");
             }
+            System.out.println();
         }
 
         RandomSerialWithTies(student_preferences, project_list);
-
     }
 }
