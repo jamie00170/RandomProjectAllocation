@@ -15,7 +15,22 @@ public class RandomSerialDictatorshipTies {
     public static String[][] calculate_values_of_matrix(String[][] matrix, BipartiteGraph bG){
         for (Vertex v : bG.vertexList){
             if (v.mate != null){
-               utilityMethods.incrementValue(matrix, v.name, v.mate.name, new Fraction(1));
+                if (v.isStudent) {
+                    System.out.println("Incremenitng value between: " + v.name + " and " + v.mate.name);
+                    utilityMethods.incrementValue(matrix, v.name, v.mate.name, new Fraction(1));
+                }else{
+                    utilityMethods.incrementValueProject(matrix, v.name, v.mate.name, new Fraction(1));
+                }
+            }
+        }
+        return matrix;
+    }
+
+    public static String[][] calculate_initial_values_of_matrix(String[][] matrix, BipartiteGraph bG){
+        for (Vertex v : bG.vertexList){
+            if (v.mate != null && v.isStudent) {
+                System.out.println("Incremenitng value between: " + v.name + " and " + v.mate.name);
+                utilityMethods.incrementValue(matrix, v.name, v.mate.name, new Fraction(1));
             }
         }
         return matrix;
@@ -117,7 +132,7 @@ public class RandomSerialDictatorshipTies {
 
             BipartiteGraph g_minus = G.clone();
             // Generate G-(e)
-            g_minus.remove_matching_edge(edgeFrom);
+            g_minus.remove_matching_edge(edgeFrom.name, edgeFrom.mate.name);
             // Call enum_perfect_matchings_iter(G-(e), M')
             enum_perfect_matchings_iter(g_minus, M);
 
@@ -160,7 +175,7 @@ public class RandomSerialDictatorshipTies {
         BipartiteGraph bG = new BipartiteGraph(student_list, project_list);
 
         // 2. for each agent in order of current permutation
-        String[] permutation = {"Student1", "Student2", "Student3"};
+        String[] permutation = {"Student2", "Student1", "Student3"};
 
         //ArrayList<String[]> permutations = new ArrayList<>();
 
@@ -206,8 +221,13 @@ public class RandomSerialDictatorshipTies {
             System.out.println(v.toString());
         }
 
+        System.out.println("Printing matrix.....");
+        for (String[] row: matrix){
+            System.out.println(Arrays.toString(row));
+        }
+
         // Calculate values for matrix from graph
-        calculate_values_of_matrix(matrix, bG);
+        calculate_initial_values_of_matrix(matrix, bG);
 
         // Clean up graph, i.e. remove adjacent edges where there is a matching one
         bG.cleanUp();

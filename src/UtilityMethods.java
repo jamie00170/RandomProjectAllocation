@@ -32,6 +32,31 @@ public class UtilityMethods {
         matrix[coordinates[0]][coordinates[1]] = new_value.toString();
     }
 
+    public void incrementValueProject(String[][] matrix, String project, String student, Fraction calculated_value){
+        int i = 0;
+        int j;
+
+        int[] coordinates = new int[2];
+
+        while( i < matrix.length){
+            j = 0;
+            while (j < matrix[i].length){
+                // only have to search first column and row
+                if(matrix[i][j].equals(student))
+                    coordinates[0] = i;
+                if(matrix[i][j].equals(project))
+                    coordinates[1] = j;
+                j++;
+            }
+            i++;
+        }
+
+        Fraction current_value = stringToFraction(matrix[coordinates[0]][coordinates[1]]);
+        Fraction new_value = current_value.add(calculated_value);
+        matrix[coordinates[0]][coordinates[1]] = new_value.toString();
+    }
+
+
     public int factorial(int n) {
         int fact = 1; // this  will be the result
         for (int i = 1; i <= n; i++) {
@@ -73,7 +98,6 @@ public class UtilityMethods {
         fraction_string = fraction_string.replaceAll("\\s","");
         String[] data = fraction_string.split("/");
         //System.out.println("string split:" + Arrays.toString(data));
-
 
         if (data.length > 1) {
             Double numerator = Double.parseDouble(data[0]);

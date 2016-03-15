@@ -243,7 +243,7 @@ public class BipartiteGraph implements Cloneable {
                                 System.out.println("Cycle found starting at Vertex: " + vertex.name);
                                 System.out.println("Linked list containing path..");
                                 for (Vertex v : verticesInCycle){
-                                    System.out.println(v);
+                                    System.out.println(v.name);
                                 }
                                 System.out.println("\n\n");
                                 return verticesInCycle;
@@ -261,13 +261,21 @@ public class BipartiteGraph implements Cloneable {
             after_first = true;
         }
         System.out.println("No cycle Found!");
-        return verticesInCycle;
+        return new HashSet<>();
     }
 
 
-    public void remove_matching_edge(Vertex v){
+    public void remove_matching_edge(String v, String u){
 
-        v.mate = null;
+        for (Vertex vertex : vertexList){
+            if (vertex.name.equals(v)){
+                vertex.mate = null;
+            }
+            if (vertex.name.equals(u)){
+                vertex.mate = null;
+            }
+        }
+
     }
 
     public BipartiteGraph clone() throws CloneNotSupportedException{
@@ -291,21 +299,41 @@ public class BipartiteGraph implements Cloneable {
     public void exchange_edges(HashSet<Vertex> verticesInCycle){
         // **Needs to be used in depth first search method so right edges are changed**
 
-        for (Vertex v: verticesInCycle){
-            // if edge is not currently in the matching reverse it therefore adding it to the matching
-            if (v.adjacentV.size() > 0){
-                // Needs fixed
-                v.mate = v.adjacentV.get(0);
-                v.adjacentV.remove(0);
-            }
+        HashMap<Vertex, Vertex> edges_to_remove = new HashMap<>();
+        HashMap<Vertex, Vertex> edges_to_add = new HashMap<>();
 
-            // if vertex/edge is currently in the matching reverse it and remove it from matching
-            if (v.mate != null){
-                v.adjacentV.add(v);
-                v.mate = null;
+
+        for (Vertex v: verticesInCycle) {
+
+            // Add edges to be added to the matching to the hash map
+            if (v.adjacentV.size() > 0) {
+                edges_to_add.put(v, v.adjacentV.get(0));
+                // TODO : Fix could be more than one in adjacent verticies
+            }
+            // Add edges to be removed to hash map
+            if (v.mate != null) {
+                edges_to_remove.put(v, v.mate);
             }
         }
+
+
+
+        for (Map.Entry<Vertex, Vertex> entry : edges_to_remove.entrySet()){
+            // if vertex/edge is currently in the matching reverse it and remove it from matching
+            System.out.println("Removing edge in matching between: " + entry.getKey().name + " and " + entry.getValue().name);
+            entry.getKey().mate = null;
+            entry.getKey().adjacentV.add(entry.getValue());
+        }
+
+        for (Map.Entry<Vertex, Vertex> entry : edges_to_add.entrySet()){
+            // if edge is not currently in the matching reverse it therefore adding it to the matching
+            System.out.println("Adding edge to the matching between: " + entry.getKey().name + " and " + entry.getValue().name);
+            entry.getKey().mate = entry.getValue();
+            entry.getKey().adjacentV.remove(entry.getValue());
+        }
+
     }
+
 
     public static BipartiteGraph undirectedToDirected(BipartiteGraph bG){
 
@@ -352,8 +380,7 @@ public class BipartiteGraph implements Cloneable {
         project_list.add(project_3);
 
         BipartiteGraph bG2 = new BipartiteGraph(student_list, project_list);
-
-
+        
         bG2.new_matching_edge("Student1", "Project1");
         bG2.new_matching_edge("Student2", "Project2");
         bG2.new_matching_edge("Student3", "Project3");
@@ -385,7 +412,7 @@ public class BipartiteGraph implements Cloneable {
         //Vertex end_v = bG2.searchAP();
         //bG2.augment(end_v);
 
-        System.out.println("Graph after exchaning edges.....");
+        System.out.println("Graph after exchanging edges.....");
         for (Vertex v : bG2.vertexList){
             System.out.println(v.toString());
         }
