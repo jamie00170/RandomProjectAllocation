@@ -14,34 +14,7 @@ public class BostonSerial {
 
     public String[][] bostonSerial(HashMap<String, ArrayList<String>> student_preferences, ArrayList<String> project_list){
 
-        // Create matrix
-        String[][] matrix = new String[(student_preferences.size() + 1)][(project_list.size() + 1)];
-
-        matrix[0][0] = "-";
-        int i = 1;
-        for (String student : student_preferences.keySet()) {
-            matrix[i][0] = student;
-            i++;
-        }
-
-
-        int j = 1;
-        for (String project : project_list){
-
-            matrix[0][j] = project;
-            j++;
-        }
-
-        i = 1;
-        while( i < matrix.length){
-            j = 1;
-            while (j < matrix[i].length){
-                matrix[i][j] = "0";
-                j++;
-            }
-            i++;
-        }
-
+        String[][] matrix = utilityMethods.setUpMatrix(student_preferences.keySet(), project_list);
 
         // Stores the amount left of each project to be consumed
         HashMap<String, Fraction> project_allocation = new HashMap<>();
@@ -50,15 +23,15 @@ public class BostonSerial {
         HashMap<String, Fraction> student_allocation = new HashMap<>();
 
 
-        i = 0;
+        int i = 0;
         while (i < project_list.size()){
             project_allocation.put(project_list.get(i), new Fraction(0));
             i++;
         }
         System.out.println(project_allocation.toString());
 
-        for(Object name : student_preferences.keySet()){
-            student_allocation.put((String) name, new Fraction(0));
+        for(String name : student_preferences.keySet()){
+            student_allocation.put(name, new Fraction(0));
         }
         System.out.println(student_allocation.toString());
         System.out.println(student_preferences.toString());
