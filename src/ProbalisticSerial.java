@@ -86,7 +86,6 @@ public class ProbalisticSerial {
             if (!max_increment_for_projects.isEmpty()) {
                 increment_for_round = Collections.min(max_increment_for_projects.values());
 
-
                 System.out.println("Max increments for projects: " + max_increment_for_projects);
                 for (Map.Entry<String, Fraction> entry : max_increment_for_projects.entrySet()) {
                     if (entry.getValue().equals(increment_for_round)) {

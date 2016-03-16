@@ -1,37 +1,20 @@
-import org.apache.commons.math3.fraction.Fraction;
-
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.Scanner;
+;
 
 /**
  * Created by Jamie on 11/01/2016.
  */
-public class inputReader {
+public class InputReader {
 
     private static UtilityMethods utilityMethods = new UtilityMethods();
 
-    public static void main(String[] args) {
-        BufferedReader br = null;
+    public void read_file(String filename, String alg) {
 
 
-        try {
-
-            String filename;
-            Scanner sc = new Scanner(System.in);
-            System.out.println("Enter the name of the file to use as input: ");
-
-            filename = sc.nextLine();
-
-            System.out.println("Enter the name of the algortihm to run : RSD, PS or BS ");
-
-            String alg;
-            alg = sc.nextLine();
-
-
-            br = new BufferedReader(new FileReader(filename));
+        try (BufferedReader br = new BufferedReader((new FileReader(filename)))) {
 
             String currentLine;
 
@@ -52,17 +35,17 @@ public class inputReader {
             i = 0;
             //String[] student_list = new String[number_students];
             ArrayList<String> student_list = new ArrayList<>();
-            while (i < (number_students)){
+            while (i < (number_students)) {
                 student_list.add(br.readLine());
                 i++;
             }
 
             i = 0;
             HashMap<String, ArrayList<String>> student_preferences = new HashMap<>();
-            while (i < (number_students)){
+            while (i < (number_students)) {
                 String[] project_rankings = br.readLine().split("\\s+");
                 int j = 0;
-                while (j < project_rankings.length){
+                while (j < project_rankings.length) {
                     project_rankings[j] = "Project-" + project_rankings[j];
                     j++;
                 }
@@ -73,7 +56,7 @@ public class inputReader {
 
             i = 0;
             ArrayList<String> project_list = new ArrayList<>();
-            while (i < (number_projects-1)){
+            while (i < (number_projects - 1)) {
                 project_list.add("Project-" + br.readLine());
                 i++;
             }
@@ -91,10 +74,10 @@ public class inputReader {
             if (alg.equals("PS")) {
                 ProbalisticSerial ps = new ProbalisticSerial();
                 ps.probabilisticSerialDictatorship(student_preferences, project_list);
-            }else if (alg.equals("BS")){
+            } else if (alg.equals("BS")) {
                 BostonSerial bs = new BostonSerial();
                 bs.bostonSerial(student_preferences, project_list);
-            }else if (alg.equals("RSD")){
+            } else if (alg.equals("RSD")) {
 
                 String[][] matrix = utilityMethods.setUpMatrix(student_preferences.keySet(), project_list);
 
@@ -103,27 +86,22 @@ public class inputReader {
 
                 matrix = utilityMethods.divideMatrixByFactorial(matrix, utilityMethods.factorial(student_list.size()));
 
-                for (String[] row : matrix){
+                for (String[] row : matrix) {
                     System.out.println(Arrays.toString(row));
                 }
             }
 
 
-        }catch (FileNotFoundException e){
+        } catch (FileNotFoundException e) {
             System.out.println("Specified file could not be found!");
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             e.printStackTrace();
-
-        }finally {
-
-            try {
-                if (br != null)
-                    br.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
         }
+
+    }
+
+
+    public static void main(String[] args) {
+
     }
 }

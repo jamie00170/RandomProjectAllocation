@@ -33,34 +33,32 @@ public class RandomSerialDictatorship {
             projects_allocated.clear();
             while (i < permutation.length) {
                 // If the current student in the priority list is in student_preferences
-                if (student_preferences.containsKey(permutation[i])) {
-                    String name = permutation[i];
-                    // Get the students preferences
-                    ArrayList<String> preferences = student_preferences.get(name);
-                    // For each choice in the list of preferences
-                    //System.out.println("Preferences: " + preferences);
-                    int j = 0;
-                    while (j < preferences.size()) {
-                        // If the project has already been taken
-                        if (projects_allocated.contains(preferences.get(j))) {
-                            // If the choice is the students last
-                            if (preferences.get(preferences.size() - 1).equals(preferences.get(j))) {
-                                // Unable to match student
-                                System.out.println(name + " not matched because none of their choices are available!");
-                            }
-                        } else {
-                            // Match the student to their choice
-                            System.out.println(name + " " + preferences.get(j));
-                            utilityMethods.incrementValue(matrix, name, preferences.get(j), new Fraction(1));
-                            // Add the project to the projects_allocated list
-                            projects_allocated.add(preferences.get(j));
-                            break;
+
+                String name = permutation[i];
+                // Get the students preferences
+                ArrayList<String> preferences = student_preferences.get(name);
+                // For each choice in the list of preferences
+                //System.out.println("Preferences: " + preferences);
+                int j = 0;
+                while (j < preferences.size()) {
+                    // If the project has already been taken
+                    if (projects_allocated.contains(preferences.get(j))) {
+                        // If the choice is the students last
+                        if (preferences.get(preferences.size() - 1).equals(preferences.get(j))) {
+                            // Unable to match student
+                            System.out.println(name + " not matched because none of their choices are available!");
                         }
-                        j++;
+                    } else {
+                        // Match the student to their choice
+                        System.out.println(name + " " + preferences.get(j));
+                        utilityMethods.incrementValue(matrix, name, preferences.get(j), new Fraction(1));
+                        // Add the project to the projects_allocated list
+                        projects_allocated.add(preferences.get(j));
+                        break;
                     }
-                } else {
-                    System.out.println("Name not in student list!");
+                    j++;
                 }
+
                 i++;
             }
 
