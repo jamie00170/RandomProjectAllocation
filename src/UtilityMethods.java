@@ -116,7 +116,7 @@ public class UtilityMethods {
                 e.printStackTrace();
             }
         }else{
-
+            
             Double fraction_value = Double.parseDouble(data[0]);
             try {
 

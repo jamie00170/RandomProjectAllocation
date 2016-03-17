@@ -95,7 +95,7 @@ public class EvaluationExperiments {
 
             // Set up
             // Create matrix
-            String[][] matrix = utilityMethods.setUpMatrix(student_preferences.keySet(), project_list);
+            String[][] matrix = utilityMethods.setUpMatrix(student_preferences_copy.keySet(), project_list);
 
 
             //String[] student_list = new String[student_preferences.size()];
