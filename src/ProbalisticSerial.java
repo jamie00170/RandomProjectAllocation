@@ -48,7 +48,10 @@ public class ProbalisticSerial {
 
             System.out.println("Current projects:" + current_projects);
             String max_project = "";
+
             HashMap<String, Fraction> max_increment_for_projects = new HashMap<>();
+            HashMap<String, Fraction> max_increment_for_students = new HashMap<>();
+
             for (String project: current_projects.keySet()){
                 if (!(current_projects.get(project).equals(new Fraction(0)))){
                     Fraction max_increment_for_current_project = new Fraction(1).subtract(project_allocation.get(project)).divide(current_projects.get(project));
@@ -56,11 +59,22 @@ public class ProbalisticSerial {
                 }
             }
 
+            // Store the max each student can be incremented each round
+            for (String student: student_preferences.keySet()){
+
+                Fraction max_increment_for_student = new Fraction(1).subtract(student_allocation.get(student));
+                max_increment_for_students.put(student, max_increment_for_student);
+
+            }
+
+
             Fraction increment_for_round;
             if (!max_increment_for_projects.isEmpty()) {
                 increment_for_round = Collections.min(max_increment_for_projects.values());
 
                 System.out.println("Max increments for projects: " + max_increment_for_projects);
+                System.out.println("Max increments for students: " + max_increment_for_students);
+
                 for (Map.Entry<String, Fraction> entry : max_increment_for_projects.entrySet()) {
                     if (entry.getValue().equals(increment_for_round)) {
                         max_project = entry.getKey();
@@ -68,6 +82,13 @@ public class ProbalisticSerial {
                     }
 
                 }
+
+                Fraction max_student_increment = Collections.min(max_increment_for_students.values());
+                //If increment for round would cause a student to be over allocated
+                if (increment_for_round.compareTo(max_student_increment) > 0 ){
+                    increment_for_round = max_student_increment;
+                }
+
                 System.out.println("Max project:" + max_project);
 
                 System.out.println("Increment: " + increment_for_round);

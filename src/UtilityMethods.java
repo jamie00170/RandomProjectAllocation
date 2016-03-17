@@ -1,6 +1,7 @@
 import org.apache.commons.math3.fraction.Fraction;
 import org.apache.commons.math3.fraction.FractionConversionException;
 
+import java.math.BigDecimal;
 import java.util.*;
 
 /**
@@ -100,10 +101,12 @@ public class UtilityMethods {
         //System.out.println("string split:" + Arrays.toString(data));
 
         if (data.length > 1) {
+
             Double numerator = Double.parseDouble(data[0]);
             Double denominator = Double.parseDouble(data[1]);
 
             Double fraction_value = numerator / denominator;
+
 
 
             try {
@@ -116,6 +119,10 @@ public class UtilityMethods {
 
             Double fraction_value = Double.parseDouble(data[0]);
             try {
+
+                double epsilon;
+                epsilon = 5 * (Math.pow(10.0, -17.0));
+
                 f = new Fraction(fraction_value);
                 return f;
             } catch (FractionConversionException e) {

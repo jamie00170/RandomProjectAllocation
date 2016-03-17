@@ -38,16 +38,18 @@ public class stringToFractionTest {
         Fraction fraction3 = utilityMethods.stringToFraction(frac_string);
 
 
-        BigDecimal bd = new BigDecimal(0.982789447);
+        BigDecimal bd = new BigDecimal(0.9827894477787894342);
 
         Double d = bd.doubleValue();
 
         System.out.println("Double value:" + d);
 
+        System.out.println("Big decimal value: " + bd);
+
         double epsilon;
         epsilon = 5 * (Math.pow(10.0, -9.0));
 
-        Fraction fraction4 = new Fraction(d, epsilon, 10 );
+        Fraction fraction4 = new Fraction(d);
 
         System.out.println(fraction4);
 
