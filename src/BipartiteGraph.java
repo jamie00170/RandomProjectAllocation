@@ -410,20 +410,24 @@ public class BipartiteGraph implements Cloneable {
             if (v.name.equals("Student1")){
                 startVertex = v;
                 verticesInCycle = bG2.find_cycle(startVertex);
-                if (!verticesInCycle.isEmpty()){
-                    bG2.exchange_edges(verticesInCycle);
-                }
+                //if (!verticesInCycle.isEmpty()){
+                //    bG2.exchange_edges(verticesInCycle);
+                //}
             }
         }
 
+        System.out.println("Verticies in cycle...");
+        for (Vertex v : verticesInCycle){
+            System.out.println(v.name);
+        }
 
         //Vertex end_v = bG2.searchAP();
         //bG2.augment(end_v);
 
-        System.out.println("Graph after exchanging edges.....");
-        for (Vertex v : bG2.vertexList){
-            System.out.println(v.toString());
-        }
+        //System.out.println("Graph after exchanging edges.....");
+        //for (Vertex v : bG2.vertexList){
+        //    System.out.println(v.toString());
+        //}
 
     }
 

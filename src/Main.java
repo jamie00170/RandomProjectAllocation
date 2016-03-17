@@ -37,30 +37,37 @@ public class Main {
             int size_of_preference_lists = Integer.parseInt(scanner.nextLine());
             //     alg
             System.out.println("Which algorithm do you want to run?");
-            System.out.println("Enter RSD, PS or BS");
+            System.out.println("Enter RSD, PS, BS or RSDT");
             String alg = scanner.nextLine();
 
             ArrayList<String> project_list = utilityMethods.generateprojects(num_projects);
 
-            System.out.println("Project List:" + project_list.toString());
-
             HashMap<String, ArrayList<String>> student_preferences = utilityMethods.generateStudents(num_students, project_list, size_of_preference_lists);
-
-            System.out.println("Student Preferences: " + student_preferences.toString());
 
             ArrayList<String> student_list = new ArrayList<>();
             for (String name : student_preferences.keySet()) {
                 student_list.add(name);
             }
-            System.out.println("Student list:" + student_list);
+
+
+            if (!alg.equals("RSDT")){
+                System.out.println("Project List:" + project_list.toString());
+                System.out.println("Student Preferences: " + student_preferences.toString());
+                System.out.println("Student list:" + student_list);
+            }
+
 
             //     run given alg with randomly generated instance with given parameters
             if (alg.equals("PS")) {
+
                 ProbalisticSerial ps = new ProbalisticSerial();
                 ps.probabilisticSerialDictatorship(student_preferences, project_list);
+
             } else if (alg.equals("BS")) {
+
                 BostonSerial bs = new BostonSerial();
                 bs.bostonSerial(student_preferences, project_list);
+
             } else if (alg.equals("RSD")) {
 
                 String[][] matrix = utilityMethods.setUpMatrix(student_preferences.keySet(), project_list);
@@ -73,6 +80,33 @@ public class Main {
                 for (String[] row : matrix) {
                     System.out.println(Arrays.toString(row));
                 }
+
+            }else if (alg.equals("RSDT")){
+
+                System.out.println("What probability of ties?");
+                System.out.println("Enter a real number between 0 and 1");
+
+                double probability_of_ties = Double.parseDouble(scanner.nextLine());
+                
+                GenerateRandomInstance generateRandomInstance = new GenerateRandomInstance();
+
+                HashMap<String, ArrayList<String[]>> student_pref_ties = new HashMap<>();
+                student_pref_ties = generateRandomInstance.generateStudents(3, project_list);
+
+                student_pref_ties = generateRandomInstance.generateRandomInstanceWithTies(student_pref_ties, 0.7);
+
+                System.out.println("Student Preferences: ");
+                for (Map.Entry<String, ArrayList<String[]>> entry: student_pref_ties.entrySet()){
+                    System.out.println(entry.getKey());
+                    for (String[] indifference_class : entry.getValue()){
+                        System.out.print(Arrays.toString(indifference_class) + " ");
+                    }
+                    System.out.println();
+                }
+
+                RandomSerialDictatorshipTies rsdt = new RandomSerialDictatorshipTies();
+
+                rsdt.RandomSerialWithTies(student_pref_ties, project_list);
 
             }
 
