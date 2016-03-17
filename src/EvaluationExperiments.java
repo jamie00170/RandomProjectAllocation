@@ -10,9 +10,18 @@ public class EvaluationExperiments {
 
     private static UtilityMethods utilityMethods = new UtilityMethods();
 
-    public static Double calculateCostOfMatching(String[][] matrix, HashMap<String, ArrayList<String>> student_preferences){
 
-        //System.out.println("Student Preferences in Calculate cost: " + student_preferences);
+    public static int calculateDepthOfMatching(String[][] matrix,HashMap<String, ArrayList<String>> student_preferences){
+
+        // Depth of a matching is equal
+
+
+    }
+
+
+
+
+    public static Double calculateCostOfMatching(String[][] matrix, HashMap<String, ArrayList<String>> student_preferences){
 
 
         Double costOfMatching = 0.0;
@@ -23,16 +32,13 @@ public class EvaluationExperiments {
             if (counter >= 1) { // skip the first row - contains students
                 int i = 1; // skip the project labels
                 while (i < row.length) {
-                    //System.out.print(row[i] + " ");
                     Fraction fraction = utilityMethods.stringToFraction(row[i]);
                     if (fraction.compareTo(new Fraction(0)) > 0){ // if the value is more than 0
                         String project = matrix[0][i];
                         String student = matrix[counter][0];
-                        //System.out.println("Student: " + student + " Project: " + project);
                         // Get what choice the current project is of the student
                         int position_in_preference_list = student_preferences.get(student).indexOf(project);
-                        //System.out.println("Position in preference list: " + position_in_preference_list);
-                        //System.out.println("Adding : " + (position_in_preference_list + 1) * fraction.doubleValue() + " to the cost of the matching");
+
                         Fraction increment_fraction = new Fraction((position_in_preference_list +1) * fraction.doubleValue());
                         costOfMatching += increment_fraction.doubleValue();
                         //System.out.println();
@@ -44,6 +50,7 @@ public class EvaluationExperiments {
             counter++;
         }
 
+        // TODO - take account of unmatched fraction?
         return costOfMatching;
     }
 
@@ -108,8 +115,6 @@ public class EvaluationExperiments {
 
             try {
 
-
-
                 if (experiment.equals("cost")) {
                     // Need to create a deep copy or running boston serial removes elements from student_preferences
                     HashMap<String, ArrayList<String>> student_preferences_copy = (HashMap) objectCloner.deepCopy(student_preferences);
@@ -162,7 +167,7 @@ public class EvaluationExperiments {
 
                     csvWriter.csvWriteLine(cost_rsd, cost_ps, cost_bs);
 
-                }
+                }else if (experiment.equals("depth"));
 
             } catch (Exception e) {
                 e.printStackTrace();

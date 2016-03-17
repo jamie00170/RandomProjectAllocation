@@ -31,7 +31,6 @@ public class InputReader {
                     number_projects = Integer.parseInt(currentLine);
                 i++;
             }
-            int number_supervisors = Integer.parseInt(br.readLine());
 
             i = 0;
             //String[] student_list = new String[number_students];
@@ -64,7 +63,6 @@ public class InputReader {
 
             System.out.println("Number of projects: " + number_projects);
             System.out.println("Number of students: " + number_students);
-            System.out.println("Number of supervisors: " + number_supervisors);
 
             System.out.println("Student list: " + student_list.toString());
             System.out.println("Project list: " + project_list.toString());

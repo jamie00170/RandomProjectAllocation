@@ -38,7 +38,7 @@ public class Main {
             //     alg
             System.out.println("Which algorithm do you want to run?");
             System.out.println("Enter RSD, PS, BS or RSDT");
-            String alg = scanner.nextLine();
+            String alg = scanner.next();
 
             ArrayList<String> project_list = utilityMethods.generateprojects(num_projects);
 
