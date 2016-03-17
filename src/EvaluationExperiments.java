@@ -47,120 +47,128 @@ public class EvaluationExperiments {
         return costOfMatching;
     }
 
-    public static void runCostOfMatchingRSD(String[][] matching, HashMap<String, ArrayList<String>> student_preferences){
+    public static double runCostOfMatchingRSD(String[][] matching, HashMap<String, ArrayList<String>> student_preferences){
 
         Double cost = calculateCostOfMatching(matching, student_preferences);
         System.out.println("Cost of matching for RSD: " + cost);
+
+        return cost;
     }
 
-    public static void runCostOfMatchingPS(String[][] matching, HashMap<String, ArrayList<String>> student_preferences){
+    public static double runCostOfMatchingPS(String[][] matching, HashMap<String, ArrayList<String>> student_preferences){
 
         Double cost = calculateCostOfMatching(matching, student_preferences);
         System.out.println("Cost of matching for PS: " + cost);
 
+        return cost;
     }
 
-    public static void runCostOfMatchingBS(String[][] matching, HashMap<String, ArrayList<String>> student_preferences){
+    public static double runCostOfMatchingBS(String[][] matching, HashMap<String, ArrayList<String>> student_preferences){
 
         Double cost = calculateCostOfMatching(matching, student_preferences);
         System.out.println("Cost of matching for BS: " + cost);
 
+        return cost;
     }
 
     public static void main(String[] args){
 
-        ArrayList<String> project_list = utilityMethods.generateprojects(10);
+        Scanner scanner = new Scanner(System.in);
+        //     ask for num students
+        System.out.println("Enter the number of students: ");
+        int num_students = scanner.nextInt();
+        //     num projects
+        System.out.println("Enter the number of projects: ");
+        int num_projects = scanner.nextInt();
+        //     size of preference lists
+        System.out.println("Enter the size of preference lists: ");
+        int size_of_preference_lists = scanner.nextInt();
 
-        HashMap<String, ArrayList<String>> student_preferences = utilityMethods.generateStudents(7, project_list, 5);
+        System.out.println("What experiment do you want to run? ");
+        System.out.println("Enter cost, depth, % of position ");
+        String experiment = scanner.next();
 
-        ObjectCloner objectCloner = new ObjectCloner();
-        //ArrayList<String> project_list_copy = new ArrayList<>(project_list);
-        try {
-            // Need to create a deep copy or running boston serial removes elements from student_preferences
-            HashMap<String, ArrayList<String>> student_preferences_copy = (HashMap) objectCloner.deepCopy(student_preferences);
+        System.out.println("How many random instances should the experiment be run on? ");
+        int num_instances = scanner.nextInt();
 
-            HashMap<String, ArrayList<String>> student_preferences_copy2 = (HashMap) objectCloner.deepCopy(student_preferences);
+        System.out.println("What should the output file be named? - note don't include a file extension ");
+        String output_filename = scanner.next();
 
-            HashMap<String, ArrayList<String>> student_preferences_copy3 = (HashMap) objectCloner.deepCopy(student_preferences);
+        CsvWriter csvWriter = new CsvWriter(output_filename + ".csv");
 
+        for (int i =0; i < num_instances; i++) {
 
-            BostonSerial bs = new BostonSerial();
-            String[][] bs_matching =  bs.bostonSerial(student_preferences, project_list);
+            ArrayList<String> project_list = utilityMethods.generateprojects(num_projects);
 
-            ProbalisticSerial ps = new ProbalisticSerial();
-
-            String[][] ps_matching = ps.probabilisticSerialDictatorship(student_preferences_copy2, project_list);
-
-            /////////////////////////////////////RSD////////////////////////////////////////////////////////
-
-            // Set up
-            // Create matrix
-            String[][] matrix = utilityMethods.setUpMatrix(student_preferences_copy.keySet(), project_list);
-
-
-            //String[] student_list = new String[student_preferences.size()];
-            ArrayList<String> student_list = new ArrayList<>();
-            for (String name : student_preferences_copy3.keySet()){
-                student_list.add(name);
-            }
-            System.out.println("Student list:" + student_list);
+            HashMap<String, ArrayList<String>> student_preferences = utilityMethods.generateStudents(num_students, project_list, size_of_preference_lists);
 
 
-            RandomSerialDictatorship rsd = new RandomSerialDictatorship();
+            ObjectCloner objectCloner = new ObjectCloner();
+            //ArrayList<String> project_list_copy = new ArrayList<>(project_list);
 
-            for (String[] row : matrix){
-                System.out.println(Arrays.toString(row));
-            }
+            try {
 
-            String[][] rsd_matching = rsd.permute(student_list,0, student_preferences_copy3, project_list, matrix);
 
-            int divisor = utilityMethods.factorial(student_list.size());
 
-            int p = 1;
-            while( p < rsd_matching.length) {
-                int f = 1;
-                while (f < rsd_matching[p].length) {
-                    try {
+                if (experiment.equals("cost")) {
+                    // Need to create a deep copy or running boston serial removes elements from student_preferences
+                    HashMap<String, ArrayList<String>> student_preferences_copy = (HashMap) objectCloner.deepCopy(student_preferences);
 
-                        Fraction fraction = utilityMethods.stringToFraction(rsd_matching[p][f]).divide(new Fraction(divisor));
+                    HashMap<String, ArrayList<String>> student_preferences_copy2 = (HashMap) objectCloner.deepCopy(student_preferences);
 
-                        rsd_matching[p][f] = fraction.toString();
-                    } catch (NumberFormatException e) {
-                        e.printStackTrace();
-                    } catch (FractionConversionException e) {
-                        e.printStackTrace();
+                    HashMap<String, ArrayList<String>> student_preferences_copy3 = (HashMap) objectCloner.deepCopy(student_preferences);
+
+
+                    BostonSerial bs = new BostonSerial();
+                    String[][] bs_matching = bs.bostonSerial(student_preferences, project_list);
+
+                    ProbalisticSerial ps = new ProbalisticSerial();
+
+                    String[][] ps_matching = ps.probabilisticSerialDictatorship(student_preferences_copy2, project_list);
+
+
+                    ArrayList<String> student_list = new ArrayList<>();
+                    for (String name : student_preferences_copy3.keySet()) {
+                        student_list.add(name);
                     }
-                    f++;
+                    System.out.println("Student list:" + student_list);
+
+
+                    RandomSerialDictatorship rsd = new RandomSerialDictatorship();
+
+                    String[][] rsd_matching = rsd.randomSerialDictatorship(student_list, student_preferences_copy3, project_list, 100);
+
+
+                    System.out.println("Running Evaluation on matchings generated......\n\n");
+
+                    //for (String[] row : bs_matching){
+                    //System.out.println(Arrays.toString(row));
+                    //}
+                    System.out.println();
+                    // need to pass a copy because we need the original state of the the preference lists to calculate cost
+                    double cost_bs = runCostOfMatchingBS(bs_matching, student_preferences_copy);
+                    System.out.println();
+                    //for (String[] row : ps_matching){
+                    //    System.out.println(Arrays.toString(row));
+                    //}
+                    System.out.println();
+                    double cost_ps = runCostOfMatchingPS(ps_matching, student_preferences_copy);
+                    System.out.println();
+                    //for (String[] row : rsd_matching){
+                    //    System.out.println(Arrays.toString(row));
+                    //}
+                    System.out.println();
+                    double cost_rsd = runCostOfMatchingRSD(rsd_matching, student_preferences_copy);
+
+                    csvWriter.csvWriteLine(cost_rsd, cost_ps, cost_bs);
+
                 }
-                p++;
+
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-
-
-
-            System.out.println("Running Evaluation on matchings generated......\n\n");
-
-            //for (String[] row : bs_matching){
-                //System.out.println(Arrays.toString(row));
-            //}
-            System.out.println();
-            // need to pass a copy because we need the original state of the the preference lists to calculate cost
-            runCostOfMatchingBS(bs_matching, student_preferences_copy);
-            System.out.println();
-            //for (String[] row : ps_matching){
-            //    System.out.println(Arrays.toString(row));
-            //}
-            System.out.println();
-            runCostOfMatchingPS(ps_matching, student_preferences_copy);
-            System.out.println();
-            //for (String[] row : rsd_matching){
-            //    System.out.println(Arrays.toString(row));
-            //}
-            System.out.println();
-            runCostOfMatchingRSD(rsd_matching, student_preferences_copy);
-
-        }catch (Exception e){
-            e.printStackTrace();
         }
+        csvWriter.closeCsv();
 
     }
 

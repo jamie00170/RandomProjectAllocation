@@ -2,6 +2,7 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Scanner;
 ;
 
 /**
@@ -79,16 +80,14 @@ public class InputReader {
                 bs.bostonSerial(student_preferences, project_list);
             } else if (alg.equals("RSD")) {
 
-                String[][] matrix = utilityMethods.setUpMatrix(student_preferences.keySet(), project_list);
+                Scanner scanner = new Scanner(System.in);
+
+                System.out.println("How many permutations of student list do you want to run?");
+                int num_permutations = scanner.nextInt();
 
                 RandomSerialDictatorship randomSerialDictatorship = new RandomSerialDictatorship();
-                matrix = randomSerialDictatorship.permute(student_list, 0, student_preferences, project_list, matrix);
+                randomSerialDictatorship.randomSerialDictatorship(student_list, student_preferences, project_list, num_permutations);
 
-                matrix = utilityMethods.divideMatrixByFactorial(matrix, utilityMethods.factorial(student_list.size()));
-
-                for (String[] row : matrix) {
-                    System.out.println(Arrays.toString(row));
-                }
             }
 
 

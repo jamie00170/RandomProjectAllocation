@@ -18,9 +18,9 @@ public class Main {
             //     ask for filename
             System.out.println("Enter the name of the file to load the instance from: ");
             String filename = scanner.nextLine();
-            //     ask for algortihm to run
+            //     ask for algorithm to run
             System.out.println("Which algorithm do you want to run?");
-            System.out.println("Enter RSD, PS or BS");
+            System.out.println("Enter RSD, PS, BS or RSDT");
             String alg = scanner.nextLine();
 
             InputReader inputReader = new InputReader();
@@ -28,13 +28,13 @@ public class Main {
         } else {
             //     ask for num students
             System.out.println("Enter the number of students: ");
-            int num_students = Integer.parseInt(scanner.nextLine());
+            int num_students = scanner.nextInt();
             //     num projects
             System.out.println("Enter the number of projects: ");
-            int num_projects = Integer.parseInt(scanner.nextLine());
+            int num_projects = scanner.nextInt();
             //     size of preference lists
             System.out.println("Enter the size of preference lists: ");
-            int size_of_preference_lists = Integer.parseInt(scanner.nextLine());
+            int size_of_preference_lists = scanner.nextInt();
             //     alg
             System.out.println("Which algorithm do you want to run?");
             System.out.println("Enter RSD, PS, BS or RSDT");
@@ -48,7 +48,6 @@ public class Main {
             for (String name : student_preferences.keySet()) {
                 student_list.add(name);
             }
-
 
             if (!alg.equals("RSDT")){
                 System.out.println("Project List:" + project_list.toString());
@@ -70,23 +69,18 @@ public class Main {
 
             } else if (alg.equals("RSD")) {
 
-                String[][] matrix = utilityMethods.setUpMatrix(student_preferences.keySet(), project_list);
+                System.out.println("How many permutations of student list do you want to run?");
+                int num_permutations = scanner.nextInt();
 
                 RandomSerialDictatorship randomSerialDictatorship = new RandomSerialDictatorship();
-                matrix = randomSerialDictatorship.permute(student_list, 0, student_preferences, project_list, matrix);
-
-                matrix = utilityMethods.divideMatrixByFactorial(matrix, utilityMethods.factorial(student_list.size()));
-
-                for (String[] row : matrix) {
-                    System.out.println(Arrays.toString(row));
-                }
+                randomSerialDictatorship.randomSerialDictatorship(student_list, student_preferences, project_list, 100);
 
             }else if (alg.equals("RSDT")){
 
                 System.out.println("What probability of ties?");
                 System.out.println("Enter a real number between 0 and 1");
 
-                double probability_of_ties = Double.parseDouble(scanner.nextLine());
+                double probability_of_ties = scanner.nextDouble();
 
                 GenerateRandomInstance generateRandomInstance = new GenerateRandomInstance();
 

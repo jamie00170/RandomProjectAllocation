@@ -237,12 +237,6 @@ public class RandomSerialDictatorshipTies {
             System.out.println(v.toString());
         }
 
-        /**
-        System.out.println("Printing matrix.....");
-        for (String[] row: matrix){
-            System.out.println(Arrays.toString(row));
-        }
-         **/
 
         // Calculate values for matrix from graph
         calculate_initial_values_of_matrix(matrix, bG);

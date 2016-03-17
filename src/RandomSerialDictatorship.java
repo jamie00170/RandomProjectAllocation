@@ -2,6 +2,8 @@
  * Created by Jamie on 30/11/2015.
  */
 
+import com.google.common.collect.Collections2;
+import com.google.common.collect.ImmutableList;
 import org.apache.commons.math3.fraction.Fraction;
 import org.apache.commons.math3.fraction.FractionConversionException;
 
@@ -13,28 +15,38 @@ public class RandomSerialDictatorship {
     private static UtilityMethods utilityMethods = new UtilityMethods();
 
 
-    public String[][] permute(ArrayList<String> student_list, int k, HashMap<String, ArrayList<String>> student_preferences, ArrayList<String> project_list, String[][] matrix){
-        String[] permutation = new String[student_list.size()];
+    public String[][] randomSerialDictatorship(ArrayList<String> student_list, HashMap<String, ArrayList<String>> student_preferences, ArrayList<String> project_list, int num_permutations){
+
+        String[][] matrix = utilityMethods.setUpMatrix(student_preferences.keySet(), project_list);
+
         // Initialise projects_allocated array
         ArrayList<String> projects_allocated = new ArrayList<>();
 
-        for(int n = k; n < student_list.size(); n++){
-            java.util.Collections.swap(student_list, n, k);
-            permute(student_list, k+1, student_preferences, project_list, matrix);
-            java.util.Collections.swap(student_list, k, n);
+
+        Collection<ImmutableList<String>> permutations;
+
+        // If not all permutations are required
+        if (num_permutations != utilityMethods.factorial(student_list.size())){
+            permutations = utilityMethods.generatePermutations(student_list, num_permutations);
+        }else{
+            Collection student_col = student_list;
+            permutations = Collections2.permutations(student_col);
         }
-        if (k == student_list.size() -1) {
-            permutation = student_list.toArray(permutation);
-            System.out.println(Arrays.toString(permutation));
+
+        for (ImmutableList<String> permutation: permutations) {
+
+
+            System.out.println(permutation);
+
             // run rsd code here for permutation
 
             int i = 0;
             // Start here - need to format string into list first
             projects_allocated.clear();
-            while (i < permutation.length) {
+            while (i < permutation.size()) {
                 // If the current student in the priority list is in student_preferences
 
-                String name = permutation[i];
+                String name = permutation.get(i);
                 // Get the students preferences
                 ArrayList<String> preferences = student_preferences.get(name);
                 // For each choice in the list of preferences
@@ -61,9 +73,26 @@ public class RandomSerialDictatorship {
 
                 i++;
             }
-
         }
-        
+
+        // divide all values in the matrix by factorial of the size of the  student list or the num of permutations given
+        int divisor;
+        int factorial_student_list = utilityMethods.factorial(student_list.size());
+        if (num_permutations != factorial_student_list){
+            divisor = num_permutations;
+            matrix = utilityMethods.divideMatrixByFactorial(matrix, divisor);
+        }else{
+            divisor = factorial_student_list;
+            matrix = utilityMethods.divideMatrixByFactorial(matrix, divisor);
+        }
+
+
+
+
+
+        for (String[] row : matrix){
+            System.out.println(Arrays.toString(row));
+        }
 
         return matrix;
     }
@@ -72,17 +101,16 @@ public class RandomSerialDictatorship {
     public static void main(String[] args){
 
 
-        ArrayList<String> project_list = utilityMethods.generateprojects(3);
+        ArrayList<String> project_list = utilityMethods.generateprojects(200);
         System.out.println("Project List:" + project_list.toString());
 
-        HashMap<String, ArrayList<String>> student_preferences = utilityMethods.generateStudents(3, project_list, 3);
+        HashMap<String, ArrayList<String>> student_preferences = utilityMethods.generateStudents(200, project_list, 6);
 
         System.out.println("Student Preferences: " + student_preferences.toString());
 
         String[][] matrix = utilityMethods.setUpMatrix(student_preferences.keySet(), project_list);
 
 
-        //String[] student_list = new String[student_preferences.size()];
         ArrayList<String> student_list = new ArrayList<>();
         for (String name : student_preferences.keySet()){
             student_list.add(name);
@@ -91,15 +119,8 @@ public class RandomSerialDictatorship {
 
         RandomSerialDictatorship rsd = new RandomSerialDictatorship();
 
-        matrix = rsd.permute(student_list, 0, student_preferences, project_list, matrix);
+        matrix = rsd.randomSerialDictatorship(student_list, student_preferences, project_list, 100);
 
-        int divisor = utilityMethods.factorial(student_list.size());
 
-        // divide all values in the matrix by factorial of the size of the  student list
-        matrix = utilityMethods.divideMatrixByFactorial(matrix, divisor);
-
-        for (String[] row : matrix){
-            System.out.println(Arrays.toString(row));
-        }
     }
 }

@@ -1,3 +1,4 @@
+import com.google.common.collect.ImmutableList;
 import org.apache.commons.math3.fraction.Fraction;
 import org.apache.commons.math3.fraction.FractionConversionException;
 
@@ -289,16 +290,19 @@ public class UtilityMethods {
 
     }
 
-    public Collection<ArrayList<String>> generatePermutations(ArrayList<String> student_list, int num_permutations){
+    public Collection<ImmutableList<String>> generatePermutations(ArrayList<String> student_list, int num_permutations){
 
-        System.out.println("student list: " + student_list);
-        ArrayList<ArrayList<String>> permutations = new ArrayList<>();
+        Collection<ImmutableList<String>> permutations = new ArrayList<>();
+
+        //ImmutableList<String> im_student_list = ImmutableList.copyOf(student_list);
 
         while (permutations.size() < num_permutations){
             Collections.shuffle(student_list);
-            ArrayList<String> shuffeled_student_list = new ArrayList<>();
+            ArrayList<String> shuffeled_student_list;
             shuffeled_student_list = (ArrayList<String>) student_list.clone();
-            permutations.add(shuffeled_student_list);
+            ImmutableList<String> im_shuffeled_student_list = ImmutableList.copyOf(shuffeled_student_list);
+
+            permutations.add(im_shuffeled_student_list);
             //System.out.println("Student list: " + student_list);
 
         }
