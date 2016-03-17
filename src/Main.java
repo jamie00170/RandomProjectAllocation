@@ -87,7 +87,7 @@ public class Main {
                 System.out.println("Enter a real number between 0 and 1");
 
                 double probability_of_ties = Double.parseDouble(scanner.nextLine());
-                
+
                 GenerateRandomInstance generateRandomInstance = new GenerateRandomInstance();
 
                 HashMap<String, ArrayList<String[]>> student_pref_ties = new HashMap<>();
