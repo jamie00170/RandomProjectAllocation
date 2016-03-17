@@ -116,7 +116,7 @@ public class UtilityMethods {
                 e.printStackTrace();
             }
         }else{
-            
+
             Double fraction_value = Double.parseDouble(data[0]);
             try {
 
@@ -287,6 +287,22 @@ public class UtilityMethods {
 
         return matrix;
 
+    }
+
+    public Collection<ArrayList<String>> generatePermutations(ArrayList<String> student_list, int num_permutations){
+
+        System.out.println("student list: " + student_list);
+        ArrayList<ArrayList<String>> permutations = new ArrayList<>();
+
+        while (permutations.size() < num_permutations){
+            Collections.shuffle(student_list);
+            ArrayList<String> shuffeled_student_list = new ArrayList<>();
+            shuffeled_student_list = (ArrayList<String>) student_list.clone();
+            permutations.add(shuffeled_student_list);
+            //System.out.println("Student list: " + student_list);
+
+        }
+        return permutations;
     }
 
 

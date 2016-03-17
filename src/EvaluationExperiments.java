@@ -69,9 +69,9 @@ public class EvaluationExperiments {
 
     public static void main(String[] args){
 
-        ArrayList<String> project_list = utilityMethods.generateprojects(30);
+        ArrayList<String> project_list = utilityMethods.generateprojects(10);
 
-        HashMap<String, ArrayList<String>> student_preferences = utilityMethods.generateStudents(8, project_list, 4);
+        HashMap<String, ArrayList<String>> student_preferences = utilityMethods.generateStudents(7, project_list, 5);
 
         ObjectCloner objectCloner = new ObjectCloner();
         //ArrayList<String> project_list_copy = new ArrayList<>(project_list);
@@ -136,12 +136,14 @@ public class EvaluationExperiments {
             }
 
 
+
             System.out.println("Running Evaluation on matchings generated......\n\n");
-            // need to pass a copy because we need the original state of the the preference lists to calculate cost
+
             //for (String[] row : bs_matching){
                 //System.out.println(Arrays.toString(row));
             //}
             System.out.println();
+            // need to pass a copy because we need the original state of the the preference lists to calculate cost
             runCostOfMatchingBS(bs_matching, student_preferences_copy);
             System.out.println();
             //for (String[] row : ps_matching){
