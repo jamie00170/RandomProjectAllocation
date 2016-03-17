@@ -95,31 +95,7 @@ public class EvaluationExperiments {
 
             // Set up
             // Create matrix
-            String[][] matrix = new String[(student_preferences_copy3.size() + 1)][(project_list.size() + 1)];
-
-            matrix[0][0] = "-";
-            int i = 1;
-            for (String student : student_preferences_copy3.keySet()) {
-                matrix[i][0] = student;
-                i++;
-            }
-
-
-            int j = 1;
-            for (String project : project_list){
-                matrix[0][j] = project;
-                j++;
-            }
-
-            i = 1;
-            while( i < matrix.length){
-                j = 1;
-                while (j < matrix[i].length){
-                    matrix[i][j] = "0";
-                    j++;
-                }
-                i++;
-            }
+            String[][] matrix = utilityMethods.setUpMatrix(student_preferences.keySet(), project_list);
 
 
             //String[] student_list = new String[student_preferences.size()];
