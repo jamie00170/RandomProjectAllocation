@@ -31,7 +31,7 @@ public class CsvWriter {
 
     }
 
-    public void csvWriteLine(double rsd_cost, double ps_cost, double bs_cost){
+    public void csvWriteLineValue(double rsd_value, double ps_value, double bs_value){
 
         try {
             //Add a new line separator after the header
@@ -39,17 +39,39 @@ public class CsvWriter {
 
             //Write a new student object list to the CSV file
 
-            fileWriter.append(Double.toString(rsd_cost));
+            fileWriter.append(Double.toString(rsd_value));
             fileWriter.append(COMMA_DELIMITER);
-            fileWriter.append(Double.toString(ps_cost));
+            fileWriter.append(Double.toString(ps_value));
             fileWriter.append(COMMA_DELIMITER);
-            fileWriter.append(Double.toString(bs_cost));
+            fileWriter.append(Double.toString(bs_value));
             fileWriter.append(NEW_LINE_SEPARATOR);
         }catch (IOException e){
             e.printStackTrace();
         }
 
     }
+
+    public void csvWriteLineDepth(int rsd_depth, int ps_depth, int bs_depth){
+
+        try {
+            //Add a new line separator after the header
+            fileWriter.append(NEW_LINE_SEPARATOR);
+
+            //Write a new student object list to the CSV file
+
+            fileWriter.append(Integer.toString(rsd_depth));
+            fileWriter.append(COMMA_DELIMITER);
+            fileWriter.append(Integer.toString(ps_depth));
+            fileWriter.append(COMMA_DELIMITER);
+            fileWriter.append(Integer.toString(bs_depth));
+            fileWriter.append(NEW_LINE_SEPARATOR);
+        }catch (IOException e){
+            e.printStackTrace();
+        }
+
+
+    }
+
 
     public void closeCsv(){
 
@@ -69,7 +91,7 @@ public class CsvWriter {
 
         CsvWriter csvWriter = new CsvWriter("test_csv.csv");
 
-        csvWriter.csvWriteLine(58.5, 57.0, 54.4);
+        csvWriter.csvWriteLineValue(58.5, 57.0, 54.4);
 
         csvWriter.closeCsv();
 

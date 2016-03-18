@@ -204,7 +204,7 @@ public class UtilityMethods {
         for (String name : names_to_remove){
             student_preferences.remove(name);
         }
-        
+
     }
 
     public int[] getCoordinates(String[][] matrix, String student, String project){
