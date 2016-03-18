@@ -13,9 +13,10 @@ public class EvaluationExperiments {
 
     public static int calculateDepthOfMatching(String[][] matrix,HashMap<String, ArrayList<String>> student_preferences){
 
+        int depth = 0;
         // Depth of a matching is equal
 
-
+        return depth;
     }
 
 

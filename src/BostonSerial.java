@@ -2,6 +2,7 @@ import java.util.*;
 import org.apache.commons.math3.fraction.Fraction;
 import org.apache.commons.math3.fraction.FractionConversionException;
 
+
 /**
  * Created by Jamie on 15/11/2015.
  */
