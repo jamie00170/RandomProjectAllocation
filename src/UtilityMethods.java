@@ -166,7 +166,7 @@ public class UtilityMethods {
 
     public void removeMatched(Map<String, ArrayList<String>> student_preferences, Map<String, Fraction> project_allocation, Map<String, Fraction> student_allocation){
 
-        //System.out.println("Attempting to remove matched students and projects .... ");
+
         ArrayList<String> student_list = new ArrayList<>();
         for (String name : student_preferences.keySet()) {
             student_list.add(name);
