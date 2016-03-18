@@ -50,7 +50,7 @@ public class BostonSerial {
         HashMap<String, Fraction> max_student_increments = new HashMap<>();
 
 
-        while(!(utilityMethods.check_sizes(project_allocation) || utilityMethods.check_sizes(student_allocation) || student_preferences.isEmpty())){
+        while(student_preferences.isEmpty()){
 
             //Clear max student and max project increment hash maps
             max_project_increments.clear();

@@ -42,7 +42,7 @@ public class ProbalisticSerial {
         }
 
         // while projects are still to be allocated or students are fully matched i.e have a combined total of 1
-        while(!(utilityMethods.check_sizes(project_allocation) || utilityMethods.check_sizes(student_allocation) || student_preferences.isEmpty())){
+        while(!student_preferences.isEmpty()){
             // Get current projects being consumed by students
             utilityMethods.getCurrentProjects(student_preferences, current_projects);
 
