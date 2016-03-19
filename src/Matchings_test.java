@@ -113,9 +113,6 @@ public class Matchings_test {
                 // TODO if student not in matching make their ith_choice in M integer.MaxValue
                 String students_project_in_matching = matching.get(student_list.get(i));
 
-                //System.out.println("Current_student: " + student_list.get(i));
-                //System.out.println("Students project in M: " + students_project_in_matching );
-                //System.out.println("Students project is M'" + students_project_in_current_permutation);
                 ArrayList<String> students_preferences = student_preferences.get(student_list.get(i));
                 //System.out.println("Current students preference list: " + students_preferences);
                 // Check if the current student is worse off than in M
@@ -259,9 +256,9 @@ public class Matchings_test {
     public static void main(String[] args) {
 
 
-        ArrayList<String> project_list = generateprojects(3);
+        ArrayList<String> project_list = generateprojects(50);
 
-        HashMap<String, ArrayList<String>> student_preferences = generateStudents(3, project_list);
+        HashMap<String, ArrayList<String>> student_preferences = generateStudents(50, project_list);
 
         ArrayList<String> student_list = new ArrayList<>();
 

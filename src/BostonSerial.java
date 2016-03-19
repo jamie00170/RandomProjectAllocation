@@ -12,6 +12,50 @@ public class BostonSerial {
 
     private static UtilityMethods utilityMethods = new UtilityMethods();
 
+    public HashMap<String, Fraction> getCurrentProjects(HashMap<String, ArrayList<String>> student_preferences, HashMap<String, Fraction> current_projects, HashMap<String, Integer> current_position_in_prefernce_list){
+
+        // reset current projects
+        for(String project : current_projects.keySet()){
+            current_projects.put(project, current_projects.get(project).subtract(current_projects.get(project)));
+        }
+
+        for (String student : student_preferences.keySet()){
+            // Get the students preferences
+            ArrayList<String> preferences =  student_preferences.get(student);
+            if (!preferences.isEmpty()) {
+                // current project
+                String current_project = preferences.get(current_position_in_prefernce_list.get(student));
+                System.out.println(student + " " + current_project);
+                current_projects.put(current_project, current_projects.get(current_project).add(new Fraction(1)));
+            }
+        }
+        return current_projects;
+    }
+
+    public void removeMatched(Map<String, ArrayList<String>> student_preferences, Map<String, Fraction> student_allocation){
+
+        ArrayList<String> student_list = new ArrayList<>();
+        for (String name : student_preferences.keySet()) {
+            student_list.add(name);
+        }
+
+        ArrayList<String> names_to_remove = new ArrayList<>();
+        for (String name : student_list) {
+            if (student_preferences.get(name).isEmpty()){
+                names_to_remove.add(name);
+            }
+            if (student_allocation.get(name).equals(new Fraction(1))) {
+                student_preferences.remove(name);
+            }
+
+        }
+
+        for (String name : names_to_remove){
+            student_preferences.remove(name);
+        }
+
+    }
+
 
     public String[][] bostonSerial(HashMap<String, ArrayList<String>> student_preferences, ArrayList<String> project_list){
 
@@ -49,8 +93,13 @@ public class BostonSerial {
         HashMap<String, Fraction> max_project_increments = new HashMap<>();
         HashMap<String, Fraction> max_student_increments = new HashMap<>();
 
+        HashMap<String, Integer> current_position_in_preference_list = new HashMap<>();
+        for (String student: student_preferences.keySet()){
+            current_position_in_preference_list.put(student, 0);
+        }
 
-        while(!student_preferences.isEmpty()){
+
+        while(!(utilityMethods.check_sizes(project_allocation) || utilityMethods.check_sizes(student_allocation) || student_preferences.isEmpty())){
 
             //Clear max student and max project increment hash maps
             max_project_increments.clear();
@@ -58,14 +107,14 @@ public class BostonSerial {
 
 
             // Get current projects being consumed by students
-            HashMap<String, Fraction> currentProjects = utilityMethods.getCurrentProjects(student_preferences, current_projects);
-            System.out.println("Current Projects: " + currentProjects.toString());
+            current_projects = getCurrentProjects(student_preferences, current_projects, current_position_in_preference_list);
+            //System.out.println("Current Projects: " + currentProjects.toString());
 
             // Store the max each project can be incremented by for the current round
             for (String project : current_projects.keySet()){
                 // Only add projects that are being consumed in the current round
-                if (current_projects.get(project).compareTo(new Fraction(0)) == 0)
-                    continue;
+                //if (current_projects.get(project).compareTo(new Fraction(0)) == 0)
+                //    continue;
 
                 Fraction max_increment_for_project = new Fraction(1).subtract(project_allocation.get(project));
                 if (current_projects.get(project).compareTo(new Fraction(1)) > 0){
@@ -88,24 +137,30 @@ public class BostonSerial {
             System.out.println("Max increments for projects: " + max_project_increments);
             System.out.println("Max increments for students: " + max_student_increments);
 
+
             // for each student that hasn't yet been matched
-            for (String name : student_preferences.keySet()) {
+            for (String student : student_preferences.keySet()) {
 
                 // if the student has picked a project that is already matched then skip the student
                 // get the students list of preferences
-                ArrayList<String> preferences = student_preferences.get(name);
+                ArrayList<String> preferences = student_preferences.get(student);
                 // get their first available choice - matched choices have been removed to always index 0
                 if (preferences.isEmpty())
                     continue;
-                String current_project = preferences.get(0);
+                String current_project = preferences.get(current_position_in_preference_list.get(student));
                 // if the student has picked a project that is already matched then skip the student
-                if (project_allocation.get(current_project).compareTo(new Fraction(1)) == 0)
+                if (project_allocation.get(current_project).compareTo(new Fraction(1)) == 0){
+                    // increment position in students preference list
+                    current_position_in_preference_list.put(student, current_position_in_preference_list.get(student) +1);
+                    System.out.println("Student: " + student + " Project: " + current_project);
                     continue;
+                }
+
 
                 // Increment value is equal to the minimum of max_student_increments.get(student) and
                 // max_project_increments.get(project)
                 Fraction incrementValue;
-                Fraction max_student_increment = max_student_increments.get(name);
+                Fraction max_student_increment = max_student_increments.get(student);
                 Fraction max_project_increment = max_project_increments.get(current_project);
 
                 if (max_student_increment.compareTo(max_project_increment) < 0){
@@ -115,21 +170,36 @@ public class BostonSerial {
                 }
 
 
-                System.out.println("Student: " + name + " Project: " + current_project);
+                System.out.println("Student: " + student + " Project: " + current_project);
                 System.out.println("Increment: " + incrementValue + "\n");
 
-                student_allocation.put(name, student_allocation.get(name).add(incrementValue));
+                student_allocation.put(student, student_allocation.get(student).add(incrementValue));
                 project_allocation.put(current_project, project_allocation.get(current_project).add(incrementValue));
                 // Increment values in the matrix
-                utilityMethods.incrementValue(matrix, name, current_project, incrementValue);
+                utilityMethods.incrementValue(matrix, student, current_project, incrementValue);
+
 
             }
 
-            System.out.println("Student Allocation: " + student_allocation.toString());
-            System.out.println("Project Allocation: " + project_allocation.toString());
+            // If the project the student is consumed fully during a round, increment the current position in preference list students consuming
+            for (String student : student_preferences.keySet()) {
+
+                ArrayList<String> preference_list = student_preferences.get(student);
+
+                String current_project =  preference_list.get(current_position_in_preference_list.get(student));
+
+                if (project_allocation.get(current_project).compareTo(new Fraction(1)) == 0) {
+                    // increment position in students preference list
+                    current_position_in_preference_list.put(student, current_position_in_preference_list.get(student) + 1);
+                }
+            }
+
+
+            //System.out.println("Student Allocation: " + student_allocation.toString());
+            //System.out.println("Project Allocation: " + project_allocation.toString());
             System.out.println("Student preferences before removal: " + student_preferences.toString());
             // Removed matched Students and Projects
-            utilityMethods.removeMatched(student_preferences, project_allocation, student_allocation);
+            removeMatched(student_preferences, student_allocation);
             System.out.println("Student preferences: " + student_preferences.toString());
         }
 
