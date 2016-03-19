@@ -25,27 +25,33 @@ public class BostonSerial {
             if (!preferences.isEmpty()) {
                 // current project
                 String current_project = preferences.get(current_position_in_prefernce_list.get(student));
-                System.out.println(student + " " + current_project);
+                //System.out.println(student + " " + current_project);
                 current_projects.put(current_project, current_projects.get(current_project).add(new Fraction(1)));
             }
         }
         return current_projects;
     }
 
-    public void removeMatched(Map<String, ArrayList<String>> student_preferences, Map<String, Fraction> student_allocation){
+    public void removeMatched(Map<String, ArrayList<String>> student_preferences, Map<String, Fraction> student_allocation, HashMap<String, Integer> current_position_in_preference_list){
 
         ArrayList<String> student_list = new ArrayList<>();
-        for (String name : student_preferences.keySet()) {
-            student_list.add(name);
+        for (String student : student_preferences.keySet()) {
+            student_list.add(student);
         }
 
         ArrayList<String> names_to_remove = new ArrayList<>();
-        for (String name : student_list) {
-            if (student_preferences.get(name).isEmpty()){
-                names_to_remove.add(name);
+        for (String student : student_list) {
+            if (student_preferences.get(student).isEmpty()){
+                names_to_remove.add(student);
             }
-            if (student_allocation.get(name).equals(new Fraction(1))) {
-                student_preferences.remove(name);
+            if (student_allocation.get(student).equals(new Fraction(1))) {
+                names_to_remove.add(student);
+            }
+            int size_prefernce_list = student_preferences.get(student).size();
+
+            // If reached the end of the students prefernce list - remove student
+            if (current_position_in_preference_list.get(student) > size_prefernce_list -1) {
+                names_to_remove.add(student);
             }
 
         }
@@ -134,8 +140,8 @@ public class BostonSerial {
 
             }
 
-            System.out.println("Max increments for projects: " + max_project_increments);
-            System.out.println("Max increments for students: " + max_student_increments);
+            //System.out.println("Max increments for projects: " + max_project_increments);
+            //System.out.println("Max increments for students: " + max_student_increments);
 
 
             // for each student that hasn't yet been matched
@@ -150,10 +156,12 @@ public class BostonSerial {
                 String current_project = preferences.get(current_position_in_preference_list.get(student));
                 // if the student has picked a project that is already matched then skip the student
                 if (project_allocation.get(current_project).compareTo(new Fraction(1)) == 0){
-                    // increment position in students preference list
-                    current_position_in_preference_list.put(student, current_position_in_preference_list.get(student) +1);
-                    System.out.println("Student: " + student + " Project: " + current_project);
+                    // increment position in students preference list if not on last project
+
+                    System.out.println("Student: " + student + " Project: " + current_project + " Skipped for this round");
+                    System.out.println();
                     continue;
+
                 }
 
 
@@ -178,29 +186,35 @@ public class BostonSerial {
                 // Increment values in the matrix
                 utilityMethods.incrementValue(matrix, student, current_project, incrementValue);
 
-
             }
 
-            // If the project the student is consumed fully during a round, increment the current position in preference list students consuming
+            // If the project the student is consumed fully during a round, or was skipped
+            // increment the current position in preference list students consuming
+
             for (String student : student_preferences.keySet()) {
 
                 ArrayList<String> preference_list = student_preferences.get(student);
 
-                String current_project =  preference_list.get(current_position_in_preference_list.get(student));
+                String current_project = preference_list.get(current_position_in_preference_list.get(student));
+
 
                 if (project_allocation.get(current_project).compareTo(new Fraction(1)) == 0) {
-                    // increment position in students preference list
+                    // increment position in students preference list if not on last project
                     current_position_in_preference_list.put(student, current_position_in_preference_list.get(student) + 1);
                 }
+
             }
 
+            //System.out.println("Current position in preference lists: " + current_position_in_preference_list);
 
             //System.out.println("Student Allocation: " + student_allocation.toString());
             //System.out.println("Project Allocation: " + project_allocation.toString());
             System.out.println("Student preferences before removal: " + student_preferences.toString());
             // Removed matched Students and Projects
-            removeMatched(student_preferences, student_allocation);
+            removeMatched(student_preferences, student_allocation, current_position_in_preference_list);
             System.out.println("Student preferences: " + student_preferences.toString());
+
+
         }
 
         for (String[] row : matrix){
