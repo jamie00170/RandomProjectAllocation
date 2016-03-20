@@ -504,7 +504,7 @@ public class BipartiteGraph implements Cloneable {
             }
         }
 
-        
+
 
     }
 

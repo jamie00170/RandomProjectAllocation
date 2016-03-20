@@ -1,6 +1,7 @@
 import org.apache.commons.math3.fraction.Fraction;
 import org.apache.commons.math3.fraction.FractionConversionException;
 
+import java.math.BigDecimal;
 import java.util.*;
 
 /**
@@ -9,6 +10,55 @@ import java.util.*;
 public class EvaluationExperiments {
 
     private static UtilityMethods utilityMethods = new UtilityMethods();
+
+
+    public static double calculateAvgChanceOfBeingUnmatched(String[][] matrix, int num_students){
+
+        double avg_chance = 0.0;
+
+        ArrayList<Double> value_unmatched_each_student = new ArrayList<>();
+
+        // calculate value for each row then subtract it from one
+        // gives the percentage chance of being un matched for a student
+        // add it to the array of values
+        int i = 1; // skip project labels in first row
+        while (i < matrix.length){
+            int j = 1; // skip student label's in first column of each row
+            double row_total = 0.0;
+            while (j < matrix[i].length){
+                // if the value in the matrix at i, j isn't a 0
+                if (!matrix[i][j].equals("0")){
+
+                    double current_value = utilityMethods.stringToFraction(matrix[i][j]).doubleValue();
+                    row_total += current_value;
+
+                }
+                j++;
+            }
+            double value_unmatched = 1.0 - row_total;
+            double diff = Math.abs(row_total - 1.0);
+            if (diff < 0.0001)
+                value_unmatched = 0.0;
+
+            value_unmatched_each_student.add(value_unmatched);
+
+            i++;
+        }
+
+        System.out.println("Values unmatched: " + value_unmatched_each_student);
+
+        // for each row total
+        for (double value_unmatched : value_unmatched_each_student){
+            // add it to avg_chance
+            avg_chance += value_unmatched;
+        }
+
+        // divide avg_chance by num_students
+        avg_chance  = avg_chance / num_students;
+
+        System.out.println("Average chance of being unmatched: " + avg_chance);
+        return avg_chance;
+    }
 
 
     public static int calculateDepthOfMatching(String[][] matrix, HashMap<String, ArrayList<String>> student_preferences){
@@ -96,7 +146,7 @@ public class EvaluationExperiments {
     public static double runValueOfMatchingRSD(String[][] matching, HashMap<String, ArrayList<String>> student_preferences){
 
         Double cost = calculateValueOfMatching(matching, student_preferences);
-        System.out.println("Cost of matching for RSD: " + cost);
+        System.out.println("Value of matching for RSD: " + cost);
 
         return cost;
     }
@@ -104,7 +154,7 @@ public class EvaluationExperiments {
     public static double runValueOfMatchingPS(String[][] matching, HashMap<String, ArrayList<String>> student_preferences){
 
         Double cost = calculateValueOfMatching(matching, student_preferences);
-        System.out.println("Cost of matching for PS: " + cost);
+        System.out.println("Value of matching for PS: " + cost);
 
         return cost;
     }
@@ -112,7 +162,7 @@ public class EvaluationExperiments {
     public static double runValueOfMatchingBS(String[][] matching, HashMap<String, ArrayList<String>> student_preferences){
 
         Double cost = calculateValueOfMatching(matching, student_preferences);
-        System.out.println("Cost of matching for BS: " + cost);
+        System.out.println("Value of matching for BS: " + cost);
 
         return cost;
     }
@@ -131,7 +181,7 @@ public class EvaluationExperiments {
         int size_of_preference_lists = scanner.nextInt();
 
         System.out.println("What experiment do you want to run? ");
-        System.out.println("Enter value, depth, % of position ");
+        System.out.println("Enter value, depth, first, last or unmatched");
         String experiment = scanner.next();
 
         System.out.println("How many random instances should the experiment be run on? ");
@@ -154,13 +204,14 @@ public class EvaluationExperiments {
 
             try {
 
+                HashMap<String, ArrayList<String>> student_preferences_copy = (HashMap) objectCloner.deepCopy(student_preferences);
+
+                HashMap<String, ArrayList<String>> student_preferences_copy2 = (HashMap) objectCloner.deepCopy(student_preferences);
+
+                HashMap<String, ArrayList<String>> student_preferences_copy3 = (HashMap) objectCloner.deepCopy(student_preferences);
+
                 if (experiment.equals("value")) {
                     // Need to create a deep copy or running boston serial removes elements from student_preferences
-                    HashMap<String, ArrayList<String>> student_preferences_copy = (HashMap) objectCloner.deepCopy(student_preferences);
-
-                    HashMap<String, ArrayList<String>> student_preferences_copy2 = (HashMap) objectCloner.deepCopy(student_preferences);
-
-                    HashMap<String, ArrayList<String>> student_preferences_copy3 = (HashMap) objectCloner.deepCopy(student_preferences);
 
 
                     BostonSerial bs = new BostonSerial();
@@ -204,15 +255,10 @@ public class EvaluationExperiments {
                     System.out.println();
                     double cost_rsd = runValueOfMatchingRSD(rsd_matching, student_preferences_copy);
 
-                    csvWriter.csvWriteLineValue(cost_rsd, cost_ps, cost_bs);
+                    csvWriter.csvWriteLineDouble(cost_rsd, cost_ps, cost_bs);
 
                 }else if (experiment.equals("depth")){
 
-                    HashMap<String, ArrayList<String>> student_preferences_copy = (HashMap) objectCloner.deepCopy(student_preferences);
-
-                    HashMap<String, ArrayList<String>> student_preferences_copy2 = (HashMap) objectCloner.deepCopy(student_preferences);
-
-                    HashMap<String, ArrayList<String>> student_preferences_copy3 = (HashMap) objectCloner.deepCopy(student_preferences);
 
                     BostonSerial bs = new BostonSerial();
                     String[][] bs_matching = bs.bostonSerial(student_preferences, project_list);
@@ -241,7 +287,34 @@ public class EvaluationExperiments {
                     int ps_depth = calculateDepthOfMatching(ps_matching, student_preferences_copy);
                     int bs_depth = calculateDepthOfMatching(bs_matching, student_preferences_copy);
 
-                    csvWriter.csvWriteLineDepth(rsd_depth, ps_depth, bs_depth);
+                    csvWriter.csvWriteLineInt(rsd_depth, ps_depth, bs_depth);
+
+                }else if (experiment.equals("unmatched")){
+
+                    BostonSerial bs = new BostonSerial();
+                    String[][] bs_matching = bs.bostonSerial(student_preferences, project_list);
+
+                    ProbalisticSerial ps = new ProbalisticSerial();
+
+                    String[][] ps_matching = ps.probabilisticSerialDictatorship(student_preferences_copy2, project_list);
+
+
+                    ArrayList<String> student_list = new ArrayList<>();
+                    for (String name : student_preferences_copy3.keySet()) {
+                        student_list.add(name);
+                    }
+                    System.out.println("Student list:" + student_list);
+
+
+                    RandomSerialDictatorship rsd = new RandomSerialDictatorship();
+
+                    String[][] rsd_matching = rsd.randomSerialDictatorship(student_list, student_preferences_copy3, project_list, 1000);
+
+                    double bs_chance = calculateAvgChanceOfBeingUnmatched(bs_matching, student_list.size());
+                    double ps_chance = calculateAvgChanceOfBeingUnmatched(ps_matching, student_list.size());
+                    double rsd_chance = calculateAvgChanceOfBeingUnmatched(rsd_matching, student_list.size());
+
+                    csvWriter.csvWriteLineDouble(rsd_chance, ps_chance, bs_chance);
 
                 }
 
