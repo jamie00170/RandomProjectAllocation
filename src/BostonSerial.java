@@ -41,16 +41,13 @@ public class BostonSerial {
 
         ArrayList<String> names_to_remove = new ArrayList<>();
         for (String student : student_list) {
-            if (student_preferences.get(student).isEmpty()){
-                names_to_remove.add(student);
-            }
             if (student_allocation.get(student).equals(new Fraction(1))) {
                 names_to_remove.add(student);
             }
-            int size_prefernce_list = student_preferences.get(student).size();
+            int size_preference_list = student_preferences.get(student).size();
 
             // If reached the end of the students prefernce list - remove student
-            if (current_position_in_preference_list.get(student) > size_prefernce_list -1) {
+            if (current_position_in_preference_list.get(student) > size_preference_list -1) {
                 names_to_remove.add(student);
             }
 
@@ -105,7 +102,7 @@ public class BostonSerial {
         }
 
 
-        while(!(utilityMethods.check_sizes(project_allocation) || utilityMethods.check_sizes(student_allocation) || student_preferences.isEmpty())){
+        while(!student_preferences.isEmpty()){
 
             //Clear max student and max project increment hash maps
             max_project_increments.clear();
@@ -156,15 +153,11 @@ public class BostonSerial {
                 String current_project = preferences.get(current_position_in_preference_list.get(student));
                 // if the student has picked a project that is already matched then skip the student
                 if (project_allocation.get(current_project).compareTo(new Fraction(1)) == 0){
-                    // increment position in students preference list if not on last project
-
                     System.out.println("Student: " + student + " Project: " + current_project + " Skipped for this round");
                     System.out.println();
                     continue;
 
                 }
-
-
                 // Increment value is equal to the minimum of max_student_increments.get(student) and
                 // max_project_increments.get(project)
                 Fraction incrementValue;
@@ -194,9 +187,7 @@ public class BostonSerial {
             for (String student : student_preferences.keySet()) {
 
                 ArrayList<String> preference_list = student_preferences.get(student);
-
                 String current_project = preference_list.get(current_position_in_preference_list.get(student));
-
 
                 if (project_allocation.get(current_project).compareTo(new Fraction(1)) == 0) {
                     // increment position in students preference list if not on last project

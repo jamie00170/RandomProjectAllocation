@@ -198,15 +198,62 @@ public class BipartiteGraph implements Cloneable {
         return false;
     }
 
-    public HashSet<Vertex> find_cycle(Vertex startVertex) {
+    public LinkedList<Vertex> verticesInCycle(HashMap<Vertex, ArrayList<Vertex>> visitedBy, Vertex last_vertex, Vertex start_vertex){
+
+        LinkedList<Vertex> path = new LinkedList<>();
+
+        System.out.println("Last vertex: " + last_vertex.name);
+        // Look for last_vertex in values
+
+        Vertex current_vertex = new Vertex();
+        for (Vertex v : visitedBy.keySet()){
+            if (visitedBy.get(v).contains(last_vertex)){
+                path.add(last_vertex);
+                System.out.println("Adding " + last_vertex.name + " to the path!");
+                current_vertex = v;
+            }
+        }
+
+        // While the path doesn't contain the start vertex
+        while (!path.contains(start_vertex)) {
+
+            for (Vertex v : visitedBy.keySet()) {
+                if (visitedBy.get(v).contains(current_vertex)) {
+                    path.add(current_vertex);
+                    System.out.println("Adding " + current_vertex.name + " to the path!");
+
+                    if (current_vertex.equals(start_vertex)){
+                        break;
+                    }
+                    current_vertex = v;
+
+                }
+            }
+        }
+        System.out.println("Linked list containing path: ");
+        for (Vertex v : path){
+            System.out.println(v.name);
+        }
+        System.out.println();
+
+        return path;
+    }
+
+
+    public Queue<Vertex> find_cycle(Vertex startVertex) {
 
         System.out.println("\n\nBeginning Depth First Search to find cycle .......\n");
+        System.out.println("Starting from vertex: " + startVertex.name);
 
-        HashSet<Vertex> verticesInCycle = new HashSet<>();
         Stack<Vertex> stack = new Stack<>();
+
+        // keeps track of vertex visited another vertex - used to reconstruct cycle by back tracking
+        HashMap<Vertex, ArrayList<Vertex>> visitedBy = new HashMap<>();
 
         // Set up vertices and push the start vertex onto the stack
         for (Vertex v : this.vertexList) {
+            // Initialise visited By
+            visitedBy.put(v, new ArrayList<>());
             v.visited = false;
             v.startVertex = false;
             if (v.name.equals(startVertex.name)) {
@@ -223,6 +270,8 @@ public class BipartiteGraph implements Cloneable {
             Vertex u = stack.pop();
             // Print that u has been visited
             System.out.println("Visited: " + u.name);
+
+            //visited_vertices.push(u);
             // If u hasn't already been visited
             if (!(u.visited = false)) {
                 u.visited = true;
@@ -234,32 +283,49 @@ public class BipartiteGraph implements Cloneable {
                         // has already looked at the first vertex
                         if (!(vertex.visited) || (vertex.startVertex && after_first)) {
                             stack.push(vertex);
-                            verticesInCycle.add(vertex);
+                            visitedBy.get(u).add(vertex);
                             // If the vertex is th start vertex then we have come back to the start and therefore there
                             // is a cycle starting at the startVertex
                             if (vertex.startVertex) {
                                 System.out.println("Cycle found starting at Vertex: " + vertex.name);
-                                System.out.println("Linked list containing path..");
-                                for (Vertex v : verticesInCycle){
-                                    System.out.println(v.name);
-                                }
                                 System.out.println("\n\n");
-                                return verticesInCycle;
+
+                                for (Map.Entry<Vertex, ArrayList<Vertex>> entry : visitedBy.entrySet()){
+                                    System.out.println(entry.getKey().name + " Visited By : " );
+                                    for (Vertex v : entry.getValue()){
+                                        System.out.print(v.name + " ");
+                                    }
+                                    System.out.println();
+                                }
+                                // Use visited by to backtrack and return the vertices in the cycle
+                                return verticesInCycle(visitedBy, u, startVertex) ;
                             }
                         }
                     }
                 }
+                // if the vertex has a mate
                 if (u.mate != null) {
                     if (!(u.mate.visited) || (u.startVertex && after_first)) {
                         stack.push(u.mate);
-                        verticesInCycle.add(u.mate);
+                        visitedBy.get(u).add(u.mate);
+                    }
+                    // If back to the start vertex - cycle found
+                    if (u.mate.startVertex) {
+                        System.out.println("Cycle found starting at Vertex: " + u.mate.name);
+
+                        System.out.println("\n");
+                        // Use visited by to backtrack and return the vertices in the cycle
+                        return verticesInCycle(visitedBy, u, startVertex);
+
+
+                        // Back track through verticies in cycle starting from last node in cycle
                     }
                 }
             }
             after_first = true;
         }
         System.out.println("No cycle Found!");
-        return new HashSet<>();
+        return new PriorityQueue<>();
     }
 
 
@@ -284,17 +350,42 @@ public class BipartiteGraph implements Cloneable {
 
     public void remove_associated_edges(Vertex v){
 
+        // Have to remove v from all other vertices adjaceny lists
+        // and if v is a mate
+
+        for (Vertex u : this.vertexList){
+            // if u has any adjacent edges - check to see if v is an adjacent edge
+            if (u.adjacentV.size() > 0){
+
+                for (Vertex vertex : u.adjacentV ){
+                    // if v is in any adjacency lists remove it
+                    if (vertex.equals(v)){
+                        u.adjacentV.remove(v);
+                        break;
+                    }
+                }
+            }
+            if (u.mate != null) {
+                if (u.mate.equals(v)) {
+                    u.mate = null;
+                }
+            }
+        }
+
         if (v.mate != null) {
             v.mate.adjacentV = null;
             v.mate = null;
         }
-        if (v.adjacentV != null) v.adjacentV = null;
+        if (v.adjacentV != null){
+            v.adjacentV = null;
+        }
 
         vertexList.remove(v);
         vertexList.remove(v.mate);
+
     }
 
-    public void exchange_edges(HashSet<Vertex> verticesInCycle){
+    public void exchange_edges(Queue<Vertex> verticesInCycle){
         // **Needs to be used in depth first search method so right edges are changed**
 
         HashMap<Vertex, Vertex> edges_to_remove = new HashMap<>();
@@ -302,7 +393,6 @@ public class BipartiteGraph implements Cloneable {
 
 
         for (Vertex v: verticesInCycle) {
-
             // Add edges to be added to the matching to the hash map
             if (v.adjacentV.size() > 0) {
                 int i = 0;
@@ -314,7 +404,7 @@ public class BipartiteGraph implements Cloneable {
                     i++;
                 }
 
-                // TODO : Fix could be more than one in adjacent verticies
+                // TODO : Might not find the correct adjacent vertex, if it has more than one adjacent vertex in cycle if that is possible?
             }
             // Add edges to be removed to hash map
             if (v.mate != null) {
@@ -402,30 +492,19 @@ public class BipartiteGraph implements Cloneable {
         }
 
         System.out.println("------------------------------");
-        HashSet<Vertex> verticesInCycle = new HashSet<>();
+        Queue<Vertex> verticesInCycle = new PriorityQueue<>();
         Vertex startVertex;
         for (Vertex v : bG2.vertexList){
             if (v.name.equals("Student1")){
                 startVertex = v;
-                verticesInCycle = bG2.find_cycle(startVertex);
+                bG2.find_cycle(startVertex);
                 //if (!verticesInCycle.isEmpty()){
                 //    bG2.exchange_edges(verticesInCycle);
                 //}
             }
         }
 
-        System.out.println("Verticies in cycle...");
-        for (Vertex v : verticesInCycle){
-            System.out.println(v.name);
-        }
-
-        //Vertex end_v = bG2.searchAP();
-        //bG2.augment(end_v);
-
-        //System.out.println("Graph after exchanging edges.....");
-        //for (Vertex v : bG2.vertexList){
-        //    System.out.println(v.toString());
-        //}
+        
 
     }
 

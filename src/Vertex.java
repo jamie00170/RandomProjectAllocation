@@ -16,6 +16,7 @@ public class Vertex {
     public List<Vertex> adjacentV; // graph represented
     // by adjacency lists
 
+    public Vertex(){}
 
     public Vertex(String name, boolean isStudent){
 

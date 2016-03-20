@@ -60,7 +60,7 @@ public class RandomSerialDictatorshipTies {
             return;
         }
         // 2. Try to find a cycle in G by DFS therefore confirming if there is another perfect matching
-        HashSet<Vertex> verticesInCycle = new HashSet<>();
+        Queue<Vertex> verticesInCycle = new PriorityQueue<>();
         int i = 0;
         while (i < G.vertexList.size()){// - Cycle could start from any vertex?
             verticesInCycle = G.find_cycle(G.vertexList.get(i));
@@ -94,59 +94,65 @@ public class RandomSerialDictatorshipTies {
             }
 
         }
-        Vertex e = null;
+        Vertex e = new Vertex();
         while (i < verticesInCycle.size()) {
-            if (verticesInCycle.contains(G.vertexList.get(i)) && G.vertexList.get(i) != null)
+            // choose an edge e, that is both in the original matching M and in the cycle
+            if (verticesInCycle.contains(G.vertexList.get(i))) {
                 e = G.vertexList.get(i);
+            }
             i++;
         }
+        System.out.println(e.name);
 
-        if (e != null) {
-            System.out.println("e: " + e.name + " - " + e.mate.name);
-            // use vertex G.vertexList.get(i-1) as edge, e when .mate is not null then the vertex is also in the matching
+        //System.out.println("e: " + e.name + " - " + e.mate.name);
 
-            try {
+        try {
 
-                //ObjectCloner objectCloner = new ObjectCloner(); - make biparite graph seriazliable
+            //ObjectCloner objectCloner = new ObjectCloner(); - make biparite graph seriazliable
 
-                BipartiteGraph g_minus = G.clone();
-                // Generate G-(e)
-                System.out.println("Printing g_minus...");
-                for (Vertex v : g_minus.vertexList) {
-                    System.out.println(v);
-                }
-
+            BipartiteGraph g_minus = G.clone();
+            // Generate G-(e)
+            if (e.mate != null) {
                 g_minus.remove_matching_edge(e.name, e.mate.name);
-                // Call enum_perfect_matchings_iter(G-(e), M')
-                enum_perfect_matchings_iter(g_minus, M);
-
-            } catch (CloneNotSupportedException ex) {
-                ex.printStackTrace();
+            }else{
+                System.out.println("e is not in the matching!");
+                System.exit(1);
             }
 
-
-            try {
-
-                BipartiteGraph g_plus = G.clone();
-                // Generate G+(e)
-
-                System.out.println("Printing g_plus...");
-                for (Vertex v : g_plus.vertexList) {
-                    System.out.println(v);
-                }
-
-                g_plus.remove_associated_edges(e);
-                // Call enum_perfect_matchings_iter(G+(e), M)
-                enum_perfect_matchings_iter(g_plus, M);
-
-            } catch (CloneNotSupportedException ex) {
-                ex.printStackTrace();
+            System.out.println("Printing g_minus...");
+            for (Vertex v : g_minus.vertexList) {
+                System.out.println(v);
             }
 
+            // Call enum_perfect_matchings_iter(G-(e), M')
+            enum_perfect_matchings_iter(g_minus, M);
 
-
+        } catch (CloneNotSupportedException ex) {
+            ex.printStackTrace();
         }
+
+
+        try {
+
+            BipartiteGraph g_plus = G.clone();
+            // Generate G+(e)
+
+            g_plus.remove_associated_edges(e);
+
+            System.out.println("Printing g_plus...");
+            for (Vertex v : g_plus.vertexList) {
+                System.out.println(v);
+            }
+
+            // Call enum_perfect_matchings_iter(G+(e), M)
+            enum_perfect_matchings_iter(g_plus, M);
+
+        } catch (CloneNotSupportedException ex) {
+            ex.printStackTrace();
+        }
+
     }
+
 
     public static void enum_perfect_matchings(BipartiteGraph G, String[][] M){
         // Step 1: Find a perfect matching M of G and output M. If M is not found, stop.
@@ -223,39 +229,32 @@ public class RandomSerialDictatorshipTies {
                 }
                 // 5.3 move onto agent i's next indifference class until reach end of choices/classes
                 j++;
-                //if (j == student_preferences.get(student).size()){
-                //    System.out.println(student + " not matched in the current iteration because none of their choices are are available");
-                //}
             }
 
-            // increment appropriate values in matrix at end of permutation i.e. where a vertex has a mate (matching edge)
-
         }
+
+        // Clean up graph, i.e. remove adjacent edges where there is a matching one
+        bG.cleanUp();
 
         System.out.println("Printing Graph.....");
         for (Vertex v : bG.vertexList){
             System.out.println(v.toString());
         }
 
-
         // Calculate values for matrix from graph
         calculate_initial_values_of_matrix(matrix, bG);
 
-        // Clean up graph, i.e. remove adjacent edges where there is a matching one
-        bG.cleanUp();
-
-        System.out.println("Printing graph after clean up....");
-        for (Vertex v : bG.vertexList){
-            System.out.println(v.toString());
-        }
-        // call perfect emum here?
-        enum_perfect_matchings(bG, matrix);
-
-        for (String[] row : matrix){
+        for (String[] row : matrix) {
             System.out.println(Arrays.toString(row));
         }
 
+        // call perfect emum here?
+        enum_perfect_matchings(bG, matrix);
+
     }
+
+
+
 
     public static int randInt(int min, int max) {
 
@@ -315,5 +314,7 @@ public class RandomSerialDictatorshipTies {
         RandomSerialDictatorshipTies rsdt = new RandomSerialDictatorshipTies();
 
         rsdt.RandomSerialWithTies(student_preferences, project_list);
+
     }
+
 }
