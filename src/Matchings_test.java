@@ -235,6 +235,186 @@ public class Matchings_test {
         }
     }
 
+    public static String[][] calculate_values_of_matrix(String[][] matrix, BipartiteGraph bG){
+        for (Vertex v : bG.vertexList){
+            if (v.mate != null){
+                if (v.isStudent) {
+                    System.out.println("Incremenitng value between: " + v.name + " and " + v.mate.name);
+                    utilityMethods.incrementValue(matrix, v.name, v.mate.name, new Fraction(1));
+                }else{
+                    utilityMethods.incrementValueProject(matrix, v.name, v.mate.name, new Fraction(1));
+                }
+            }
+        }
+        return matrix;
+    }
+
+    public static void RandomSerialWithTiesTesting(HashMap<String, ArrayList<String[]>> student_preferences, ArrayList<String> project_list){
+
+        ArrayList<String> student_list = new ArrayList<>();
+        for (String student: student_preferences.keySet()){
+            student_list.add(student);
+        }
+        Collection student_col = student_list;
+        Collection<ImmutableList<String>> permutations = Collections2.permutations(student_col);
+
+        for (ImmutableList<String> permutation : permutations){
+
+            String[][] matrix = utilityMethods.setUpMatrix(student_preferences.keySet(), project_list);
+
+            // 1. Construct undirected bipartite graph where V = (N U A) and E = empty
+            BipartiteGraph bG = new BipartiteGraph(student_list, project_list);
+
+
+            System.out.println("Student list: " + student_list);
+
+
+            System.out.println("Permutation: " +permutation);
+            //ArrayList<String[]> permutations = new ArrayList<>();
+
+            for (String student : permutation) {
+                // Until end of student's indifference classes is reached or student is matched
+                int j = 0;
+                System.out.println("Student: " + student);
+
+                while (j < student_preferences.get(student).size()) {
+                    // 3. Look at the agents ith indifference class
+                    System.out.println("Student indifference class: " + Arrays.toString(student_preferences.get(student).get(j)));
+                    String[] indifference_class = student_preferences.get(student).get(j);
+
+                    //4. provisionally add (i, a) to E for all a in agent i's current indifference class
+                    for (String project : indifference_class) {
+                        //4.1 bG.newEdge(i, a) - for all a in i's indifference class
+                        bG.new_provisional_edge(student, project);
+                    }
+                    Vertex end_v;
+                    if ((end_v = bG.searchAP()) != null) {
+                        // 5.1. augment along path and modify E accordingly - augment()
+                        bG.augment(end_v);
+
+                    } else {
+                        // 5.2 provisionally added edges are removed
+                        for (String project : indifference_class) {
+                            //4.1 bG.newEdge(i, a) - for all a in i's indifference class
+                            bG.remove_provisional_edge(student, project);
+                        }
+                    }
+                    // 5.3 move onto agent i's next indifference class until reach end of choices/classes
+                    j++;
+                }
+
+            }
+
+            // Clean up graph, i.e. remove adjacent edges where there is a matching one
+            bG.cleanUp();
+
+            HashMap<String, String> matching = new HashMap<>();
+
+            // Update matrix here
+
+
+            for (Vertex vertex : bG.vertexList){
+                if (vertex.isStudent && vertex.mate != null){
+                    matching.put(vertex.name, vertex.mate.name);
+
+                    // Get the coordinates in the matrix where to incremnt the value
+                    int[] coordinates = utilityMethods.getCoordinates(matrix, vertex.name, vertex.mate.name);
+
+                    matrix[coordinates[0]][coordinates[1]] = "1";
+                }
+
+            }
+
+            for (String[] row : matrix) {
+                System.out.println(Arrays.toString(row));
+            }
+            System.out.println("Matching : " + matching);
+            // compute the signature for the current permutation
+            ArrayList<Integer> signature = new ArrayList<>();
+            // For each student in order of the current permutation
+            for (String student: permutation) {
+                // update the pth position in the signature vector
+                if (matching.containsKey(student)) {
+                    // get the positon in the students preference list when the project is located
+                    // and add it to the signature
+                    int position = 1; // rank of project starts at 1
+                    for (String[] indifference_class : student_preferences.get(student)) {
+                        for (String project : indifference_class) {
+                            // if the project equals the project to which the student is matched
+                            if (project.equals(matching.get(student))) {
+                                signature.add(position);
+                            }
+                        }
+                        position++;
+                    }
+                } else {
+                    signature.add(project_list.size() * 2 + 1);
+                }
+            }
+            System.out.println("Signature: " + signature);
+
+            //}
+            // Test the signature for the current permutation
+            //testRSDTStrongPrority(student_list, project_list, student_preferences, signature, permutation);
+
+        }
+
+
+    }
+
+    public static void runTestRDSTStrongPriority(){
+
+        ArrayList<String> project_list = utilityMethods.generateprojects(3);
+
+        GenerateRandomInstance generateRandomInstance = new GenerateRandomInstance();
+
+        HashMap<String, ArrayList<String[]>> student_pref_ties = new HashMap<>();
+        student_pref_ties = generateRandomInstance.generateStudents(3, project_list);
+
+        student_pref_ties = generateRandomInstance.generateRandomInstanceWithTies(student_pref_ties, 0.7);
+
+        System.out.println("Student Preferences: ");
+        for (Map.Entry<String, ArrayList<String[]>> entry: student_pref_ties.entrySet()){
+            System.out.println(entry.getKey());
+            for (String[] indifference_class : entry.getValue()){
+                System.out.print(Arrays.toString(indifference_class) + " ");
+            }
+            System.out.println();
+        }
+
+        RandomSerialWithTiesTesting(student_pref_ties, project_list);
+
+
+    }
+
+
+    public static void testRSDTStrongPrority(ArrayList<String> student_list, List<String> project_list, HashMap<String, ArrayList<String[]>> student_preferences, ArrayList<Integer> signature_rsdt){
+
+
+
+
+        // generate all possible matchings
+        Collection project_col = project_list;
+
+        Collection<ImmutableList<String>> project_permutations = Collections2.permutations(project_col);
+
+        // for each possible matching
+        for (Object project : project_permutations) {
+            ImmutableList<String> project_permutation = (ImmutableList<String>) project;
+
+            // student_list.get(i) is matched to project_permutation[i]
+            HashMap<String, String> matching = new HashMap<>();
+
+
+        }
+
+
+
+
+    }
+
+
+
     public static void runCheckRowsColumnProalisticSerial(HashMap<String, ArrayList<String>> student_preferences,  ArrayList<String> project_list){
 
        ProbabilisticSerial ps = new ProbabilisticSerial();
@@ -253,6 +433,9 @@ public class Matchings_test {
 
     public static void main(String[] args) {
 
+
+        runTestRDSTStrongPriority();
+        System.exit(0);
 
         ArrayList<String> project_list = generateprojects(50);
 
