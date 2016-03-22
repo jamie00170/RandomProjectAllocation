@@ -353,9 +353,8 @@ public class Matchings_test {
             }
             System.out.println("Signature: " + signature);
 
-            //}
             // Test the signature for the current permutation
-            //testRSDTStrongPrority(student_list, project_list, student_preferences, signature, permutation);
+            testRSDTStrongPrority(student_list, project_list, student_preferences, signature, permutation);
 
         }
 
@@ -364,14 +363,14 @@ public class Matchings_test {
 
     public static void runTestRDSTStrongPriority(){
 
-        ArrayList<String> project_list = utilityMethods.generateprojects(3);
+        ArrayList<String> project_list = utilityMethods.generateprojects(4);
 
         GenerateRandomInstance generateRandomInstance = new GenerateRandomInstance();
 
         HashMap<String, ArrayList<String[]>> student_pref_ties = new HashMap<>();
-        student_pref_ties = generateRandomInstance.generateStudents(3, project_list);
+        student_pref_ties = generateRandomInstance.generateStudents(4, project_list);
 
-        student_pref_ties = generateRandomInstance.generateRandomInstanceWithTies(student_pref_ties, 0.7);
+        student_pref_ties = generateRandomInstance.generateRandomInstanceWithTies(student_pref_ties, 0.5);
 
         System.out.println("Student Preferences: ");
         for (Map.Entry<String, ArrayList<String[]>> entry: student_pref_ties.entrySet()){
@@ -387,11 +386,20 @@ public class Matchings_test {
 
     }
 
+    public static boolean indifferenceClassContainsProject(String project, String[] indifference_class) {
 
-    public static void testRSDTStrongPrority(ArrayList<String> student_list, List<String> project_list, HashMap<String, ArrayList<String[]>> student_preferences, ArrayList<Integer> signature_rsdt){
+        for(int i =0; i < indifference_class.length; i++) {
+
+            if(project.equals(indifference_class[i])) {
+                return true;
+            }
+
+        }
+        return false;
+    }
 
 
-
+    public static void testRSDTStrongPrority(ArrayList<String> student_list, List<String> project_list, HashMap<String, ArrayList<String[]>> student_preferences, ArrayList<Integer> signature_rsdt, ImmutableList<String> permutation){
 
         // generate all possible matchings
         Collection project_col = project_list;
@@ -399,19 +407,63 @@ public class Matchings_test {
         Collection<ImmutableList<String>> project_permutations = Collections2.permutations(project_col);
 
         // for each possible matching
-        for (Object project : project_permutations) {
-            ImmutableList<String> project_permutation = (ImmutableList<String>) project;
+        for (Object project_list_perm : project_permutations) {
+            ImmutableList<String> project_permutation = (ImmutableList<String>) project_list_perm;
 
-            // student_list.get(i) is matched to project_permutation[i]
+            System.out.println("project_ permutation: " + project_permutation);
+            // permutation.get(i) is matched to project_permutation[i]
             HashMap<String, String> matching = new HashMap<>();
 
+            ArrayList<Integer> signature_for_current_matching = new ArrayList<>();
 
+            int i = 0;
+            for (String student : permutation) {
+
+                String project = project_permutation.get(i);
+                ArrayList<String[]> preference_list = student_preferences.get(student);
+                // While the
+                int current_indifference_class_index = 0;
+                for (String[] indifference_class : preference_list) {
+                    // if the project is not in the students indifference class
+                    if (indifferenceClassContainsProject(project, preference_list.get(current_indifference_class_index))) {
+                        signature_for_current_matching.add(current_indifference_class_index + 1); // ranks start at 1
+
+                    } else {
+                        current_indifference_class_index++;
+                    }
+                    if (current_indifference_class_index == preference_list.size() -1 ) {
+                        signature_for_current_matching.add(project_list.size() * 2 + 1);
+                        break;
+                    }
+
+                }
+                i++;
+
+            }
+
+
+            System.out.println("COMPARING SIGNATURES OF MATCHINGS ");
+            System.out.println("Signature of matching returned by sdmt-1: " + signature_rsdt);
+            System.out.println("Signature of current matching: " + signature_for_current_matching);
+            // Compare the signature of the current matching to that returned by sdmt-1
+            int j = 0;
+            while (j < signature_rsdt.size()) {
+
+                if (signature_rsdt.get(j) < signature_for_current_matching.get(j)) {
+                    break;
+                } else if (signature_rsdt.get(j).equals(signature_for_current_matching.get(j))) {
+                    j++;
+                } else {
+                    System.out.println("Matching returned by SDMT-1 is not strong prioirty");
+                    System.exit(1);
+                }
+
+            }
         }
-
-
-
-
     }
+
+
+
 
 
 
