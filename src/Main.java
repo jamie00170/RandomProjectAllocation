@@ -67,7 +67,7 @@ public class Main {
             //     run given alg with randomly generated instance with given parameters
             if (alg.equals("PS")) {
 
-                ProbalisticSerial ps = new ProbalisticSerial();
+                ProbabilisticSerial ps = new ProbabilisticSerial();
                 ps.probabilisticSerialDictatorship(student_preferences, project_list);
 
             } else if (alg.equals("BS")) {

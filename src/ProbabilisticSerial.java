@@ -5,7 +5,7 @@ import java.util.*;
 /**
  * Created by Jamie on 12/03/2016.
  */
-public class ProbalisticSerial {
+public class ProbabilisticSerial {
 
     private static UtilityMethods utilityMethods = new UtilityMethods();
 

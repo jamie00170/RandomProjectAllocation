@@ -1,4 +1,3 @@
-import java.lang.reflect.Array;
 import java.util.*;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableList;
@@ -238,7 +237,7 @@ public class Matchings_test {
 
     public static void runCheckRowsColumnProalisticSerial(HashMap<String, ArrayList<String>> student_preferences,  ArrayList<String> project_list){
 
-       ProbalisticSerial ps = new ProbalisticSerial();
+       ProbabilisticSerial ps = new ProbabilisticSerial();
 
         String[][] matrix = ps.probabilisticSerialDictatorship(student_preferences, project_list);
 

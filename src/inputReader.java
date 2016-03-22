@@ -68,7 +68,7 @@ public class InputReader {
 
 
             if (alg.equals("PS")) {
-                ProbalisticSerial ps = new ProbalisticSerial();
+                ProbabilisticSerial ps = new ProbabilisticSerial();
                 ps.probabilisticSerialDictatorship(student_preferences, project_list);
             } else if (alg.equals("BS")) {
                 BostonSerial bs = new BostonSerial();

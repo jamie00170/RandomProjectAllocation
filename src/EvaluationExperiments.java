@@ -1,7 +1,5 @@
 import org.apache.commons.math3.fraction.Fraction;
-import org.apache.commons.math3.fraction.FractionConversionException;
 
-import java.math.BigDecimal;
 import java.util.*;
 
 /**
@@ -11,6 +9,24 @@ public class EvaluationExperiments {
 
     private static UtilityMethods utilityMethods = new UtilityMethods();
 
+
+    public static double calculateSizeOfMatching(String[][] matrix){
+
+        // To calculate the size of a matching - add up each value in the matrix
+        double size = 0.0;
+
+        int i = 1;
+        while(i < matrix.length){
+            int j = 1;
+            while (j < matrix[i].length){
+                size += utilityMethods.stringToFraction(matrix[i][j]).doubleValue();
+                j++;
+            }
+            i++;
+        }
+
+        return size;
+    }
 
     public static double calculateAvgChanceOfBeingUnmatched(String[][] matrix, int num_students){
 
@@ -35,6 +51,7 @@ public class EvaluationExperiments {
                 }
                 j++;
             }
+            // account for double precision error
             double value_unmatched = 1.0 - row_total;
             double diff = Math.abs(row_total - 1.0);
             if (diff < 0.0001)
@@ -181,7 +198,7 @@ public class EvaluationExperiments {
         int size_of_preference_lists = scanner.nextInt();
 
         System.out.println("What experiment do you want to run? ");
-        System.out.println("Enter value, depth, first, last or unmatched");
+        System.out.println("Enter value, depth, first, profile, unmatched, size");
         String experiment = scanner.next();
 
         System.out.println("How many random instances should the experiment be run on? ");
@@ -217,7 +234,7 @@ public class EvaluationExperiments {
                     BostonSerial bs = new BostonSerial();
                     String[][] bs_matching = bs.bostonSerial(student_preferences, project_list);
 
-                    ProbalisticSerial ps = new ProbalisticSerial();
+                    ProbabilisticSerial ps = new ProbabilisticSerial();
 
                     String[][] ps_matching = ps.probabilisticSerialDictatorship(student_preferences_copy2, project_list);
 
@@ -263,7 +280,7 @@ public class EvaluationExperiments {
                     BostonSerial bs = new BostonSerial();
                     String[][] bs_matching = bs.bostonSerial(student_preferences, project_list);
 
-                    ProbalisticSerial ps = new ProbalisticSerial();
+                    ProbabilisticSerial ps = new ProbabilisticSerial();
 
                     String[][] ps_matching = ps.probabilisticSerialDictatorship(student_preferences_copy2, project_list);
 
@@ -294,7 +311,7 @@ public class EvaluationExperiments {
                     BostonSerial bs = new BostonSerial();
                     String[][] bs_matching = bs.bostonSerial(student_preferences, project_list);
 
-                    ProbalisticSerial ps = new ProbalisticSerial();
+                    ProbabilisticSerial ps = new ProbabilisticSerial();
 
                     String[][] ps_matching = ps.probabilisticSerialDictatorship(student_preferences_copy2, project_list);
 
@@ -303,7 +320,6 @@ public class EvaluationExperiments {
                     for (String name : student_preferences_copy3.keySet()) {
                         student_list.add(name);
                     }
-                    System.out.println("Student list:" + student_list);
 
 
                     RandomSerialDictatorship rsd = new RandomSerialDictatorship();
@@ -315,6 +331,32 @@ public class EvaluationExperiments {
                     double rsd_chance = calculateAvgChanceOfBeingUnmatched(rsd_matching, student_list.size());
 
                     csvWriter.csvWriteLineDouble(rsd_chance, ps_chance, bs_chance);
+
+                }else if (experiment.equals("size")){
+
+                    RandomSerialDictatorship randomSerialDictatorship = new RandomSerialDictatorship();
+
+                    ArrayList<String> student_list = new ArrayList<>();
+                    for (String name : student_preferences_copy3.keySet()) {
+                        student_list.add(name);
+                    }
+
+                    String[][] rsd_matching = randomSerialDictatorship.randomSerialDictatorship(student_list, student_preferences_copy, project_list, 1000);
+
+
+                    ProbabilisticSerial probabilisticSerial = new ProbabilisticSerial();
+
+                    String[][] ps_matching =  probabilisticSerial.probabilisticSerialDictatorship(student_preferences_copy2, project_list);
+
+                    BostonSerial bostonSerial = new BostonSerial();
+
+                    String[][] bs_matching = bostonSerial.bostonSerial(student_preferences_copy3, project_list);
+
+                    double rsd_size = calculateSizeOfMatching(rsd_matching);
+                    double ps_size = calculateSizeOfMatching(ps_matching);
+                    double bs_size = calculateSizeOfMatching(bs_matching);
+
+                    csvWriter.csvWriteLineDouble(rsd_size, ps_size, bs_size);
 
                 }
 
