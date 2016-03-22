@@ -113,6 +113,11 @@ public class RandomSerialDictatorshipTies {
                 // 3. If there is no cycle found stop algorithm
                 if ((i == G.vertexList.size()) && verticesInCycle.isEmpty()) {
                     System.out.println("Algorithm Stopped no cycle found!");
+
+                    System.out.println("Final Matching...");
+                    for (String[] row : M){
+                        System.out.println(Arrays.toString(row));
+                    }
                     return;
                 }
 
@@ -276,7 +281,7 @@ public class RandomSerialDictatorshipTies {
 
         return randomNum;
     }
-    
+
 
     public static void main(String[] args){
 

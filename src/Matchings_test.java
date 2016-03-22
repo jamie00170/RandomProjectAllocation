@@ -110,7 +110,6 @@ public class Matchings_test {
             while (i < student_list.size()){
 
                 String students_project_in_current_permutation = project_permutation.get(i);
-                // TODO if student not in matching make their ith_choice in M integer.MaxValue
                 String students_project_in_matching = matching.get(student_list.get(i));
 
                 ArrayList<String> students_preferences = student_preferences.get(student_list.get(i));
