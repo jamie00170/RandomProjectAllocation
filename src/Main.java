@@ -23,8 +23,15 @@ public class Main {
             System.out.println("Enter RSD, PS, BS or RSDT");
             String alg = scanner.nextLine();
 
-            InputReader inputReader = new InputReader();
-            inputReader.read_file(filename, alg);
+            if (alg.equals("RSDT")){
+
+                InputReader inputReader = new InputReader();
+                inputReader.read_file_with_ties(filename);
+
+            }else {
+                InputReader inputReader = new InputReader();
+                inputReader.read_file(filename, alg);
+            }
         } else {
             //     ask for num students
             System.out.println("Enter the number of students: ");
@@ -53,8 +60,9 @@ public class Main {
                 System.out.println("Project List:" + project_list.toString());
                 System.out.println("Student Preferences: " + student_preferences.toString());
                 System.out.println("Student list:" + student_list);
-            }
 
+
+            }
 
             //     run given alg with randomly generated instance with given parameters
             if (alg.equals("PS")) {

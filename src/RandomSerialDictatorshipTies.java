@@ -54,67 +54,94 @@ public class RandomSerialDictatorshipTies {
     }
 
 
-    public static void enum_perfect_matchings_iter(BipartiteGraph G, String[][] M){
+    public static void enum_perfect_matchings_iter(BipartiteGraph G, String[][] M) {
         // Step 1: If G has no edge, stop
-        if (!(G.hasEdge())){
-            return;
-        }
-        // 2. Try to find a cycle in G by DFS therefore confirming if there is another perfect matching
-        Queue<Vertex> verticesInCycle = new PriorityQueue<>();
-        int i = 0;
-        while (i < G.vertexList.size()){// - Cycle could start from any vertex?
-            verticesInCycle = G.find_cycle(G.vertexList.get(i));
-            if (!verticesInCycle.isEmpty()){
-                // Step 4: Find a perfect matching M' by exchanging edges along the cycle. Output M'
-
-                System.out.println("Current Matching....");
-                for (String[] row : M){
-                    System.out.println(Arrays.toString(row));
-                }
-                System.out.println("Exchanging edges......");
-                G.exchange_edges(verticesInCycle);
-                // output M'
-                System.out.println("New matching......");
-                String[][] matching_to_output = calculate_values_of_matrix(M, G);
-                for (String[] row : matching_to_output){
-                    System.out.println(Arrays.toString(row));
-                }
-                System.out.println("Graph after exchaning edges...");
-                for (Vertex v : G.vertexList){
-                    System.out.println(v);
-                }
-                break;
-
-            }
-            i++;
-            // 3. If there is no cycle found stop algorithm
-            if ((i == G.vertexList.size()) && verticesInCycle.isEmpty()){
-                System.out.println("Algorithm Stopped no cycle found!");
-                return;
-            }
-
-        }
-        Vertex e = new Vertex();
-        while (i < verticesInCycle.size()) {
-            // choose an edge e, that is both in the original matching M and in the cycle
-            if (verticesInCycle.contains(G.vertexList.get(i))) {
-                e = G.vertexList.get(i);
-            }
-            i++;
-        }
-        System.out.println(e.name);
-
-        //System.out.println("e: " + e.name + " - " + e.mate.name);
 
         try {
 
-            //ObjectCloner objectCloner = new ObjectCloner(); - make biparite graph seriazliable
+            if (!(G.hasEdge())) {
+                return;
+            }
+            // 2. Try to find a cycle in G by DFS therefore confirming if there is another perfect matching
+            Queue<Vertex> verticesInCycle = new PriorityQueue<>();
+            int i = 0;
+            Vertex e = new Vertex();
+            BipartiteGraph g_plus = G.clone();
+            while (i < G.vertexList.size()) {// - Cycle could start from any vertex?
+                verticesInCycle = G.find_cycle(G.vertexList.get(i));
+                if (!verticesInCycle.isEmpty()) {
+                    // Step 4: Find a perfect matching M' by exchanging edges along the cycle. Output M'
 
-            BipartiteGraph g_minus = G.clone();
+                    System.out.println("Current Matching....");
+                    for (String[] row : M) {
+                        System.out.println(Arrays.toString(row));
+                    }
+
+                    int k = 0;
+                    // Choose an edge e here, that is both in the matching and in the cycle
+                    System.out.println("Verticies in cycle in the matching: ");
+                    for (Vertex v : verticesInCycle) {
+                        if (v.mate != null) {
+                            e = v.clone();
+                            System.out.println("e: " + e.name + " - " + e.mate.name);
+                            break;
+                        }
+                    }
+                    try {
+                        // Need to create g_plus before the edges are changed - uses M not M'
+                        g_plus = G.clone();
+                    } catch (CloneNotSupportedException ex) {
+                        ex.printStackTrace();
+                    }
+
+                    System.out.println("Exchanging edges......");
+                    G.exchange_edges(verticesInCycle);
+                    // output M'
+                    System.out.println("New matching......");
+                    String[][] matching_to_output = calculate_values_of_matrix(M, G);
+                    for (String[] row : matching_to_output) {
+                        System.out.println(Arrays.toString(row));
+                    }
+                    System.out.println("Graph after exchaning edges...");
+                    for (Vertex v : G.vertexList) {
+                        System.out.println(v);
+                    }
+                    break;
+
+                }
+                i++;
+                // 3. If there is no cycle found stop algorithm
+                if ((i == G.vertexList.size()) && verticesInCycle.isEmpty()) {
+                    System.out.println("Algorithm Stopped no cycle found!");
+                    return;
+                }
+
+            }
+
+
+            // Generate G+(e)
+            if (e.mate != null) {
+                g_plus.remove_matching_edge(e.name, e.mate.name);
+            } else {
+                System.out.println("e is not in the matching!");
+                System.exit(1);
+            }
+
+            System.out.println("Printing g_plus...");
+            for (Vertex v : g_plus.vertexList) {
+                System.out.println(v);
+            }
+
+            // Call enum_perfect_matchings_iter(G+(e), M')
+            // G_plus represents M'
+            enum_perfect_matchings_iter(g_plus, M);
+
+
             // Generate G-(e)
+            BipartiteGraph g_minus = G.clone();
             if (e.mate != null) {
                 g_minus.remove_matching_edge(e.name, e.mate.name);
-            }else{
+            } else {
                 System.out.println("e is not in the matching!");
                 System.exit(1);
             }
@@ -124,28 +151,10 @@ public class RandomSerialDictatorshipTies {
                 System.out.println(v);
             }
 
-            // Call enum_perfect_matchings_iter(G-(e), M')
+            // Call enum_perfect_matchings_iter(G-(e), M)
+
             enum_perfect_matchings_iter(g_minus, M);
 
-        } catch (CloneNotSupportedException ex) {
-            ex.printStackTrace();
-        }
-
-
-        try {
-
-            BipartiteGraph g_plus = G.clone();
-            // Generate G+(e)
-
-            g_plus.remove_associated_edges(e);
-
-            System.out.println("Printing g_plus...");
-            for (Vertex v : g_plus.vertexList) {
-                System.out.println(v);
-            }
-
-            // Call enum_perfect_matchings_iter(G+(e), M)
-            enum_perfect_matchings_iter(g_plus, M);
 
         } catch (CloneNotSupportedException ex) {
             ex.printStackTrace();
@@ -267,39 +276,18 @@ public class RandomSerialDictatorshipTies {
 
         return randomNum;
     }
-
-    public static HashMap<String, ArrayList<String[]>> generateStudents(int num_of_students, ArrayList<String> project_list) {
-
-
-        HashMap<String, ArrayList<String[]>> student_preferences = new HashMap<>();
-        int j = 1;
-
-        while (j <= num_of_students) {
-            //int rand_index = randInt(0, (project_list.size()-1));
-            Collections.shuffle(project_list);
-            ArrayList<String[]> preferences = new ArrayList<>();
-            for (String project : project_list){
-                String[] project_Arr = {project};
-
-                preferences.add(project_Arr);
-            }
-
-            student_preferences.put("Student" + j, preferences );
-            j++;
-        }
-        return student_preferences;
-    }
+    
 
     public static void main(String[] args){
 
 
-        ArrayList<String> project_list = utilityMethods.generateprojects(3);
+        ArrayList<String> project_list = utilityMethods.generateprojects(10);
 
         GenerateRandomInstance generateRandomInstance = new GenerateRandomInstance();
 
         HashMap<String, ArrayList<String[]>> student_preferences = new HashMap<>();
 
-        student_preferences = generateRandomInstance.generateStudents(3, project_list);
+        student_preferences = generateRandomInstance.generateStudents(5, project_list);
 
         student_preferences = generateRandomInstance.generateRandomInstanceWithTies(student_preferences, 0.7);
 

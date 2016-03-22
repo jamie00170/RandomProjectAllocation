@@ -7,7 +7,7 @@ import java.util.List;
  * Created by Jamie on 23/11/2015.
  */
 
-public class Vertex {
+public class Vertex implements Cloneable{
 
     public String name;
     public boolean visited, startVertex;
@@ -48,6 +48,12 @@ public class Vertex {
         }
 
         return return_string;
+    }
+
+    public Vertex clone() throws CloneNotSupportedException{
+
+        return (Vertex) super.clone();
+
     }
 
 }

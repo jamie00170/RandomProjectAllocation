@@ -202,14 +202,14 @@ public class BipartiteGraph implements Cloneable {
 
         LinkedList<Vertex> path = new LinkedList<>();
 
-        System.out.println("Last vertex: " + last_vertex.name);
+        //System.out.println("Last vertex: " + last_vertex.name);
         // Look for last_vertex in values
 
         Vertex current_vertex = new Vertex();
         for (Vertex v : visitedBy.keySet()){
             if (visitedBy.get(v).contains(last_vertex)){
                 path.add(last_vertex);
-                System.out.println("Adding " + last_vertex.name + " to the path!");
+                //System.out.println("Adding " + last_vertex.name + " to the path!");
                 current_vertex = v;
             }
         }
@@ -220,7 +220,7 @@ public class BipartiteGraph implements Cloneable {
             for (Vertex v : visitedBy.keySet()) {
                 if (visitedBy.get(v).contains(current_vertex)) {
                     path.add(current_vertex);
-                    System.out.println("Adding " + current_vertex.name + " to the path!");
+                    //System.out.println("Adding " + current_vertex.name + " to the path!");
 
                     if (current_vertex.equals(start_vertex)){
                         break;
@@ -230,11 +230,13 @@ public class BipartiteGraph implements Cloneable {
                 }
             }
         }
+        /**
         System.out.println("Linked list containing path: ");
         for (Vertex v : path){
             System.out.println(v.name);
         }
         System.out.println();
+         **/
 
         return path;
     }
@@ -291,7 +293,7 @@ public class BipartiteGraph implements Cloneable {
                                 System.out.println("\n\n");
 
                                 for (Map.Entry<Vertex, ArrayList<Vertex>> entry : visitedBy.entrySet()){
-                                    System.out.println(entry.getKey().name + " Visited By : " );
+                                    //System.out.println(entry.getKey().name + " Visited By : " );
                                     for (Vertex v : entry.getValue()){
                                         System.out.print(v.name + " ");
                                     }

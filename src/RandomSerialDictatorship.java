@@ -19,6 +19,10 @@ public class RandomSerialDictatorship {
 
         String[][] matrix = utilityMethods.setUpMatrix(student_preferences.keySet(), project_list);
 
+        for (String[] row :  matrix ){
+            System.out.println(Arrays.toString(row));
+        }
+
         // Initialise projects_allocated array
         ArrayList<String> projects_allocated = new ArrayList<>();
 
@@ -80,13 +84,15 @@ public class RandomSerialDictatorship {
         int factorial_student_list = utilityMethods.factorial(student_list.size());
         if (num_permutations != factorial_student_list){
             divisor = num_permutations;
+            System.out.println("divisor: " + divisor);
             matrix = utilityMethods.divideMatrixByFactorial(matrix, divisor);
         }else{
             divisor = factorial_student_list;
+            System.out.println("divisor: " + divisor);
+
             matrix = utilityMethods.divideMatrixByFactorial(matrix, divisor);
+
         }
-
-
 
 
 
