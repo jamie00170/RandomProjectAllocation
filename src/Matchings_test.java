@@ -80,6 +80,22 @@ public class Matchings_test {
         return matching;
     }
 
+    public static BipartiteGraph undirectedToDirected(BipartiteGraph bG){
+
+        for (Vertex v: bG.vertexList) {
+            if (v.mate != null && v.isStudent) {
+                Vertex u = v.mate;
+                u.mate = null;
+            }
+            // if v is a student make its adjacent v null, i.e remove adjacent edges pointing from students to projets
+            if (v.adjacentV != null && v.isStudent){
+                v.adjacentV = new ArrayList<Vertex>();
+            }
+
+        }
+        return bG;
+    }
+
 
     public boolean enum_all_matchings(ArrayList<String> student_list, List<String> project_list, HashMap<String, ArrayList<String>> student_preferences , HashMap<String, String> matching){
 
@@ -249,6 +265,193 @@ public class Matchings_test {
         return matrix;
     }
 
+
+    public static void enum_perfect_matchings_iter(BipartiteGraph G, String[][] M, ImmutableList<String> permutation, HashMap<String, ArrayList<String[]>> student_preferences, ArrayList<String> project_list) {
+        // Step 1: If G has no edge, stop
+
+
+
+        try {
+
+
+            HashSet<ArrayList<Integer>> ssm = new HashSet<>();
+
+
+            if (!(G.hasEdge())) {
+                return;
+            }
+            // 2. Try to find a cycle in G by DFS therefore confirming if there is another perfect matching
+            Queue<Vertex> verticesInCycle = new PriorityQueue<>();
+            int i = 0;
+            Vertex e = new Vertex();
+            BipartiteGraph g_plus = G.clone();
+            while (i < G.vertexList.size()) {// - Cycle could start from any vertex?
+                verticesInCycle = G.find_cycle(G.vertexList.get(i));
+
+                if (!verticesInCycle.isEmpty()) {
+                    // Step 4: Find a perfect matching M' by exchanging edges along the cycle. Output M'
+                    System.out.println("Current Matching....");
+                    for (String[] row : M) {
+                        System.out.println(Arrays.toString(row));
+                    }
+
+                    // Choose an edge e here, that is both in the matching and in the cycle
+                    System.out.println("Verticies in cycle in the matching: ");
+                    for (Vertex v : verticesInCycle) {
+                        if (v.mate != null) {
+                            e = v.clone();
+                            System.out.println("e: " + e.name + " - " + e.mate.name);
+                            break;
+                        }
+                    }
+                    try {
+                        // Need to create g_plus before the edges are changed - uses M not M'
+                        g_plus = G.clone();
+                    } catch (CloneNotSupportedException ex) {
+                        ex.printStackTrace();
+                    }
+
+                    System.out.println("Exchanging edges......");
+                    G.exchange_edges(verticesInCycle);
+                    // output M'
+                    System.out.println("New matching......");
+                    String[][] matching_to_output = calculate_values_of_matrix(M, G);
+
+                    HashMap<String, String> matching = new HashMap<>();
+
+                    for (String[] row : matching_to_output) {
+                        System.out.println(Arrays.toString(row));
+
+                    }
+                    int r = 0;
+                    while (r < matching_to_output.length){
+                        int s = 0;
+                        while (s < matching_to_output[r].length){
+                            if (matching_to_output[r][s].equals("1")){
+                                matching.put(matching_to_output[r][0], matching_to_output[0][s]);
+                            }
+                            s++;
+                        }
+                        r++;
+                    }
+
+                    // generate matching from matrix
+
+
+
+                    // Add signature of matching to ssm
+                    ArrayList<Integer> signature = new ArrayList<>();
+                    // For each student in order of the current permutation
+                    for (String student: permutation) {
+                        // update the pth position in the signature vector
+                        if (matching.containsKey(student)) {
+                            // get the positon in the students preference list when the project is located
+                            // and add it to the signature
+                            int position = 1; // rank of project starts at 1
+                            for (String[] indifference_class : student_preferences.get(student)) {
+                                for (String project : indifference_class) {
+                                    // if the project equals the project to which the student is matched
+                                    if (project.equals(matching.get(student))) {
+                                        signature.add(position);
+                                    }
+                                }
+                                position++;
+                            }
+                        } else {
+                            signature.add(project_list.size() * 2 + 1);
+                        }
+                    }
+
+                    System.out.println("signature for matching output from uno's : "  + signature);
+                    matching.clear();
+                    signature.clear();
+
+                    System.out.println("Graph after exchaning edges...");
+                    for (Vertex v : G.vertexList) {
+                        System.out.println(v);
+                    }
+                    break;
+
+                }
+                i++;
+                // 3. If there is no cycle found stop algorithm
+                if ((i == G.vertexList.size()) && verticesInCycle.isEmpty()) {
+                    System.out.println("Algorithm Stopped no cycle found!");
+
+                    System.out.println("Final Matching...");
+                    for (String[] row : M){
+                        System.out.println(Arrays.toString(row));
+                    }
+                    // TODO = still need to calculate final matching values
+                    return;
+                }
+
+            }
+
+
+
+            // Generate G-(e)
+            BipartiteGraph g_minus = G.clone();
+            if (e.mate != null) {
+                g_minus.remove_matching_edge(e.name, e.mate.name);
+            } else {
+                System.out.println("e is not in the matching!");
+                System.exit(1);
+            }
+
+            System.out.println("Printing g_minus...");
+            for (Vertex v : g_minus.vertexList) {
+                System.out.println(v);
+            }
+
+            // Call enum_perfect_matchings_iter(G-(e), M)
+            enum_perfect_matchings_iter(g_minus, M, permutation, student_preferences, project_list);
+
+            // Generate G+(e)
+            if (e.mate != null) {
+                g_plus.remove_associated_edges(e);
+            } else {
+                System.out.println("e is not in the matching!");
+                System.exit(1);
+            }
+
+            System.out.println("Printing g_plus...");
+            for (Vertex v : g_plus.vertexList) {
+                System.out.println(v);
+            }
+
+            // Call enum_perfect_matchings_iter(G+(e), M')
+            // G_plus represents M'
+            enum_perfect_matchings_iter(g_plus, M, permutation, student_preferences, project_list);
+
+
+        } catch (CloneNotSupportedException ex) {
+            ex.printStackTrace();
+        }
+
+    }
+
+
+    public static void enum_perfect_matchings(BipartiteGraph G, String[][] M, ImmutableList<String> permutation, HashMap<String, ArrayList<String[]>> student_preferences, ArrayList<String> project_list){
+        // Step 1: Find a perfect matching M of G and output M. If M is not found, stop.
+        // Already found M in with RSDT algorithm
+
+        // Transform undirected graph into a directed graph
+        G = undirectedToDirected(G);
+
+        System.out.println("-------------------------------------------");
+        System.out.println("Graph input to emun_perfect_matchings_iter");
+        for (Vertex v : G.vertexList){
+            System.out.println(v.toString());
+        }
+        // Step 2: Step 2: Trim unnecessary edges from G by a strongly connected component
+        // decomposition algorithm with D(G, M)
+        // TODO - Trim unnecessary edges from G by a strongly connected component decomposition algorithm
+        // Step 3: Call Enum Perfect Matchings Iter (G, M)
+        enum_perfect_matchings_iter(G, M, permutation, student_preferences, project_list);
+    }
+
+
     public static void RandomSerialWithTiesTesting(HashMap<String, ArrayList<String[]>> student_preferences, ArrayList<String> project_list){
 
         ArrayList<String> student_list = new ArrayList<>();
@@ -259,6 +462,8 @@ public class Matchings_test {
         Collection<ImmutableList<String>> permutations = Collections2.permutations(student_col);
 
         for (ImmutableList<String> permutation : permutations){
+
+            System.out.println("\nNew Permutation....\n\n");
 
             String[][] matrix = utilityMethods.setUpMatrix(student_preferences.keySet(), project_list);
 
@@ -351,10 +556,23 @@ public class Matchings_test {
                     signature.add(project_list.size() * 2 + 1);
                 }
             }
+            // signature returned by SDMT-1
             System.out.println("Signature: " + signature);
+            // need to add the projects macthed somehow to the signature
+
+            //HashSet SSM = generateAllmatchingsSameSignature(signature);
+
+            // run uno's here - return set of matchings generated
+
+            // comapre SSM with set of matchings returned by Uno's
 
             // Test the signature for the current permutation
-            testRSDTStrongPrority(student_list, project_list, student_preferences, signature, permutation);
+            //testRSDTStrongPrority(student_list, project_list, student_preferences, signature, permutation);
+
+            bG.cleanUp();
+
+            // call perfect emum here?
+            enum_perfect_matchings(bG, matrix, permutation, student_preferences, project_list);
 
         }
 
@@ -363,14 +581,14 @@ public class Matchings_test {
 
     public static void runTestRDSTStrongPriority(){
 
-        ArrayList<String> project_list = utilityMethods.generateprojects(4);
+        ArrayList<String> project_list = utilityMethods.generateprojects(3);
 
         GenerateRandomInstance generateRandomInstance = new GenerateRandomInstance();
 
         HashMap<String, ArrayList<String[]>> student_pref_ties = new HashMap<>();
-        student_pref_ties = generateRandomInstance.generateStudents(4, project_list);
+        student_pref_ties = generateRandomInstance.generateStudents(3, project_list);
 
-        student_pref_ties = generateRandomInstance.generateRandomInstanceWithTies(student_pref_ties, 0.5);
+        student_pref_ties = generateRandomInstance.generateRandomInstanceWithTies(student_pref_ties, 0.7);
 
         System.out.println("Student Preferences: ");
         for (Map.Entry<String, ArrayList<String[]>> entry: student_pref_ties.entrySet()){
@@ -427,16 +645,16 @@ public class Matchings_test {
                     // if the project is not in the students indifference class
                     if (indifferenceClassContainsProject(project, preference_list.get(current_indifference_class_index))) {
                         signature_for_current_matching.add(current_indifference_class_index + 1); // ranks start at 1
-
+                        break;
                     } else {
                         current_indifference_class_index++;
                     }
-                    if (current_indifference_class_index == preference_list.size() -1 ) {
-                        signature_for_current_matching.add(project_list.size() * 2 + 1);
-                        break;
-                    }
 
                 }
+                if (current_indifference_class_index == preference_list.size()) {
+                    signature_for_current_matching.add(project_list.size() * 2 + 1);
+                }
+                // move onto the next project in the permutation
                 i++;
 
             }

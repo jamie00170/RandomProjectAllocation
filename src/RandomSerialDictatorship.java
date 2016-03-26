@@ -26,13 +26,28 @@ public class RandomSerialDictatorship {
         // Initialise projects_allocated array
         ArrayList<String> projects_allocated = new ArrayList<>();
 
-
         Collection<ImmutableList<String>> permutations;
 
+        int factorial_student_list = Math.abs(utilityMethods.factorial(student_list.size()));
+        if (num_permutations > factorial_student_list ){
+            System.out.println("Number of permutations: " + num_permutations + " factorial of student list: " + factorial_student_list);
+            System.out.println("Number of permutations specified exceeds max number of permutations!");
+            System.exit(1);
+        }
+
+        System.out.println("Factorial of student list size: " + factorial_student_list);
+
         // If not all permutations are required
-        if (num_permutations != utilityMethods.factorial(student_list.size())){
+        if (num_permutations != factorial_student_list){
+            System.out.println("Num permutations not equal to factorial of student list!");
+            System.out.println("Number of permutations: " + num_permutations);
             permutations = utilityMethods.generatePermutations(student_list, num_permutations);
+
+            System.out.println("Size of permutations: " + permutations.size());
+
         }else{
+            System.out.println("All permutations selected!");
+
             Collection student_col = student_list;
             permutations = Collections2.permutations(student_col);
         }
@@ -81,7 +96,6 @@ public class RandomSerialDictatorship {
 
         // divide all values in the matrix by factorial of the size of the  student list or the num of permutations given
         int divisor;
-        int factorial_student_list = utilityMethods.factorial(student_list.size());
         if (num_permutations != factorial_student_list){
             divisor = num_permutations;
             System.out.println("divisor: " + divisor);

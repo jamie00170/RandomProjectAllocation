@@ -1,3 +1,4 @@
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -7,7 +8,7 @@ import java.util.List;
  * Created by Jamie on 23/11/2015.
  */
 
-public class Vertex implements Cloneable{
+public class Vertex implements Cloneable, Serializable{
 
     public String name;
     public boolean visited, startVertex;

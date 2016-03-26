@@ -1,16 +1,16 @@
+import java.io.Serializable;
 import java.util.*;
 
 /**
  * Created by Jamie on 06/12/2015.
  */
-public class BipartiteGraph implements Cloneable {
+public class BipartiteGraph implements Cloneable, Serializable {
 
     public List<Vertex> vertexList;
 
     public Vertex getExposedUnvisited(List<Vertex> vL){
         for (Vertex x : vL) {
             if(x.mate==null && !x.visited) {
-                System.out.println("Exposed Vertex: " + x.name);
                 for (Vertex w : x.adjacentV)
                     if (!w.visited) {
                         return x;
@@ -200,6 +200,16 @@ public class BipartiteGraph implements Cloneable {
 
     public LinkedList<Vertex> verticesInCycle(HashMap<Vertex, ArrayList<Vertex>> visitedBy, Vertex last_vertex, Vertex start_vertex){
 
+
+
+        System.out.println("Entered vertices in cycle!");
+        for (Vertex v : visitedBy.keySet()){
+            System.out.print(v.name + ": ");
+            for (Vertex u : visitedBy.get(v))
+                System.out.print(u.name + " ");
+            System.out.println();
+        }
+
         LinkedList<Vertex> path = new LinkedList<>();
 
         //System.out.println("Last vertex: " + last_vertex.name);
@@ -221,23 +231,19 @@ public class BipartiteGraph implements Cloneable {
                 if (visitedBy.get(v).contains(current_vertex)) {
                     path.add(current_vertex);
                     //System.out.println("Adding " + current_vertex.name + " to the path!");
-
                     if (current_vertex.equals(start_vertex)){
                         break;
                     }
                     current_vertex = v;
-
                 }
             }
         }
-        /**
-        System.out.println("Linked list containing path: ");
-        for (Vertex v : path){
-            System.out.println(v.name);
-        }
-        System.out.println();
-         **/
 
+        System.out.println("final path...");
+        for (Vertex vertex : path){
+            System.out.println(vertex.name);
+        }
+        System.out.println("Exited Vertices in cycle!");
         return path;
     }
 
@@ -292,13 +298,6 @@ public class BipartiteGraph implements Cloneable {
                                 System.out.println("Cycle found starting at Vertex: " + vertex.name);
                                 System.out.println("\n\n");
 
-                                for (Map.Entry<Vertex, ArrayList<Vertex>> entry : visitedBy.entrySet()){
-                                    //System.out.println(entry.getKey().name + " Visited By : " );
-                                    for (Vertex v : entry.getValue()){
-                                        System.out.print(v.name + " ");
-                                    }
-                                    System.out.println();
-                                }
                                 // Use visited by to backtrack and return the vertices in the cycle
                                 return verticesInCycle(visitedBy, u, startVertex) ;
                             }
@@ -357,7 +356,7 @@ public class BipartiteGraph implements Cloneable {
 
         for (Vertex u : this.vertexList){
             // if u has any adjacent edges - check to see if v is an adjacent edge
-            if (u.adjacentV.size() > 0){
+            if (u.adjacentV != null && u.adjacentV.size() > 0){
 
                 for (Vertex vertex : u.adjacentV ){
                     // if v is in any adjacency lists remove it
@@ -400,13 +399,11 @@ public class BipartiteGraph implements Cloneable {
                 int i = 0;
                 while(i < v.adjacentV.size()){
                     if (verticesInCycle.contains(v.adjacentV.get(i))){
-                        edges_to_add.put(v, v.adjacentV.get(i));
+                        edges_to_add.put(v.adjacentV.get(i), v);
                         break;
                     }
                     i++;
                 }
-
-                // TODO : Might not find the correct adjacent vertex, if it has more than one adjacent vertex in cycle if that is possible?
             }
             // Add edges to be removed to hash map
             if (v.mate != null) {
@@ -415,12 +412,11 @@ public class BipartiteGraph implements Cloneable {
         }
 
 
-
         for (Map.Entry<Vertex, Vertex> entry : edges_to_remove.entrySet()){
             // if vertex/edge is currently in the matching reverse it and remove it from matching
             System.out.println("Removing edge in matching between: " + entry.getKey().name + " and " + entry.getValue().name);
             entry.getKey().mate = null;
-            entry.getKey().adjacentV.add(entry.getValue());
+            entry.getValue().adjacentV.add(entry.getKey());
         }
 
         for (Map.Entry<Vertex, Vertex> entry : edges_to_add.entrySet()){
@@ -466,25 +462,31 @@ public class BipartiteGraph implements Cloneable {
         student_list.add("Student1");
         student_list.add("Student2");
         student_list.add("Student3");
+        student_list.add("Student4");
 
         ArrayList<String> project_list = new ArrayList<>();
 
         String project_1 = "Project1";
         String project_2 = "Project2";
         String project_3 = "Project3";
+        String project_4 = "project4";
 
         project_list.add(project_1);
         project_list.add(project_2);
         project_list.add(project_3);
+        project_list.add(project_4);
 
         BipartiteGraph bG2 = new BipartiteGraph(student_list, project_list);
         
         bG2.new_matching_edge("Student1", "Project1");
         bG2.new_matching_edge("Student2", "Project2");
         bG2.new_matching_edge("Student3", "Project3");
+        bG2.new_matching_edge("Student4", "Project4");
 
-        bG2.new_provisional_edge("Project2", "Student1");
+        //bG2.new_provisional_edge("Project2", "Student1");
         bG2.new_provisional_edge("Project1", "Student2");
+        bG2.new_provisional_edge("Project3", "Student2");
+        bG2.new_provisional_edge("Project4", "Student1");
 
         bG2 = undirectedToDirected(bG2);
 

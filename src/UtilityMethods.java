@@ -124,7 +124,7 @@ public class UtilityMethods {
                 double epsilon;
                 epsilon = 5 * (Math.pow(10.0, -17.0));
 
-                f = new Fraction(fraction_value);
+                f = new Fraction(fraction_value, epsilon, 20);
                 return f;
             } catch (FractionConversionException e) {
                 e.printStackTrace();
@@ -292,18 +292,22 @@ public class UtilityMethods {
 
     public Collection<ImmutableList<String>> generatePermutations(ArrayList<String> student_list, int num_permutations){
 
-        Collection<ImmutableList<String>> permutations = new ArrayList<>();
+        HashSet<ImmutableList<String>> permutations = new HashSet<>();
 
         //ImmutableList<String> im_student_list = ImmutableList.copyOf(student_list);
 
-        while (permutations.size() < num_permutations){
+        int counter = 0;
+
+        while (counter < num_permutations){
             Collections.shuffle(student_list);
             ArrayList<String> shuffeled_student_list;
             shuffeled_student_list = (ArrayList<String>) student_list.clone();
             ImmutableList<String> im_shuffeled_student_list = ImmutableList.copyOf(shuffeled_student_list);
 
-            permutations.add(im_shuffeled_student_list);
-            //System.out.println("Student list: " + student_list);
+            if(permutations.add(im_shuffeled_student_list)){ // if the shuffled version didn't already exist in the set
+                counter++;
+            }
+
 
         }
         return permutations;

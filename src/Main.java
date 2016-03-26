@@ -81,7 +81,7 @@ public class Main {
                 int num_permutations = scanner.nextInt();
 
                 RandomSerialDictatorship randomSerialDictatorship = new RandomSerialDictatorship();
-                randomSerialDictatorship.randomSerialDictatorship(student_list, student_preferences, project_list, 100);
+                randomSerialDictatorship.randomSerialDictatorship(student_list, student_preferences, project_list, num_permutations);
 
             }else if (alg.equals("RSDT")){
 
@@ -93,9 +93,9 @@ public class Main {
                 GenerateRandomInstance generateRandomInstance = new GenerateRandomInstance();
 
                 HashMap<String, ArrayList<String[]>> student_pref_ties = new HashMap<>();
-                student_pref_ties = generateRandomInstance.generateStudents(3, project_list);
+                student_pref_ties = generateRandomInstance.generateStudents(num_students, project_list);
 
-                student_pref_ties = generateRandomInstance.generateRandomInstanceWithTies(student_pref_ties, 0.7);
+                student_pref_ties = generateRandomInstance.generateRandomInstanceWithTies(student_pref_ties, probability_of_ties);
 
                 System.out.println("Student Preferences: ");
                 for (Map.Entry<String, ArrayList<String[]>> entry: student_pref_ties.entrySet()){
