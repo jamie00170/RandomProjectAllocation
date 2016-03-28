@@ -86,6 +86,46 @@ public class CsvWriter {
     }
 
 
+    public void csvWriteProfile(int[] rsd_profile, int[] ps_profile, int[] bs_profile){
+
+        try {
+
+            fileWriter.append(NEW_LINE_SEPARATOR);
+
+            int i = 0;
+            while (i < rsd_profile.length){
+                fileWriter.append(Integer.toString(rsd_profile[i]));
+                fileWriter.append(COMMA_DELIMITER);
+
+                i++;
+            }
+            fileWriter.append(" ");
+            i = 0;
+            while (i < ps_profile.length){
+                fileWriter.append(Integer.toString(ps_profile[i]));
+                fileWriter.append(COMMA_DELIMITER);
+
+                i++;
+            }
+            fileWriter.append(" ");
+            i = 0;
+            while (i < bs_profile.length){
+                fileWriter.append(Integer.toString(bs_profile[i]));
+                fileWriter.append(COMMA_DELIMITER);
+
+                i++;
+            }
+
+            fileWriter.append(NEW_LINE_SEPARATOR);
+
+
+
+        }catch(IOException ex){
+            ex.printStackTrace();
+        }
+
+
+    }
 
     public static void main(String[] args){
 

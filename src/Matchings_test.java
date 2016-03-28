@@ -586,7 +586,7 @@ public class Matchings_test {
         GenerateRandomInstance generateRandomInstance = new GenerateRandomInstance();
 
         HashMap<String, ArrayList<String[]>> student_pref_ties = new HashMap<>();
-        student_pref_ties = generateRandomInstance.generateStudents(3, project_list);
+        student_pref_ties = generateRandomInstance.generateStudents(3, project_list, 3);
 
         student_pref_ties = generateRandomInstance.generateRandomInstanceWithTies(student_pref_ties, 0.7);
 

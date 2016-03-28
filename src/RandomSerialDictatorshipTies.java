@@ -53,6 +53,41 @@ public class RandomSerialDictatorshipTies {
         return bG;
     }
 
+    public static BipartiteGraph remove_associated_edges_rsdt(BipartiteGraph bipartiteGraph, Vertex v){
+
+
+        // Set v.mates adjacent list to empty
+        System.out.println("Removing  all of " + v.mate.name + "'s adjacent verticies");
+        // Remove all non matching edges coming in and out of v and v.mate
+        if (v.mate.adjacentV.removeAll(v.mate.adjacentV)){
+            System.out.println("All of " + v.mate.name + "'s adjacent edges removed");
+        }
+
+        for (Vertex u : bipartiteGraph.vertexList) {
+            // if u has any adjacent edges - check to see if v is an adjacent edge
+            if (u.adjacentV != null && u.adjacentV.size() > 0) {
+                //System.out.println("Looking at " + u.name + "'s adjacent list");
+                ArrayList<Integer> index_edges_to_remove = new ArrayList<>();
+                int index = 0;
+                for (Vertex vertex : u.adjacentV) {
+                    // if v is in any adjacency lists remove it
+                    if (vertex.name.equals(v.name)) {
+                        System.out.println("Removing: " + v.name + " from " + u.name + "'s adjacent list");
+                        index_edges_to_remove.add(index);
+                    }
+                    index++;
+                }
+                if (index_edges_to_remove.size() > 0) {
+                    int index_to_remove = index_edges_to_remove.get(0);
+                    u.adjacentV.remove(index_to_remove);
+                }
+
+            }
+        }
+
+        return bipartiteGraph;
+    }
+
 
     public static void enum_perfect_matchings_iter(BipartiteGraph G, String[][] M) {
         // Step 1: If G has no edge, stop
@@ -66,7 +101,13 @@ public class RandomSerialDictatorshipTies {
             Queue<Vertex> verticesInCycle = new PriorityQueue<>();
             int i = 0;
             Vertex e = new Vertex();
-            BipartiteGraph g_plus = G.clone();
+            ObjectCloner objectCloner = new ObjectCloner();
+            //BipartiteGraph g_plus = (BipartiteGraph) objectCloner.deepCopy(G); // create a deep copy of G
+
+            BipartiteGraph g_minus = new BipartiteGraph();
+
+            BipartiteGraph g_plus = (BipartiteGraph) objectCloner.deepClone(G);
+            //BipartiteGraph g_plus = new BipartiteGraph(G); // copy G
             while (i < G.vertexList.size()) {// - Cycle could start from any vertex?
                 verticesInCycle = G.find_cycle(G.vertexList.get(i));
 
@@ -86,14 +127,6 @@ public class RandomSerialDictatorshipTies {
                             break;
                         }
                     }
-                    try {
-                        // Need to create g_plus before the edges are changed - uses M not M'
-                        ObjectCloner objectCloner = new ObjectCloner();
-                        g_plus = (BipartiteGraph) objectCloner.deepCopy(G);
-                        g_plus = G.clone();
-                    } catch (Exception ex) {
-                        ex.printStackTrace();
-                    }
 
                     System.out.println("Exchanging edges......");
                     G.exchange_edges(verticesInCycle);
@@ -107,8 +140,10 @@ public class RandomSerialDictatorshipTies {
                     for (Vertex v : G.vertexList) {
                         System.out.println(v);
                     }
-                    break;
 
+                    g_minus = (BipartiteGraph) objectCloner.deepClone(G);
+
+                    break; // cycle found
                 }
                 i++;
                 // 3. If there is no cycle found stop algorithm
@@ -125,36 +160,41 @@ public class RandomSerialDictatorshipTies {
 
             }
 
-
-
-
-
             // Generate G+(e)
-            if (e.mate != null) {
-                g_plus.remove_associated_edges(e);
-            }
-           // } else {
-            //    System.out.println("e is not in the matching!");
-            //    System.exit(1);
+            //System.out.println("Printing g_plus before removing edges...");
+            //for (Vertex v : g_plus.vertexList) {
+            //    System.out.println(v);
             //}
 
-            System.out.println("Printing g_plus...");
+            if (e.mate != null) {
+                System.out.println("e: " + e.name + " - " + e.mate.name);
+                g_plus = remove_associated_edges_rsdt(g_plus, e);
+            } else {
+                System.out.println("e is not in the matching!");
+                System.exit(1);
+            }
+
+
+            System.out.println("Printing g_plus after removing edges...");
             for (Vertex v : g_plus.vertexList) {
                 System.out.println(v);
             }
 
-            // Call enum_perfect_matchings_iter(G+(e), M')
+            // Call enum_perfect_matchings_iter(G+(e), M)
 
             enum_perfect_matchings_iter(g_plus, M);
 
             // Generate G-(e)
+            //ObjectCloner objectCloner = new ObjectCloner();
+            //BipartiteGraph g_minus = (BipartiteGraph) objectCloner.cloneObject(G);
 
-            ObjectCloner objectCloner = new ObjectCloner();
+            System.out.println("G....");
+            for (Vertex v : G.vertexList){
+                System.out.println(v.toString());
+            }
 
-            BipartiteGraph g_minus = (BipartiteGraph) objectCloner.deepCopy(G);
-            //BipartiteGraph g_minus = G.clone();
             if (e.mate != null) {
-                g_minus.remove_matching_edge(e.name, e.mate.name);
+                g_minus.remove_matching_edge_directed(e.name, e.mate.name);
             } else {
                 System.out.println("Printing g_minus...");
 
@@ -171,7 +211,8 @@ public class RandomSerialDictatorshipTies {
                 System.out.println(v);
             }
 
-            // Call enum_perfect_matchings_iter(G-(e), M)
+
+            // Call enum_perfect_matchings_iter(G-(e), M')
             // G_minus represents M'
             enum_perfect_matchings_iter(g_minus, M);
 
@@ -310,9 +351,9 @@ public class RandomSerialDictatorshipTies {
 
         HashMap<String, ArrayList<String[]>> student_preferences = new HashMap<>();
 
-        student_preferences = generateRandomInstance.generateStudents(3, project_list);
+        student_preferences = generateRandomInstance.generateStudents(3, project_list, 3);
 
-        student_preferences = generateRandomInstance.generateRandomInstanceWithTies(student_preferences, 0.7);
+        student_preferences = generateRandomInstance.generateRandomInstanceWithTies(student_preferences, 1);
 
         for (Map.Entry<String, ArrayList<String[]>> entry: student_preferences.entrySet()){
             System.out.println(entry.getKey());

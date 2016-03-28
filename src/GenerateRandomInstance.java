@@ -5,24 +5,26 @@ import java.util.*;
  */
 public class GenerateRandomInstance {
 
-    public HashMap<String, ArrayList<String[]>> generateStudents(int num_of_students, ArrayList<String> project_list) {
+    public HashMap<String, ArrayList<String[]>> generateStudents(int num_of_students, ArrayList<String> project_list, int size_of_preference_lists) {
 
 
         HashMap<String, ArrayList<String[]>> student_preferences = new HashMap<>();
-        int j = 1;
+        int i = 1;
 
-        while (j <= num_of_students) {
+        while (i <= num_of_students) {
             //int rand_index = randInt(0, (project_list.size()-1));
             Collections.shuffle(project_list);
             ArrayList<String[]> preferences = new ArrayList<>();
-            for (String project : project_list){
-                String[] project_Arr = {project};
+            int j = 0;
+            while (j < size_of_preference_lists){
+                String[] project_Arr = {project_list.get(j)};
 
                 preferences.add(project_Arr);
+                j++;
             }
 
-            student_preferences.put("Student" + j, preferences );
-            j++;
+            student_preferences.put("Student" + i, preferences );
+            i++;
         }
         return student_preferences;
     }
@@ -89,7 +91,7 @@ public class GenerateRandomInstance {
         project_list.add("Project4");
         project_list.add("Project5");
 
-        HashMap<String, ArrayList<String[]>> student_preferences = generateRandomInstance.generateStudents(3, project_list);
+        HashMap<String, ArrayList<String[]>> student_preferences = generateRandomInstance.generateStudents(3, project_list, 4);
 
 
         for (Map.Entry<String, ArrayList<String[]>> entry: student_preferences.entrySet()){
@@ -102,7 +104,7 @@ public class GenerateRandomInstance {
 
 
         System.out.println("Generating random instance.....");
-        generateRandomInstance.generateRandomInstanceWithTies(student_preferences, 0.5);
+        generateRandomInstance.generateRandomInstanceWithTies(student_preferences, 0.6);
 
 
         for (Map.Entry<String, ArrayList<String[]>> entry: student_preferences.entrySet()){

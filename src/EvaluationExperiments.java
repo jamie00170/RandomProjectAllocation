@@ -1,5 +1,6 @@
 import org.apache.commons.math3.fraction.Fraction;
 
+import java.lang.reflect.Array;
 import java.util.*;
 
 /**
@@ -160,6 +161,40 @@ public class EvaluationExperiments {
         return valueOfMatching;
     }
 
+    public static int[] calculateProfileOfMatching(String[][] matching,  HashMap<String, ArrayList<String>> student_preferences, int size_of_preference_list){
+
+        // find out the size of preference list
+        int[] profile = new int[size_of_preference_list]; // need an index for each position in the preference list
+
+        // for each student / row in the matrix
+        // find the highest value in the row
+
+        // Start with the students first choice ??
+        for (String student: student_preferences.keySet()){
+
+            int current_position_in_preference_list = 0;
+            int index_biggest_value = 0;
+            Fraction biggestValueAllocated = new Fraction(0); // create a variable to store the biggest fraction allocated
+            ArrayList<String> preference_list = student_preferences.get(student);
+            for (String project : preference_list){
+
+                int[] coordinates = utilityMethods.getCoordinates(matching, student, project);
+                String matrix_value = matching[coordinates[0]][coordinates[1]];
+                Fraction frac_matrix_value = utilityMethods.stringToFraction(matrix_value);
+
+                if (frac_matrix_value.compareTo(biggestValueAllocated) > 0){
+                    biggestValueAllocated = frac_matrix_value;
+                    index_biggest_value = current_position_in_preference_list;
+                }
+                current_position_in_preference_list++;
+            }
+            profile[index_biggest_value] = profile[index_biggest_value] + 1;
+        }
+
+        System.out.println("Profile: " + Arrays.toString(profile));
+        return profile;
+    }
+
     public static double runValueOfMatchingRSD(String[][] matching, HashMap<String, ArrayList<String>> student_preferences){
 
         Double cost = calculateValueOfMatching(matching, student_preferences);
@@ -197,8 +232,13 @@ public class EvaluationExperiments {
         System.out.println("Enter the size of preference lists: ");
         int size_of_preference_lists = scanner.nextInt();
 
+        System.out.println("Enter the number of permutations to run rsd for: ");
+        System.out.println("Note for experiments 1000 - 10000 is a reasonable number for large instances, however the number of permutations cannot exceed ");
+        System.out.println("the factorial of the number of students.");
+        int num_permutations = scanner.nextInt();
+
         System.out.println("What experiment do you want to run? ");
-        System.out.println("Enter value, depth, first, profile, unmatched, size");
+        System.out.println("Enter value, depth, profile, unmatched, size");
         String experiment = scanner.next();
 
         System.out.println("How many random instances should the experiment be run on? ");
@@ -206,6 +246,8 @@ public class EvaluationExperiments {
 
         System.out.println("What should the output file be named? - note don't include a file extension ");
         String output_filename = scanner.next();
+
+
 
         CsvWriter csvWriter = new CsvWriter(output_filename + ".csv");
 
@@ -227,78 +269,40 @@ public class EvaluationExperiments {
 
                 HashMap<String, ArrayList<String>> student_preferences_copy3 = (HashMap) objectCloner.deepCopy(student_preferences);
 
+
+                ProbabilisticSerial ps = new ProbabilisticSerial();
+
+                String[][] ps_matching = ps.probabilisticSerialDictatorship(student_preferences_copy2, project_list);
+
+
+                ArrayList<String> student_list = new ArrayList<>();
+                for (String name : student_preferences_copy3.keySet()) {
+                    student_list.add(name);
+                }
+                System.out.println("Student list:" + student_list);
+
+
+                RandomSerialDictatorship rsd = new RandomSerialDictatorship();
+
+                String[][] rsd_matching = rsd.randomSerialDictatorship(student_list, student_preferences_copy3, project_list, num_permutations);
+
+                BostonSerial bs = new BostonSerial();
+                String[][] bs_matching = bs.bostonSerial(student_preferences, project_list);
+
+
                 if (experiment.equals("value")) {
                     // Need to create a deep copy or running boston serial removes elements from student_preferences
 
-
-                    BostonSerial bs = new BostonSerial();
-                    String[][] bs_matching = bs.bostonSerial(student_preferences, project_list);
-
-                    ProbabilisticSerial ps = new ProbabilisticSerial();
-
-                    String[][] ps_matching = ps.probabilisticSerialDictatorship(student_preferences_copy2, project_list);
-
-
-                    ArrayList<String> student_list = new ArrayList<>();
-                    for (String name : student_preferences_copy3.keySet()) {
-                        student_list.add(name);
-                    }
-                    System.out.println("Student list:" + student_list);
-
-
-                    RandomSerialDictatorship rsd = new RandomSerialDictatorship();
-
-                    String[][] rsd_matching = rsd.randomSerialDictatorship(student_list, student_preferences_copy3, project_list, 1000);
-
-
-                    System.out.println("Running Evaluation on matchings generated......\n\n");
-
-                    //for (String[] row : bs_matching){
-                    //System.out.println(Arrays.toString(row));
-                    //}
-                    System.out.println();
                     // need to pass a copy because we need the original state of the the preference lists to calculate cost
                     double cost_bs = runValueOfMatchingBS(bs_matching, student_preferences_copy);
-                    System.out.println();
-                    //for (String[] row : ps_matching){
-                    //    System.out.println(Arrays.toString(row));
-                    //}
-                    System.out.println();
+
                     double cost_ps = runValueOfMatchingPS(ps_matching, student_preferences_copy);
-                    System.out.println();
-                    //for (String[] row : rsd_matching){
-                    //    System.out.println(Arrays.toString(row));
-                    //}
-                    System.out.println();
+
                     double cost_rsd = runValueOfMatchingRSD(rsd_matching, student_preferences_copy);
 
                     csvWriter.csvWriteLineDouble(cost_rsd, cost_ps, cost_bs);
 
                 }else if (experiment.equals("depth")){
-
-
-                    BostonSerial bs = new BostonSerial();
-                    String[][] bs_matching = bs.bostonSerial(student_preferences, project_list);
-
-                    ProbabilisticSerial ps = new ProbabilisticSerial();
-
-                    String[][] ps_matching = ps.probabilisticSerialDictatorship(student_preferences_copy2, project_list);
-
-
-                    ArrayList<String> student_list = new ArrayList<>();
-                    for (String name : student_preferences_copy3.keySet()) {
-                        student_list.add(name);
-                    }
-                    System.out.println("Student list:" + student_list);
-
-
-                    RandomSerialDictatorship rsd = new RandomSerialDictatorship();
-
-                    String[][] rsd_matching = rsd.randomSerialDictatorship(student_list, student_preferences_copy3, project_list, 1000);
-
-
-                    System.out.println("Running Evaluation on matchings generated......\n\n");
-
 
                     int rsd_depth = calculateDepthOfMatching(rsd_matching, student_preferences_copy);
                     int ps_depth = calculateDepthOfMatching(ps_matching, student_preferences_copy);
@@ -308,24 +312,6 @@ public class EvaluationExperiments {
 
                 }else if (experiment.equals("unmatched")){
 
-                    BostonSerial bs = new BostonSerial();
-                    String[][] bs_matching = bs.bostonSerial(student_preferences, project_list);
-
-                    ProbabilisticSerial ps = new ProbabilisticSerial();
-
-                    String[][] ps_matching = ps.probabilisticSerialDictatorship(student_preferences_copy2, project_list);
-
-
-                    ArrayList<String> student_list = new ArrayList<>();
-                    for (String name : student_preferences_copy3.keySet()) {
-                        student_list.add(name);
-                    }
-
-
-                    RandomSerialDictatorship rsd = new RandomSerialDictatorship();
-
-                    String[][] rsd_matching = rsd.randomSerialDictatorship(student_list, student_preferences_copy3, project_list, 1000);
-
                     double bs_chance = calculateAvgChanceOfBeingUnmatched(bs_matching, student_list.size());
                     double ps_chance = calculateAvgChanceOfBeingUnmatched(ps_matching, student_list.size());
                     double rsd_chance = calculateAvgChanceOfBeingUnmatched(rsd_matching, student_list.size());
@@ -334,29 +320,20 @@ public class EvaluationExperiments {
 
                 }else if (experiment.equals("size")){
 
-                    RandomSerialDictatorship randomSerialDictatorship = new RandomSerialDictatorship();
-
-                    ArrayList<String> student_list = new ArrayList<>();
-                    for (String name : student_preferences_copy3.keySet()) {
-                        student_list.add(name);
-                    }
-
-                    String[][] rsd_matching = randomSerialDictatorship.randomSerialDictatorship(student_list, student_preferences_copy, project_list, 1000);
-
-
-                    ProbabilisticSerial probabilisticSerial = new ProbabilisticSerial();
-
-                    String[][] ps_matching =  probabilisticSerial.probabilisticSerialDictatorship(student_preferences_copy2, project_list);
-
-                    BostonSerial bostonSerial = new BostonSerial();
-
-                    String[][] bs_matching = bostonSerial.bostonSerial(student_preferences_copy3, project_list);
 
                     double rsd_size = calculateSizeOfMatching(rsd_matching);
                     double ps_size = calculateSizeOfMatching(ps_matching);
                     double bs_size = calculateSizeOfMatching(bs_matching);
 
                     csvWriter.csvWriteLineDouble(rsd_size, ps_size, bs_size);
+
+                } else if (experiment.equals("profile")){
+
+                    int[] rsd_profile = calculateProfileOfMatching(rsd_matching, student_preferences_copy, size_of_preference_lists);
+                    int[] ps_profile = calculateProfileOfMatching(ps_matching, student_preferences_copy, size_of_preference_lists);
+                    int[] bs_profile = calculateProfileOfMatching(bs_matching, student_preferences_copy, size_of_preference_lists);
+
+                    csvWriter.csvWriteProfile(rsd_profile, ps_profile, bs_profile);
 
                 }
 

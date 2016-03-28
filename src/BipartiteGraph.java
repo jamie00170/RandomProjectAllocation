@@ -6,7 +6,7 @@ import java.util.*;
  */
 public class BipartiteGraph implements Cloneable, Serializable {
 
-    public List<Vertex> vertexList;
+    public ArrayList<Vertex> vertexList;
 
     public Vertex getExposedUnvisited(List<Vertex> vL){
         for (Vertex x : vL) {
@@ -86,6 +86,15 @@ public class BipartiteGraph implements Cloneable, Serializable {
 
     }
 
+    BipartiteGraph (ArrayList<Vertex> vertexList){
+        this.vertexList = vertexList;
+    }
+
+    BipartiteGraph(BipartiteGraph bipartiteGraph){
+        this.vertexList = bipartiteGraph.vertexList;
+    }
+
+    BipartiteGraph(){}
 
     public void new_matching_edge(String student, String project){
         for(Vertex v : vertexList){
@@ -203,13 +212,14 @@ public class BipartiteGraph implements Cloneable, Serializable {
 
 
         System.out.println("Entered vertices in cycle!");
+        /**
         for (Vertex v : visitedBy.keySet()){
             System.out.print(v.name + ": ");
             for (Vertex u : visitedBy.get(v))
                 System.out.print(u.name + " ");
             System.out.println();
         }
-
+        **/
         LinkedList<Vertex> path = new LinkedList<>();
 
         //System.out.println("Last vertex: " + last_vertex.name);
@@ -269,6 +279,17 @@ public class BipartiteGraph implements Cloneable, Serializable {
                 stack.push(v);
             }
         }
+
+
+        /**
+        for (Vertex v : visitedBy.keySet()){
+            System.out.print(v.name + ": ");
+            for (Vertex u : visitedBy.get(v))
+                System.out.print(u.name + " ");
+            System.out.println();
+         }
+         **/
+
 
 
         boolean after_first = false;
@@ -343,46 +364,70 @@ public class BipartiteGraph implements Cloneable, Serializable {
 
     }
 
-    public BipartiteGraph clone() throws CloneNotSupportedException{
+    public void remove_matching_edge_directed(String v, String u){
 
-        return (BipartiteGraph) super.clone();
+        for (Vertex vertex : vertexList){
+            if (vertex.name.equals(v)){
+                vertex.mate = null;
+            }
+
+        }
 
     }
 
-    public void remove_associated_edges(Vertex v){
+    public BipartiteGraph clone() throws CloneNotSupportedException{
 
-        // Have to remove v from all other vertices adjaceny lists
-        // and if v is a mate
+        ArrayList<Vertex> new_vertexList = new ArrayList<>();
 
-        for (Vertex u : this.vertexList){
+        for (Vertex v : vertexList){
+            Vertex clone_vertex = v.clone();
+            new_vertexList.add(clone_vertex);
+        }
+
+        BipartiteGraph clone = new BipartiteGraph(new_vertexList);
+        return clone;
+
+    }
+
+    public void setVertexList(ArrayList<Vertex> vertexList){
+        this.vertexList = vertexList;
+    }
+
+    public ArrayList<Vertex> getVertexList(){
+        return this.vertexList ;
+    }
+
+    /**
+     * Remove all of the associated edges of both end points of v. Edge is from v - v.mate
+     * @param v
+     */
+    public void remove_associated_edges(Vertex v) {
+
+        System.out.println("Vertex list entered to remove associated edges...");
+        for (Vertex ver : vertexList){
+           System.out.println(ver.toString());
+        }
+        System.out.println();
+
+        // Remove all non matching edges coming in and out of v and v.mate
+
+        for (Vertex u : vertexList) {
             // if u has any adjacent edges - check to see if v is an adjacent edge
-            if (u.adjacentV != null && u.adjacentV.size() > 0){
-
-                for (Vertex vertex : u.adjacentV ){
+            if (u.adjacentV != null && u.adjacentV.size() > 0) {
+                //System.out.println("Looking at " + u.name + "'s adjacent list");
+                for (Vertex vertex : u.adjacentV) {
                     // if v is in any adjacency lists remove it
-                    if (vertex.equals(v)){
+                    if (vertex.equals(v)) {
+                        System.out.println("Removing: " + v.name + " from " + u.name + "'s adjacent list");
                         u.adjacentV.remove(v);
-                        break;
                     }
                 }
             }
-            if (u.mate != null) {
-                if (u.mate.equals(v)) {
-                    u.mate = null;
-                }
-            }
         }
 
-        if (v.mate != null) {
-            v.mate.adjacentV = null;
-            v.mate = null;
-        }
-        if (v.adjacentV != null){
-            v.adjacentV = null;
-        }
-
-        vertexList.remove(v);
-        vertexList.remove(v.mate);
+        // Set v.mates adjacent list to empty
+        System.out.println("Removing  all of " + v.mate.name + "'s adjacent verticies");
+        v.mate.adjacentV.clear();
 
     }
 
@@ -423,7 +468,11 @@ public class BipartiteGraph implements Cloneable, Serializable {
             // if edge is not currently in the matching reverse it therefore adding it to the matching
             System.out.println("Adding edge to the matching between: " + entry.getKey().name + " and " + entry.getValue().name);
             entry.getKey().mate = entry.getValue();
-            entry.getKey().adjacentV.remove(entry.getValue());
+            entry.getValue().adjacentV.remove(entry.getKey());
+            // Add edge to matching and remove non matching edge
+
+
+
         }
 
     }
@@ -440,7 +489,9 @@ public class BipartiteGraph implements Cloneable, Serializable {
             if (v.adjacentV != null && v.isStudent){
                 // Have to make adjacent edge point to student
                 for (Vertex u :  v.adjacentV){
-                    u.adjacentV.add(v);
+                    if (!u.adjacentV.contains(v)) {
+                        u.adjacentV.add(v);
+                    }
                 }
                 // then make student's adjacent edges null
                 v.adjacentV = new ArrayList<Vertex>();
@@ -462,39 +513,45 @@ public class BipartiteGraph implements Cloneable, Serializable {
         student_list.add("Student1");
         student_list.add("Student2");
         student_list.add("Student3");
-        student_list.add("Student4");
 
         ArrayList<String> project_list = new ArrayList<>();
 
         String project_1 = "Project1";
         String project_2 = "Project2";
         String project_3 = "Project3";
-        String project_4 = "project4";
 
         project_list.add(project_1);
         project_list.add(project_2);
         project_list.add(project_3);
-        project_list.add(project_4);
 
         BipartiteGraph bG2 = new BipartiteGraph(student_list, project_list);
-        
-        bG2.new_matching_edge("Student1", "Project1");
-        bG2.new_matching_edge("Student2", "Project2");
-        bG2.new_matching_edge("Student3", "Project3");
-        bG2.new_matching_edge("Student4", "Project4");
+
+        bG2.new_matching_edge("Student1", "Project2");
+        bG2.new_matching_edge("Student2", "Project3");
+        bG2.new_matching_edge("Student3", "Project1");
 
         //bG2.new_provisional_edge("Project2", "Student1");
         bG2.new_provisional_edge("Project1", "Student2");
-        bG2.new_provisional_edge("Project3", "Student2");
-        bG2.new_provisional_edge("Project4", "Student1");
+        bG2.new_provisional_edge("Project1", "Student1");
+        bG2.new_provisional_edge("Project2", "Student2");
+        bG2.new_provisional_edge("Project2", "Student3");
+        bG2.new_provisional_edge("Project3", "Student1");
+        bG2.new_provisional_edge("Project3", "Student3");
+
 
         bG2 = undirectedToDirected(bG2);
 
+        Vertex e = new Vertex();
+
         System.out.println("Graph input.....");
         for (Vertex v : bG2.vertexList){
+            if (v.name.equals("Student2")){
+                e = v;
+            }
             System.out.println(v.toString());
         }
 
+        /**
         System.out.println("------------------------------");
         Queue<Vertex> verticesInCycle = new PriorityQueue<>();
         Vertex startVertex;
@@ -507,8 +564,15 @@ public class BipartiteGraph implements Cloneable, Serializable {
                 //}
             }
         }
+         **/
 
 
+        bG2.remove_associated_edges(e);
+
+        System.out.println("Graph after removing associated edges.....");
+        for (Vertex v : bG2.vertexList){
+            System.out.println(v.toString());
+        }
 
     }
 

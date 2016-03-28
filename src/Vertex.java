@@ -53,8 +53,22 @@ public class Vertex implements Cloneable, Serializable{
 
     public Vertex clone() throws CloneNotSupportedException{
 
-        return (Vertex) super.clone();
+        Vertex clone = new Vertex(this.name, this.isStudent);
+
+        clone.mate = this.mate;
+        clone.adjacentV = this.adjacentV;
+
+        return clone;
+
 
     }
 
+    public boolean equals(Vertex vertex) {
+
+        if (this.name.equals(vertex.name)){
+            return true;
+        }
+
+        return false;
+    }
 }

@@ -56,11 +56,10 @@ public class Main {
                 student_list.add(name);
             }
 
-            if (!alg.equals("RSDT")){
+            if (!alg.equals("RSDT")){ // Display structures if not including ties
                 System.out.println("Project List:" + project_list.toString());
                 System.out.println("Student Preferences: " + student_preferences.toString());
                 System.out.println("Student list:" + student_list);
-
 
             }
 
@@ -93,7 +92,7 @@ public class Main {
                 GenerateRandomInstance generateRandomInstance = new GenerateRandomInstance();
 
                 HashMap<String, ArrayList<String[]>> student_pref_ties = new HashMap<>();
-                student_pref_ties = generateRandomInstance.generateStudents(num_students, project_list);
+                student_pref_ties = generateRandomInstance.generateStudents(num_students, project_list, size_of_preference_lists);
 
                 student_pref_ties = generateRandomInstance.generateRandomInstanceWithTies(student_pref_ties, probability_of_ties);
 
