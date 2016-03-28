@@ -29,7 +29,8 @@ public class RandomSerialDictatorship {
         Collection<ImmutableList<String>> permutations;
 
         int factorial_student_list = Math.abs(utilityMethods.factorial(student_list.size()));
-        if (num_permutations > factorial_student_list ){
+
+        if (num_permutations > factorial_student_list && factorial_student_list != 0 ){
             System.out.println("Number of permutations: " + num_permutations + " factorial of student list: " + factorial_student_list);
             System.out.println("Number of permutations specified exceeds max number of permutations!");
             System.exit(1);
